@@ -1,73 +1,49 @@
-# React + TypeScript + Vite
+﻿# BarangayHub - Barangay Management Information System (BMIS)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Introduction
 
-Currently, two official plugins are available:
+BarangayHub is a web-based platform designed to automate and digitize the operations of **Barangay Daine II**. The system allows residents to request documents, track their request status, and submit complaints or feedback digitally, while giving barangay staff the tools to manage resident records, process requests, and monitor barangay activity.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The platform has two main user roles:
 
-## React Compiler
+- **Administrator (Barangay Secretary / Staff)** - manages residents, document requests, announcements, complaints, and system settings.
+- **Resident (Public User)** - submits document requests, tracks request status, files complaints, and sends feedback without needing an account.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Each role has its own dedicated portal and interface to ensure efficient barangay management and secure resident services.
 
-## Expanding the ESLint configuration
+## Core Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Administrator Module
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Dashboard showing total residents, pending document requests, open complaints, and recent activity
+- Post, edit, publish, and archive barangay announcements
+- Add, update, and delete resident records (full CRUD with fuzzy search and CSV import)
+- Process document request queue with workflow stages: Pending, Processing, Ready for Pickup, Completed, or Rejected
+- View, assign urgency levels, and update the status of submitted complaints and blotter reports
+- Read resident feedback and suggestions with sentiment tags
+- Add or remove admin and staff accounts; assign roles (Secretary, Staff); toggle account status
+- Generate and export PDF/CSV reports: Monthly Document Summary, Census Summary, Complaint Report, Annual Summary
+- View immutable, color-coded activity logs of all admin actions
+- Manage profile, change password, toggle MFA, and configure system preferences
+- Secure logout via session termination
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Resident Module
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Access the public portal without requiring an account
+- Select a service: request a document, track a request, file a complaint, or submit feedback
+- Fill out and submit a document request form (Barangay Clearance, Certificate of Residency, Certificate of Indigency, Business Clearance, etc.)
+- Receive a unique **BD2-YYYY-XXXX** tracking reference ID upon submission
+- Track document request status using the reference ID (Pending, Processing, Ready for Pickup, Completed)
+- Submit a complaint or blotter report with optional file attachment and receive a complaint reference ID
+- Submit anonymous or named feedback and suggestions
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Security & System Features
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Role-based access control: residents interact anonymously via reference IDs; admin access requires authenticated sessions with MFA
+- Row-Level Security (RLS) enforced on all database tables - public users cannot access resident records or activity logs
+- Immutable audit logging - every admin create, update, delete, approve, or reject action is recorded in activity logs
+- Non-sequential, non-guessable reference IDs (BD2-YYYY-XXXX) to prevent ID enumeration
+- Only public Supabase keys are used in client-side code - the service role key is never exposed
+- Real-time badge count updates for pending requests and new complaints
+- Server-side pagination and filtering optimized for 4,800+ resident records
+- Mobile-first responsive design for the Public Portal with hamburger navigation
