@@ -3,6 +3,17 @@ import type { Resident, DocumentRequest, Complaint, Announcement, ActivityLog, L
 
 // ─── Activity Logging ─────────────────────────────────────────────────────────
 
+export async function 
+logLoginActivity(adminId: string): Promise<void> {
+  await supabase.from('activity_logs').insert({
+    admin_id: adminId,
+    action: 'Admin logged in',
+    entity_type: 'auth',
+    entity_id: null,
+    log_type: 'login' satisfies LogType,
+  });
+}
+
 async function logActivity(
   adminId: string,
   action: string,
