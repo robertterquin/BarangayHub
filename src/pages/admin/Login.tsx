@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { logLoginActivity } from '../../services/adminService';
+import { supabase } from '../../services/supabase';
 import heroImg from '../../assets/hero.png';
 
 export function AdminLogin() {
@@ -31,11 +32,9 @@ export function AdminLogin() {
     }
 
     // Log the login activity — we need the user id from the session
-    const { data: sessionData } = await import('../../services/supabase').then(
-      ({ supabase }) => supabase.auth.getSession()
-    );
-    if (sessionData.session?.user.id) {
-      await logLoginActivity(sessionData.session.user.id);
+    const { data } = await supabase.auth.getSession();
+    if (data.session?.user.id) {
+      await logLoginActivity(data.session.user.id);
     }
 
     navigate('/admin/dashboard', { replace: true });
