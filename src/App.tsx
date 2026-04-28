@@ -7,7 +7,7 @@ import { ResetPassword } from './pages/admin/auth/ResetPassword';
 // Public:      import { LandingPage }        from './pages/public/LandingPage';
 import { Dashboard } from './pages/admin/main/Dashboard';
 import { Residents } from './pages/admin/management/Residents';
-//              import { DocumentRequests }   from './pages/admin/management/DocumentRequests';
+import { DocumentRequests } from './pages/admin/management/DocumentRequests';
 //              import { Complaints }         from './pages/admin/management/Complaints';
 //              import { Announcements }      from './pages/admin/management/Announcements';
 //              import { Officials }          from './pages/admin/management/Officials';
@@ -40,6 +40,7 @@ function App() {
 
       {/* ── Admin protected routes ────────────────────── */}
       <Route path="/admin/residents" element={<ProtectedRoute><Residents /></ProtectedRoute>} />
+      <Route path="/admin/document-requests" element={<ProtectedRoute><DocumentRequests /></ProtectedRoute>} />
       <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
       {/* Default redirect — points to dashboard during dev */}

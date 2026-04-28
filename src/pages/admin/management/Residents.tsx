@@ -149,7 +149,7 @@ function FilterSelect({
   );
 }
 
-// ── Resident Form Modal ───────────────────────────────────────────────────────
+// ── Resident Modal ───────────────────────────────────────────────────────────
 
 function ResidentModal({
   mode,
@@ -178,181 +178,185 @@ function ResidentModal({
 
   const isView = mode === 'view';
   const title = mode === 'add' ? 'Add New Resident' : mode === 'edit' ? 'Edit Resident' : 'Resident Details';
+  const subtitle = mode === 'add' ? 'Enter new resident information' : mode === 'edit' ? 'Update resident information' : 'Full resident information';
 
   function handleChange(field: keyof ResidentFormState, value: string | boolean) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
+  // Helper for view-mode field pairs
+  function DetailField({ label, value }: { label: string; value: string }) {
+    return (
+      <div>
+        <p className="text-blue-600 text-[10px] font-bold uppercase tracking-widest mb-0.5">{label}</p>
+        <p className="text-gray-900 font-semibold text-sm">{value || '—'}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="text-gray-900 font-bold text-lg">{title}</h2>
+      <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+
+        {/* Blue gradient header */}
+        <div className="bg-linear-to-r from-blue-800 to-blue-600 px-6 py-4 flex items-start justify-between">
+          <div>
+            <h2 className="text-white font-bold text-lg leading-tight">{title}</h2>
+            <p className="text-blue-200 text-xs mt-0.5">{subtitle}</p>
+          </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+            className="p-1 rounded-full text-white/70 hover:text-white hover:bg-white/20 transition-colors mt-0.5"
           >
             <X size={18} />
           </button>
         </div>
 
-        {/* Body */}
-        <div className="px-6 py-5 grid grid-cols-2 gap-4">
-          {/* Full Name */}
-          <div className="col-span-2">
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Full Name</label>
-            <input
-              type="text"
-              disabled={isView}
-              value={form.full_name}
-              onChange={(e) => handleChange('full_name', e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 disabled:opacity-70"
-              placeholder="e.g. Juan B. dela Cruz"
-            />
-          </div>
-
-          {/* Birthdate */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Birthdate</label>
-            <input
-              type="date"
-              disabled={isView}
-              value={form.birthdate}
-              onChange={(e) => handleChange('birthdate', e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 disabled:opacity-70"
-            />
-          </div>
-
-          {/* Gender */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Gender</label>
-            <select
-              disabled={isView}
-              value={form.gender}
-              onChange={(e) => handleChange('gender', e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 disabled:opacity-70"
-            >
-              <option value="">Select gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
-          </div>
-
-          {/* Address */}
-          <div className="col-span-2">
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Address</label>
-            <input
-              type="text"
-              disabled={isView}
-              value={form.address}
-              onChange={(e) => handleChange('address', e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 disabled:opacity-70"
-              placeholder="e.g. 123 Sampaguita St., Purok 2"
-            />
-          </div>
-
-          {/* Purok */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Purok</label>
-            <select
-              disabled={isView}
-              value={form.purok}
-              onChange={(e) => handleChange('purok', e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 disabled:opacity-70"
-            >
-              <option value="">Select purok</option>
-              {PUROKS.map((p) => <option key={p} value={p}>{p}</option>)}
-            </select>
-          </div>
-
-          {/* Civil Status */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Civil Status</label>
-            <select
-              disabled={isView}
-              value={form.civil_status}
-              onChange={(e) => handleChange('civil_status', e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 disabled:opacity-70"
-            >
-              <option value="">Select status</option>
-              {(['Single', 'Married', 'Widow', 'Widower', 'Separated'] as CivilStatus[]).map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Contact Number</label>
-            <input
-              type="text"
-              disabled={isView}
-              value={form.contact_number}
-              onChange={(e) => handleChange('contact_number', e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 disabled:opacity-70"
-              placeholder="09XX-XXX-XXXX"
-            />
-          </div>
-
-          {/* Citizenship */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Citizenship</label>
-            <input
-              type="text"
-              disabled={isView}
-              value={form.citizenship}
-              onChange={(e) => handleChange('citizenship', e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 disabled:opacity-70"
-            />
-          </div>
-
-          {/* Voter */}
-          <div className="col-span-2">
-            <label className="flex items-center gap-2.5 cursor-pointer w-fit">
-              <input
-                type="checkbox"
-                disabled={isView}
-                checked={form.is_voter}
-                onChange={(e) => handleChange('is_voter', e.target.checked)}
-                className="w-4 h-4 rounded accent-blue-600"
-              />
-              <span className="text-sm text-gray-700 font-medium">Registered Voter</span>
-            </label>
-          </div>
-        </div>
-
-        {/* Footer */}
-        {!isView && (
-          <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={onClose}
-              className="px-5 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
-            >
-              {mode === 'add' ? 'Add Resident' : 'Save Changes'}
-            </button>
+        {/* ── VIEW MODE ── */}
+        {isView && resident && (
+          <div className="px-6 py-5">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+              <DetailField label="Full Name" value={resident.full_name} />
+              <DetailField label="Gender" value={resident.gender} />
+              <DetailField label="Date of Birth" value={resident.birthdate} />
+              <DetailField label="Civil Status" value={resident.civil_status} />
+              <DetailField label="Contact Number" value={resident.contact_number} />
+              <DetailField label="Citizenship" value={resident.citizenship} />
+              <DetailField label="Voter Status" value={resident.is_voter ? 'Voter' : 'Non-Voter'} />
+              <div />
+              <div className="col-span-2">
+                <DetailField label="Complete Address" value={`${resident.address}, Brgy. Daine II`} />
+              </div>
+            </div>
           </div>
         )}
-        {isView && (
-          <div className="flex justify-end px-6 py-4 border-t border-gray-100">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Close
-            </button>
-          </div>
+
+        {/* ── ADD / EDIT MODE ── */}
+        {!isView && (
+          <>
+            <div className="px-6 py-5 grid grid-cols-2 gap-x-4 gap-y-4">
+
+              {/* Full Name */}
+              <div className="col-span-2">
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Full Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={form.full_name}
+                  onChange={(e) => handleChange('full_name', e.target.value)}
+                  placeholder="e.g. Juan B. dela Cruz"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
+                />
+              </div>
+
+              {/* Gender */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Gender</label>
+                <select
+                  value={form.gender}
+                  onChange={(e) => handleChange('gender', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
+                >
+                  <option value="">Select gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+
+              {/* Birthdate */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Birthdate</label>
+                <input
+                  type="date"
+                  value={form.birthdate}
+                  onChange={(e) => handleChange('birthdate', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
+                />
+              </div>
+
+              {/* Complete Address */}
+              <div className="col-span-2">
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Complete Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={form.address}
+                  onChange={(e) => handleChange('address', e.target.value)}
+                  placeholder="e.g. 123 Sampaguita St., Purok 2, Brgy. Daine II"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
+                />
+              </div>
+
+              {/* Civil Status */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Civil Status</label>
+                <select
+                  value={form.civil_status}
+                  onChange={(e) => handleChange('civil_status', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
+                >
+                  <option value="">Select status</option>
+                  {(['Single', 'Married', 'Widow', 'Widower', 'Separated'] as CivilStatus[]).map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Contact Number */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Contact Number</label>
+                <input
+                  type="text"
+                  value={form.contact_number}
+                  onChange={(e) => handleChange('contact_number', e.target.value)}
+                  placeholder="09XX-XXX-XXXX"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
+                />
+              </div>
+
+              {/* Citizenship */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Citizenship</label>
+                <input
+                  type="text"
+                  value={form.citizenship}
+                  onChange={(e) => handleChange('citizenship', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
+                />
+              </div>
+
+              {/* Voter Status */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Voter Status</label>
+                <select
+                  value={form.is_voter ? 'Voter' : 'Non-Voter'}
+                  onChange={(e) => handleChange('is_voter', e.target.value === 'Voter')}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
+                >
+                  <option value="Voter">Voter</option>
+                  <option value="Non-Voter">Non-Voter</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Save button */}
+            <div className="px-6 pb-5">
+              <button
+                onClick={onClose}
+                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-colors text-sm"
+              >
+                {mode === 'add' ? 'Add Resident' : 'Save Changes'}
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>
   );
 }
+
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -401,7 +405,7 @@ export function Residents() {
       <AdminLayout title="Resident Management">
         {/* Page header */}
         <div className="flex items-center justify-between mb-5">
-          <h1 className="text-white font-bold text-xl">Resident Management</h1>
+          <h1 className="text-gray-800 font-bold text-xl">Resident Management</h1>
           <button
             onClick={() => setModal({ mode: 'add' })}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
@@ -446,25 +450,25 @@ export function Residents() {
         </div>
 
         {/* Table */}
-        <div className="bg-[#1e2028] border border-[#2a2d35] rounded-xl overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#2a2d35]">
+                <tr className="bg-gray-100 border-b border-gray-200">
                   {['ID', 'FULL NAME', 'ADDRESS', 'GENDER', 'BIRTHDATE', 'CIVIL STATUS', 'CONTACT', 'CITIZENSHIP', 'VOTER', 'ACTIONS'].map((col) => (
                     <th
                       key={col}
-                      className="text-left text-[11px] font-semibold tracking-widest text-gray-500 uppercase px-4 py-3 whitespace-nowrap"
+                      className="text-left text-[11px] font-bold tracking-widest text-gray-600 uppercase px-4 py-3 whitespace-nowrap"
                     >
                       {col}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200">
                 {pageRows.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="text-center text-gray-500 py-10 text-sm">
+                      <td colSpan={10} className="text-center text-gray-400 py-10 text-sm">
                       No residents match your search.
                     </td>
                   </tr>
@@ -472,38 +476,38 @@ export function Residents() {
                   pageRows.map((r, i) => (
                     <tr
                       key={r.id}
-                      className={`border-b border-[#2a2d35] last:border-0 transition-colors hover:bg-[#262931] ${
-                        i % 2 === 0 ? '' : 'bg-[#1b1d24]/40'
+                      className={`transition-colors hover:bg-blue-50 ${
+                        i % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                       }`}
                     >
                       {/* ID */}
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-blue-400 font-mono text-xs font-semibold">{r.reference_id}</span>
+                        <span className="text-blue-600 font-mono text-xs font-bold">{r.reference_id}</span>
                       </td>
                       {/* Full Name */}
                       <td className="px-4 py-3">
-                        <span className="text-white font-medium text-sm">{r.full_name}</span>
+                        <span className="text-gray-800 font-medium text-sm">{r.full_name}</span>
                       </td>
                       {/* Address */}
-                      <td className="px-4 py-3 text-gray-300 text-xs max-w-44">{r.address}</td>
+                      <td className="px-4 py-3 text-gray-500 text-xs max-w-44">{r.address}</td>
                       {/* Gender */}
-                      <td className="px-4 py-3 text-gray-300 text-xs whitespace-nowrap">{r.gender}</td>
+                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{r.gender}</td>
                       {/* Birthdate */}
-                      <td className="px-4 py-3 text-gray-300 text-xs whitespace-nowrap">{r.birthdate}</td>
+                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{r.birthdate}</td>
                       {/* Civil Status */}
-                      <td className="px-4 py-3 text-gray-300 text-xs whitespace-nowrap">{r.civil_status}</td>
+                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{r.civil_status}</td>
                       {/* Contact */}
-                      <td className="px-4 py-3 text-gray-300 text-xs whitespace-nowrap">{r.contact_number}</td>
+                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{r.contact_number}</td>
                       {/* Citizenship */}
-                      <td className="px-4 py-3 text-gray-300 text-xs whitespace-nowrap">{r.citizenship}</td>
+                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{r.citizenship}</td>
                       {/* Voter badge */}
                       <td className="px-4 py-3 whitespace-nowrap">
                         {r.is_voter ? (
-                          <span className="bg-green-500/15 text-green-400 border border-green-500/30 text-xs font-semibold px-2 py-0.5 rounded-full">
+                          <span className="bg-green-50 text-green-600 border border-green-200 text-xs font-semibold px-2 py-0.5 rounded-full">
                             Voter
                           </span>
                         ) : (
-                          <span className="bg-gray-500/15 text-gray-400 border border-gray-500/30 text-xs font-semibold px-2 py-0.5 rounded-full">
+                          <span className="bg-gray-100 text-gray-500 border border-gray-200 text-xs font-semibold px-2 py-0.5 rounded-full">
                             Non-Voter
                           </span>
                         )}
@@ -513,13 +517,13 @@ export function Residents() {
                         <div className="flex flex-col gap-1">
                           <button
                             onClick={() => setModal({ mode: 'view', resident: r })}
-                            className="text-xs border border-[#3a3d45] text-gray-300 hover:border-blue-500 hover:text-blue-400 rounded px-3 py-1 transition-colors"
+                            className="text-xs border border-gray-200 text-gray-600 hover:border-blue-400 hover:text-blue-600 rounded px-3 py-1 transition-colors"
                           >
                             View
                           </button>
                           <button
                             onClick={() => setModal({ mode: 'edit', resident: r })}
-                            className="text-xs border border-[#3a3d45] text-gray-300 hover:border-yellow-500 hover:text-yellow-400 rounded px-3 py-1 transition-colors"
+                            className="text-xs border border-gray-200 text-gray-600 hover:border-yellow-400 hover:text-yellow-600 rounded px-3 py-1 transition-colors"
                           >
                             Edit
                           </button>
@@ -533,22 +537,22 @@ export function Residents() {
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between px-4 py-3 border-t border-[#2a2d35]">
-            <span className="text-gray-500 text-xs">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
+            <span className="text-gray-400 text-xs">
               Showing {filtered.length === 0 ? 0 : displayStart}–{displayEnd} of {displayTotal.toLocaleString()} residents
             </span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handlePageChange('prev')}
                 disabled={safeCurrentPage === 1}
-                className="text-xs border border-[#3a3d45] text-gray-400 hover:text-white hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed rounded px-3 py-1.5 transition-colors"
+                className="text-xs border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed rounded px-3 py-1.5 transition-colors"
               >
                 ← Prev
               </button>
               <button
                 onClick={() => handlePageChange('next')}
                 disabled={safeCurrentPage >= totalPages}
-                className="text-xs border border-[#3a3d45] text-gray-400 hover:text-white hover:border-gray-400 disabled:opacity-30 disabled:cursor-not-allowed rounded px-3 py-1.5 transition-colors"
+                className="text-xs border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed rounded px-3 py-1.5 transition-colors"
               >
                 Next →
               </button>

@@ -48,7 +48,7 @@ const MAIN_NAV: NavItem[] = [
 
 const MANAGEMENT_NAV: NavItem[] = [
   { label: 'Resident Management', to: '/admin/residents', icon: <Users size={18} /> },
-  { label: 'Document Requests', to: '/admin/requests', icon: <FileText size={18} />, badge: 42 },
+  { label: 'Document Requests', to: '/admin/document-requests', icon: <FileText size={18} />, badge: 42 },
   { label: 'Complaints / Blotter', to: '/admin/complaints', icon: <AlertTriangle size={18} />, badge: 7 },
   { label: 'Announcements', to: '/admin/announcements', icon: <Megaphone size={18} /> },
   { label: 'Barangay Officials', to: '/admin/officials', icon: <Shield size={18} /> },
@@ -153,7 +153,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
   };
 
   return (
-    <div className="flex h-screen bg-[#121417] text-white overflow-hidden">
+    <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Sidebar */}
       <aside
         className={`flex flex-col bg-[#1a1c23] border-r border-[#2a2d35] transition-all duration-300 ${
@@ -228,16 +228,16 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
       {/* Main area */}
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Top Nav */}
-        <header className="flex items-center gap-4 px-6 py-3 bg-[#1a1c23] border-b border-[#2a2d35] shrink-0">
+        <header className="flex items-center gap-4 px-6 py-3 bg-white border-b border-gray-200 shrink-0">
           {/* Left: hamburger + page title */}
           <div className="flex items-center gap-3 min-w-35">
             <button
               onClick={() => setCollapsed(!collapsed)}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#2a2d35] transition-colors"
+              className="p-1.5 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
             >
               <Menu size={18} />
             </button>
-            <span className="font-semibold text-white text-base">{title}</span>
+            <span className="font-semibold text-gray-800 text-base">{title}</span>
           </div>
 
           {/* Center: search */}
@@ -245,7 +245,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
             <input
               type="text"
               placeholder="Search..."
-              className="text-sm bg-[#2a2d35] border border-[#3a3d45] text-gray-300 placeholder-gray-500 rounded-lg px-3 py-1.5 w-64 focus:outline-none focus:border-blue-500 transition-colors"
+              className="text-sm bg-gray-100 border border-gray-200 text-gray-700 placeholder-gray-400 rounded-lg px-3 py-1.5 w-64 focus:outline-none focus:border-blue-500 transition-colors"
             />
           </div>
 
@@ -253,15 +253,15 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
           <div className="flex items-center gap-4 min-w-50 justify-end">
             {/* Clock */}
             <div className="text-right">
-              <p className="text-white font-mono text-sm font-medium leading-tight">{clockStr}</p>
-              <p className="text-gray-500 text-xs leading-tight">{dateStr}</p>
+              <p className="text-gray-800 font-mono text-sm font-medium leading-tight">{clockStr}</p>
+              <p className="text-gray-400 text-xs leading-tight">{dateStr}</p>
             </div>
 
             {/* Notification bell */}
             <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setNotifOpen((v) => !v)}
-                className="relative p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#2a2d35] transition-colors"
+                className="relative p-1.5 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
               >
                 <Bell size={18} />
                 <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
@@ -271,20 +271,20 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
 
               {/* Notification dropdown */}
               {notifOpen && (
-                <div className="absolute right-0 top-10 w-80 bg-[#1e2028] border border-[#2a2d35] rounded-xl shadow-2xl z-50">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-[#2a2d35]">
-                    <span className="text-white font-semibold text-sm">Admin Notifications</span>
+                <div className="absolute right-0 top-10 w-80 bg-white border border-gray-200 rounded-xl shadow-2xl z-50">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                    <span className="text-gray-800 font-semibold text-sm">Admin Notifications</span>
                     <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                       {MOCK_NOTIFICATIONS.length}
                     </span>
                   </div>
                   <ul className="py-2">
                     {MOCK_NOTIFICATIONS.map((n) => (
-                      <li key={n.id} className="flex items-start gap-3 px-4 py-3 hover:bg-[#2a2d35] cursor-pointer transition-colors">
+                      <li key={n.id} className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors">
                         <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${dotColor[n.color]}`} />
                         <div>
-                          <p className="text-white text-xs font-medium leading-snug">{n.message}</p>
-                          <p className="text-gray-500 text-xs mt-0.5">{n.sub}</p>
+                          <p className="text-gray-800 text-xs font-medium leading-snug">{n.message}</p>
+                          <p className="text-gray-400 text-xs mt-0.5">{n.sub}</p>
                         </div>
                       </li>
                     ))}
@@ -296,7 +296,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto bg-[#121417] flex flex-col">
+        <main className="flex-1 overflow-y-auto bg-gray-100 flex flex-col">
           <div className="flex-1 p-6">{children}</div>
 
           {/* Footer */}

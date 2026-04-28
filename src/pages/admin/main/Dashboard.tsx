@@ -95,10 +95,10 @@ const MONTHLY_REQUESTS = [
 function StatCardItem({ card }: { card: StatCard }) {
   return (
     <div
-      className={`bg-[#1e2028] border border-[#2a2d35] rounded-xl p-5 border-l-4 ${card.accentColor} flex flex-col gap-1`}
+      className={`bg-white border border-gray-200 rounded-xl p-5 border-l-4 ${card.accentColor} flex flex-col gap-1 shadow-sm`}
     >
       <p className="text-gray-400 text-xs font-semibold tracking-widest uppercase">{card.label}</p>
-      <p className="text-white text-3xl font-bold tracking-tight">{card.value}</p>
+      <p className="text-gray-800 text-3xl font-bold tracking-tight">{card.value}</p>
       <p className={`text-xs font-medium ${card.subColor}`}>{card.sub}</p>
     </div>
   );
@@ -119,28 +119,28 @@ export function Dashboard() {
       {/* Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {/* Bar chart — Residents by Purok */}
-        <div className="bg-[#1e2028] border border-[#2a2d35] rounded-xl p-5">
-          <h2 className="text-white font-semibold text-sm mb-1">Total Residents by Purok</h2>
-          <p className="text-gray-500 text-xs mb-5">Registered residents per purok</p>
+        <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+          <h2 className="text-gray-800 font-semibold text-sm mb-1">Total Residents by Purok</h2>
+          <p className="text-gray-400 text-xs mb-5">Registered residents per purok</p>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={PUROK_DATA} barCategoryGap="35%" margin={{ top: 4, right: 8, bottom: 0, left: -10 }}>
-              <CartesianGrid vertical={false} stroke="#2a2d35" />
+              <CartesianGrid vertical={false} stroke="#e5e7eb" />
               <XAxis
                 dataKey="name"
-                tick={{ fill: '#9ca3af', fontSize: 11 }}
+                tick={{ fill: '#6b7280', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fill: '#9ca3af', fontSize: 11 }}
+                tick={{ fill: '#6b7280', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
                 domain={[0, 1000]}
                 ticks={[0, 200, 400, 600, 800, 1000]}
               />
               <Tooltip
-                contentStyle={{ background: '#1a1c23', border: '1px solid #2a2d35', borderRadius: 8, color: '#fff', fontSize: 12 }}
-                cursor={{ fill: 'rgba(59,130,246,0.08)' }}
+                contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, color: '#111827', fontSize: 12 }}
+                cursor={{ fill: 'rgba(59,130,246,0.06)' }}
               />
               <Bar dataKey="residents" fill="#3b82f6" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -148,33 +148,33 @@ export function Dashboard() {
         </div>
 
         {/* Area/Line chart — Monthly Document Requests */}
-        <div className="bg-[#1e2028] border border-[#2a2d35] rounded-xl p-5">
-          <h2 className="text-white font-semibold text-sm mb-1">Monthly Document Requests – 2026</h2>
-          <p className="text-gray-500 text-xs mb-5">Documents requested per month</p>
+        <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+          <h2 className="text-gray-800 font-semibold text-sm mb-1">Monthly Document Requests – 2026</h2>
+          <p className="text-gray-400 text-xs mb-5">Documents requested per month</p>
           <ResponsiveContainer width="100%" height={240}>
             <AreaChart data={MONTHLY_REQUESTS} margin={{ top: 4, right: 8, bottom: 0, left: -10 }}>
               <defs>
                 <linearGradient id="requestGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.25} />
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
                   <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid vertical={false} stroke="#2a2d35" />
+              <CartesianGrid vertical={false} stroke="#e5e7eb" />
               <XAxis
                 dataKey="month"
-                tick={{ fill: '#9ca3af', fontSize: 11 }}
+                tick={{ fill: '#6b7280', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fill: '#9ca3af', fontSize: 11 }}
+                tick={{ fill: '#6b7280', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
                 domain={[0, 120]}
                 ticks={[0, 20, 40, 60, 80, 100, 120]}
               />
               <Tooltip
-                contentStyle={{ background: '#1a1c23', border: '1px solid #2a2d35', borderRadius: 8, color: '#fff', fontSize: 12 }}
+                contentStyle={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, color: '#111827', fontSize: 12 }}
                 cursor={{ stroke: '#3b82f6', strokeWidth: 1, strokeDasharray: '4 4' }}
               />
               <Area
