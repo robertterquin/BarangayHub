@@ -17,7 +17,6 @@ import {
   Bell,
   Menu,
   Shield,
-  FileCheck,
   History,
 } from 'lucide-react';
 import { supabase } from '../services/supabase';
@@ -250,19 +249,13 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
             />
           </div>
 
-          {/* Right: clock + MFA + bell */}
+          {/* Right: clock + bell */}
           <div className="flex items-center gap-4 min-w-50 justify-end">
             {/* Clock */}
             <div className="text-right">
               <p className="text-white font-mono text-sm font-medium leading-tight">{clockStr}</p>
               <p className="text-gray-500 text-xs leading-tight">{dateStr}</p>
             </div>
-
-            {/* MFA badge */}
-            <span className="flex items-center gap-1 bg-green-500/15 text-green-400 border border-green-500/30 text-xs font-semibold px-2 py-1 rounded-full">
-              <FileCheck size={11} />
-              MFA
-            </span>
 
             {/* Notification bell */}
             <div className="relative" ref={notifRef}>
@@ -334,7 +327,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
             </div>
             <div className="border-t border-blue-900/60 px-8 py-3 flex items-center justify-between">
               <span className="text-blue-400/70 text-xs">© 2026 Barangay Daine II, Indang, Cavite – Admin MIS</span>
-              <span className="text-blue-400/70 text-xs">MFA Enabled | v1.0</span>
+              <span className="text-blue-400/70 text-xs">v1.0</span>
             </div>
           </footer>
         </main>
