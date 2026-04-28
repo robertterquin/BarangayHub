@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
-import { logLoginActivity } from '../../services/adminService';
-import { supabase } from '../../services/supabase';
-import heroImg from '../../assets/hero.png';
+import { useAuth } from '../../../hooks/useAuth';
+import { logLoginActivity } from '../../../services/adminService';
+import { supabase } from '../../../services/supabase';
+import heroImg from '../../../assets/hero.png';
 
 export function AdminLogin() {
   const navigate = useNavigate();

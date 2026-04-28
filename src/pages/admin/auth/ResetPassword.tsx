@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, AlertCircle, Loader2, CheckCircle2, Circle } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
-import { supabase } from '../../services/supabase';
-import heroImg from '../../assets/hero.png';
+import { useAuth } from '../../../hooks/useAuth';
+import { supabase } from '../../../services/supabase';
+import heroImg from '../../../assets/hero.png';
 
 // ── Password requirement helpers ──────────────────────────────────────────────
 
