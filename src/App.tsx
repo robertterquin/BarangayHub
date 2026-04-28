@@ -1,11 +1,22 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
-import { AdminLogin } from './pages/admin/Login';
-import { ResetPassword } from './pages/admin/ResetPassword';
+import { AdminLogin } from './pages/admin/auth/Login';
+import { ResetPassword } from './pages/admin/auth/ResetPassword';
 
 // ── Add page imports here as you build them ─────────────────────────────────
-// Public:  import { LandingPage } from './pages/public/LandingPage';
-// Admin:   import { Dashboard } from './pages/admin/Dashboard';
+// Public:      import { LandingPage }        from './pages/public/LandingPage';
+// Admin main:  import { Dashboard }          from './pages/admin/main/Dashboard';
+// Management:  import { Residents }          from './pages/admin/management/Residents';
+//              import { DocumentRequests }   from './pages/admin/management/DocumentRequests';
+//              import { Complaints }         from './pages/admin/management/Complaints';
+//              import { Announcements }      from './pages/admin/management/Announcements';
+//              import { Officials }          from './pages/admin/management/Officials';
+// Analytics:   import { Reports }            from './pages/admin/analytics/Reports';
+// System:      import { UserManagement }     from './pages/admin/system/UserManagement';
+//              import { ActivityLogs }       from './pages/admin/system/ActivityLogs';
+//              import { History }            from './pages/admin/system/History';
+//              import { Feedback }           from './pages/admin/system/Feedback';
+//              import { Settings }           from './pages/admin/system/Settings';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
