@@ -164,17 +164,47 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
         {/* Logo */}
         <div className="flex items-center justify-between px-3 py-4 border-b border-[#2a2d35]">
           {!collapsed && (
-            <span className="font-bold text-white text-lg tracking-tight">
-              Barangay<span className="text-blue-400">Hub</span>
-            </span>
+            <div className="min-w-0">
+              <span className="font-bold text-white text-lg tracking-tight block">
+                Barangay<span className="text-blue-400">Hub</span>
+              </span>
+              <span className="text-gray-500 text-[10px] tracking-wide block truncate">
+                Brgy. Daine II · Indang, Cavite
+              </span>
+            </div>
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="p-1 rounded text-gray-400 hover:text-white hover:bg-[#2a2d35] transition-colors"
+            className="p-1 rounded text-gray-400 hover:text-white hover:bg-[#2a2d35] transition-colors shrink-0"
           >
             {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
           </button>
         </div>
+
+        {/* Admin user */}
+        {!collapsed ? (
+          <div className="px-3 py-3 border-b border-[#2a2d35]">
+            <div className="flex items-center gap-2.5">
+              <div className="relative shrink-0">
+                <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                  AD
+                </div>
+                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#1a1c23]" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-white text-sm font-semibold truncate">Admin</p>
+                <p className="text-gray-500 text-xs truncate">admin@brgy.daine2.gov</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center py-3 border-b border-[#2a2d35]">
+            <div className="relative">
+              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">AD</div>
+              <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-[#1a1c23]" />
+            </div>
+          </div>
+        )}
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
@@ -273,8 +303,40 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6 bg-[#121417]">
-          {children}
+        <main className="flex-1 overflow-y-auto bg-[#121417] flex flex-col">
+          <div className="flex-1 p-6">{children}</div>
+
+          {/* Footer */}
+          <footer className="bg-[#0f2045] shrink-0 mt-4">
+            <div className="grid grid-cols-3 gap-8 px-8 py-6">
+              <div>
+                <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-3">Contact</h4>
+                <p className="text-blue-300 text-xs leading-relaxed">Address: Barangay Daine II, Indang, Cavite</p>
+                <p className="text-blue-300 text-xs leading-relaxed">Contact: (046) XXX-XXXX</p>
+                <p className="text-blue-300 text-xs leading-relaxed">Email: brgy.daine@indang.gov.ph</p>
+              </div>
+              <div>
+                <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-3">Quick Links</h4>
+                <ul className="space-y-1">
+                  {['Resident Management', 'Document Requests', 'Announcements', 'Complaints'].map((link) => (
+                    <li key={link}><span className="text-blue-300 text-xs hover:text-white cursor-pointer transition-colors">{link}</span></li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-3">Other Links</h4>
+                <ul className="space-y-1">
+                  {['Indang, Cavite Website', 'Province of Cavite', 'GOVPH'].map((link) => (
+                    <li key={link}><span className="text-blue-300 text-xs hover:text-white cursor-pointer transition-colors">{link}</span></li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="border-t border-blue-900/60 px-8 py-3 flex items-center justify-between">
+              <span className="text-blue-400/70 text-xs">© 2026 Barangay Daine II, Indang, Cavite – Admin MIS</span>
+              <span className="text-blue-400/70 text-xs">MFA Enabled | v1.0</span>
+            </div>
+          </footer>
         </main>
       </div>
     </div>
