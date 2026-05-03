@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Loader2, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 import { logLoginActivity } from '../../../services/adminService';
 import { supabase } from '../../../services/supabase';
@@ -102,27 +102,34 @@ export function AdminLogin() {
             <div className="mb-4">
               <label
                 htmlFor="email"
-                className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5"
+                className="sr-only"
               >
                 Username / Email
               </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors"
-              />
+              <div className="relative">
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Username / Email"
+                  className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 pl-10 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors"
+                />
+                <Mail
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                  aria-hidden="true"
+                />
+              </div>
             </div>
 
             {/* Password */}
             <div className="mb-6">
               <label
                 htmlFor="password"
-                className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5"
+                className="sr-only"
               >
                 Password
               </label>
@@ -135,7 +142,12 @@ export function AdminLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
-                  className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors"
+                  className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 pl-10 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors"
+                />
+                <Lock
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                  aria-hidden="true"
                 />
                 <button
                   type="button"

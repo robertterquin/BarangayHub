@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, AlertCircle, Loader2, CheckCircle2, Circle } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Loader2, CheckCircle2, Circle, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
-import { supabase } from '../../../services/supabase';
 
 // ── Password requirement helpers ──────────────────────────────────────────────
 
@@ -25,7 +24,6 @@ export function ResetPassword() {
   const navigate = useNavigate();
   const { updatePassword } = useAuth();
 
-  const [ready, setReady] = useState(false);
   const [email, setEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -34,20 +32,6 @@ export function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-
-  useEffect(() => {
-    const { data: listener } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        setReady(true);
-      }
-    });
-
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
-    });
-
-    return () => listener.subscription.unsubscribe();
-  }, []);
 
   const allRulesPassed = PASSWORD_RULES.every((r) => r.test(newPassword));
   const passwordsMatch = newPassword === confirmPassword && confirmPassword.length > 0;
@@ -147,28 +131,35 @@ export function ResetPassword() {
             <div className="mb-4">
               <label
                 htmlFor="admin-email"
-                className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5"
+                className="sr-only"
               >
                 Admin Email
               </label>
-              <input
-                id="admin-email"
-                type="email"
-                autoComplete="email"
-                required
-                disabled={success}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@brgy.daine2.gov"
-                className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors disabled:opacity-50"
-              />
+              <div className="relative">
+                <input
+                  id="admin-email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  disabled={success}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Admin email"
+                  className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 pl-10 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors disabled:opacity-50"
+                />
+                <Mail
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                  aria-hidden="true"
+                />
+              </div>
             </div>
 
             {/* New Password */}
             <div className="mb-4">
               <label
                 htmlFor="new-password"
-                className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5"
+                className="sr-only"
               >
                 New Password
               </label>
@@ -181,8 +172,13 @@ export function ResetPassword() {
                   disabled={success}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password"
-                  className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors disabled:opacity-50"
+                  placeholder="New password"
+                  className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 pl-10 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors disabled:opacity-50"
+                />
+                <Lock
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                  aria-hidden="true"
                 />
                 <button
                   type="button"
@@ -217,7 +213,7 @@ export function ResetPassword() {
             <div className="mb-6">
               <label
                 htmlFor="confirm-password"
-                className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5"
+                className="sr-only"
               >
                 Confirm New Password
               </label>
@@ -231,11 +227,16 @@ export function ResetPassword() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm new password"
-                  className={`w-full bg-[#e8f0fe] border rounded-lg px-4 py-3 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:ring-1 transition-colors disabled:opacity-50 ${
+                  className={`w-full bg-[#e8f0fe] border rounded-lg px-4 py-3 pl-10 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:ring-1 transition-colors disabled:opacity-50 ${
                     confirmPassword.length > 0 && !passwordsMatch
                       ? 'border-red-300 focus:border-red-400 focus:ring-red-300/40'
                       : 'border-transparent focus:border-[#0052cc] focus:ring-[#0052cc]/40'
                   }`}
+                />
+                <Lock
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                  aria-hidden="true"
                 />
                 <button
                   type="button"
