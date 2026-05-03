@@ -8,15 +8,13 @@ import heroImg from '../../../assets/hero.png';
 
 export function AdminLogin() {
   const navigate = useNavigate();
-  const { signIn, sendPasswordReset } = useAuth();
+  const { signIn } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [resetSent, setResetSent] = useState(false);
-  const [resetLoading, setResetLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,21 +38,6 @@ export function AdminLogin() {
     navigate('/admin/dashboard', { replace: true });
   }
 
-  async function handleForgotPassword() {
-    if (!email.trim()) {
-      setError('Enter your email address above, then click Forgot Password.');
-      return;
-    }
-    setResetLoading(true);
-    setError(null);
-    const { error: resetError } = await sendPasswordReset(email.trim());
-    setResetLoading(false);
-    if (resetError) {
-      setError('Could not send reset email. Check the address and try again.');
-    } else {
-      setResetSent(true);
-    }
-  }
 
   return (
     <div
@@ -113,13 +96,6 @@ export function AdminLogin() {
             </div>
           )}
 
-          {/* Reset success banner */}
-          {resetSent && (
-            <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-5">
-              <p className="text-green-700 text-sm">Password reset email sent. Check your inbox.</p>
-            </div>
-          )}
-
           {/* Form */}
           <form onSubmit={handleSubmit} noValidate>
             {/* Email */}
@@ -137,7 +113,7 @@ export function AdminLogin() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@brgy.daine2.gov"
+                placeholder="Email"
                 className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors"
               />
             </div>
@@ -158,7 +134,7 @@ export function AdminLogin() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••"
+                  placeholder="Password"
                   className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors"
                 />
                 <button
@@ -193,11 +169,10 @@ export function AdminLogin() {
           <div className="mt-5 text-center">
             <button
               type="button"
-              onClick={handleForgotPassword}
-              disabled={resetLoading}
-              className="text-[#0052cc] hover:text-[#1535a0] text-sm underline underline-offset-2 transition-colors disabled:opacity-50 font-medium"
+              onClick={() => navigate('/admin/reset-password')}
+              className="text-[#0052cc] hover:text-[#1535a0] text-sm underline underline-offset-2 transition-colors font-medium"
             >
-              {resetLoading ? 'Sending…' : 'Forgot Password?'}
+              Reset Password
             </button>
           </div>
         </div>

@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, AlertCircle, Loader2, CheckCircle2, Circle } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 import { supabase } from '../../../services/supabase';
-import heroImg from '../../../assets/hero.png';
 
 // ── Password requirement helpers ──────────────────────────────────────────────
 
@@ -26,7 +25,8 @@ export function ResetPassword() {
   const navigate = useNavigate();
   const { updatePassword } = useAuth();
 
-  const [ready, setReady] = useState(false);          // Supabase recovery session active
+  const [ready, setReady] = useState(false);
+  const [email, setEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showNew, setShowNew] = useState(false);
@@ -35,7 +35,6 @@ export function ResetPassword() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Supabase fires PASSWORD_RECOVERY when the user lands via the email link
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
@@ -43,7 +42,6 @@ export function ResetPassword() {
       }
     });
 
-    // If the user is already in a recovery session (page refresh), mark ready
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) setReady(true);
     });
@@ -58,6 +56,10 @@ export function ResetPassword() {
     e.preventDefault();
     setError(null);
 
+    if (!email.trim()) {
+      setError('Admin email is required.');
+      return;
+    }
     if (!allRulesPassed) {
       setError('Password does not meet all requirements.');
       return;
@@ -104,24 +106,10 @@ export function ResetPassword() {
       <div className="relative w-full max-w-lg">
         {/* Card bottom glow for floating feel */}
         <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-10 bg-black/25 blur-2xl rounded-full pointer-events-none" />
-        {/* Card */}
         <div
           className="bg-white rounded-2xl px-9 py-10 ring-1 ring-white/10"
           style={{ boxShadow: '0 8px 16px rgba(0,0,0,0.25), 0 32px 64px rgba(0,0,0,0.30), 0 0 0 1px rgba(255,255,255,0.08)' }}
         >
-
-          {/* Branding */}
-          <div className="flex items-center gap-3 mb-7">
-            <img
-              src={heroImg}
-              alt="Barangay Daine II seal"
-              className="w-12 h-12 rounded-full object-cover shrink-0 border border-gray-200"
-            />
-            <div>
-              <p className="text-[#0052cc] font-bold text-lg leading-tight">BarangayHub</p>
-              <p className="text-gray-400 text-xs tracking-wide">Brgy. Daine II · Indang, Cavite</p>
-            </div>
-          </div>
 
           {/* Heading */}
           <div className="mb-6">
@@ -152,16 +140,30 @@ export function ResetPassword() {
             </div>
           )}
 
-          {/* Invalid-link state */}
-          {!ready && !success && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-5">
-              <p className="text-amber-700 text-sm">
-                This page is only accessible via the password reset link sent to your email.
-              </p>
-            </div>
-          )}
+          {/* Note removed: page is now usable directly (forgot-password flow removed) */}
 
           <form onSubmit={handleSubmit} noValidate>
+            {/* Admin Email */}
+            <div className="mb-4">
+              <label
+                htmlFor="admin-email"
+                className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5"
+              >
+                Admin Email
+              </label>
+              <input
+                id="admin-email"
+                type="email"
+                autoComplete="email"
+                required
+                disabled={success}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@brgy.daine2.gov"
+                className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors disabled:opacity-50"
+              />
+            </div>
+
             {/* New Password */}
             <div className="mb-4">
               <label
@@ -176,7 +178,7 @@ export function ResetPassword() {
                   type={showNew ? 'text' : 'password'}
                   autoComplete="new-password"
                   required
-                  disabled={!ready || success}
+                  disabled={success}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter new password"
@@ -192,26 +194,23 @@ export function ResetPassword() {
                 </button>
               </div>
 
-              {/* Live requirements checklist */}
-              {newPassword.length > 0 && (
-                <div className="mt-3 bg-gray-50 rounded-lg px-4 py-3 space-y-1.5">
-                  <p className="text-xs font-semibold text-gray-500 mb-2">Password must have:</p>
-                  {PASSWORD_RULES.map((rule) => {
-                    const passed = rule.test(newPassword);
-                    return (
-                      <div key={rule.label} className="flex items-center gap-2">
-                        {passed
-                          ? <CheckCircle2 size={14} className="text-[#0052cc] shrink-0" />
-                          : <Circle size={14} className="text-gray-300 shrink-0" />
-                        }
-                        <span className={`text-xs ${passed ? 'text-[#0052cc]' : 'text-gray-400'}`}>
-                          {rule.label}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              <div className="mt-3 bg-blue-50 rounded-lg px-4 py-3 space-y-1.5">
+                <p className="text-xs font-semibold text-gray-600 mb-2">Password must have:</p>
+                {PASSWORD_RULES.map((rule) => {
+                  const passed = rule.test(newPassword);
+                  return (
+                    <div key={rule.label} className="flex items-center gap-2">
+                      {passed
+                        ? <CheckCircle2 size={14} className="text-[#1a3db8] shrink-0" />
+                        : <Circle size={14} className="text-gray-300 shrink-0" />
+                      }
+                      <span className={`text-xs ${passed ? 'text-[#1a3db8]' : 'text-gray-500'}`}>
+                        {rule.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Confirm New Password */}
@@ -228,7 +227,7 @@ export function ResetPassword() {
                   type={showConfirm ? 'text' : 'password'}
                   autoComplete="new-password"
                   required
-                  disabled={!ready || success}
+                  disabled={success}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm new password"
@@ -255,7 +254,7 @@ export function ResetPassword() {
             {/* Submit */}
             <button
               type="submit"
-              disabled={loading || !ready || success}
+              disabled={loading || success}
               className="w-full bg-[#1a3db8] hover:bg-[#1535a0] disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
             >
               {loading ? (
