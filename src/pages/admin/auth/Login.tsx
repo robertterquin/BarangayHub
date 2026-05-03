@@ -100,12 +100,6 @@ export function AdminLogin() {
           <form onSubmit={handleSubmit} noValidate>
             {/* Email */}
             <div className="mb-4">
-              <label
-                htmlFor="email"
-                className="sr-only"
-              >
-                Username / Email
-              </label>
               <div className="relative">
                 <input
                   id="email"
@@ -114,25 +108,25 @@ export function AdminLogin() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Username / Email"
-                  className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 pl-10 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors"
+                  placeholder=" "
+                  className="peer w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 pt-5 pb-2 pl-10 pr-4 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors"
                 />
                 <Mail
                   size={16}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
                   aria-hidden="true"
                 />
+                <label
+                  htmlFor="email"
+                  className="absolute left-10 top-2 text-[11px] text-gray-500 transition-all pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-[11px] peer-focus:text-[#0052cc]"
+                >
+                  Username / Email
+                </label>
               </div>
             </div>
 
             {/* Password */}
             <div className="mb-6">
-              <label
-                htmlFor="password"
-                className="sr-only"
-              >
-                Password
-              </label>
               <div className="relative">
                 <input
                   id="password"
@@ -141,14 +135,20 @@ export function AdminLogin() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                  className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 pl-10 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors"
+                  placeholder=" "
+                  className="peer w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 pt-5 pb-2 pl-10 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors"
                 />
                 <Lock
                   size={16}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
                   aria-hidden="true"
                 />
+                <label
+                  htmlFor="password"
+                  className="absolute left-10 top-2 text-[11px] text-gray-500 transition-all pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-[11px] peer-focus:text-[#0052cc]"
+                >
+                  Password
+                </label>
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}

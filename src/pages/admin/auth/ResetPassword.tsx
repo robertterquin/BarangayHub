@@ -129,12 +129,6 @@ export function ResetPassword() {
           <form onSubmit={handleSubmit} noValidate>
             {/* Admin Email */}
             <div className="mb-4">
-              <label
-                htmlFor="admin-email"
-                className="sr-only"
-              >
-                Admin Email
-              </label>
               <div className="relative">
                 <input
                   id="admin-email"
@@ -144,25 +138,25 @@ export function ResetPassword() {
                   disabled={success}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Admin email"
-                  className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 pl-10 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors disabled:opacity-50"
+                  placeholder=" "
+                  className="peer w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 pt-5 pb-2 pl-10 pr-4 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors disabled:opacity-50"
                 />
                 <Mail
                   size={16}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
                   aria-hidden="true"
                 />
+                <label
+                  htmlFor="admin-email"
+                  className="absolute left-10 top-2 text-[11px] text-gray-500 transition-all pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-[11px] peer-focus:text-[#0052cc]"
+                >
+                  Admin Email
+                </label>
               </div>
             </div>
 
             {/* New Password */}
             <div className="mb-4">
-              <label
-                htmlFor="new-password"
-                className="sr-only"
-              >
-                New Password
-              </label>
               <div className="relative">
                 <input
                   id="new-password"
@@ -172,14 +166,20 @@ export function ResetPassword() {
                   disabled={success}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="New password"
-                  className="w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 py-3 pl-10 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors disabled:opacity-50"
+                  placeholder=" "
+                  className="peer w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 pt-5 pb-2 pl-10 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors disabled:opacity-50"
                 />
                 <Lock
                   size={16}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
                   aria-hidden="true"
                 />
+                <label
+                  htmlFor="new-password"
+                  className="absolute left-10 top-2 text-[11px] text-gray-500 transition-all pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-[11px] peer-focus:text-[#0052cc]"
+                >
+                  New Password
+                </label>
                 <button
                   type="button"
                   onClick={() => setShowNew((v) => !v)}
@@ -211,12 +211,6 @@ export function ResetPassword() {
 
             {/* Confirm New Password */}
             <div className="mb-6">
-              <label
-                htmlFor="confirm-password"
-                className="sr-only"
-              >
-                Confirm New Password
-              </label>
               <div className="relative">
                 <input
                   id="confirm-password"
@@ -226,8 +220,8 @@ export function ResetPassword() {
                   disabled={success}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm new password"
-                  className={`w-full bg-[#e8f0fe] border rounded-lg px-4 py-3 pl-10 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:ring-1 transition-colors disabled:opacity-50 ${
+                  placeholder=" "
+                  className={`peer w-full bg-[#e8f0fe] border rounded-lg px-4 pt-5 pb-2 pl-10 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:ring-1 transition-colors disabled:opacity-50 ${
                     confirmPassword.length > 0 && !passwordsMatch
                       ? 'border-red-300 focus:border-red-400 focus:ring-red-300/40'
                       : 'border-transparent focus:border-[#0052cc] focus:ring-[#0052cc]/40'
@@ -238,6 +232,12 @@ export function ResetPassword() {
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
                   aria-hidden="true"
                 />
+                <label
+                  htmlFor="confirm-password"
+                  className="absolute left-10 top-2 text-[11px] text-gray-500 transition-all pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-[11px] peer-focus:text-[#0052cc]"
+                >
+                  Confirm New Password
+                </label>
                 <button
                   type="button"
                   onClick={() => setShowConfirm((v) => !v)}
