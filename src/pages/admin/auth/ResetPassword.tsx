@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, AlertCircle, Loader2, CheckCircle2, Circle, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 
-// ── Password requirement helpers ──────────────────────────────────────────────
 
 interface PasswordRule {
   label: string;
@@ -18,7 +17,7 @@ const PASSWORD_RULES: PasswordRule[] = [
   { label: 'At least one special character', test: (pw) => /[^A-Za-z0-9]/.test(pw) },
 ];
 
-// ── Component ─────────────────────────────────────────────────────────────────
+
 
 export function ResetPassword() {
   const navigate = useNavigate();
@@ -70,7 +69,6 @@ export function ResetPassword() {
     <div
       className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-[#0052cc]"
     >
-      {/* Line grid */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -79,23 +77,19 @@ export function ResetPassword() {
           backgroundSize: '48px 48px',
         }}
       />
-      {/* Radial vignette to darken corners and lift center */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{ background: 'radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(0,30,100,0.45) 100%)' }}
       />
-      {/* Glowing accent blob — top right */}
       <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-blue-400/10 blur-3xl pointer-events-none" />
 
       <div className="relative w-full max-w-lg">
-        {/* Card bottom glow for floating feel */}
         <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-10 bg-black/25 blur-2xl rounded-full pointer-events-none" />
         <div
           className="bg-white rounded-2xl px-9 py-10 ring-1 ring-white/10"
           style={{ boxShadow: '0 8px 16px rgba(0,0,0,0.25), 0 32px 64px rgba(0,0,0,0.30), 0 0 0 1px rgba(255,255,255,0.08)' }}
         >
 
-          {/* Heading */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-2xl" aria-hidden>🔒</span>
@@ -106,7 +100,6 @@ export function ResetPassword() {
             </p>
           </div>
 
-          {/* Success state */}
           {success && (
             <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-5">
               <CheckCircle2 size={16} className="text-green-600 mt-0.5 shrink-0" />
@@ -116,7 +109,6 @@ export function ResetPassword() {
             </div>
           )}
 
-          {/* Error banner */}
           {error && (
             <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-5">
               <AlertCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
@@ -124,10 +116,7 @@ export function ResetPassword() {
             </div>
           )}
 
-          {/* Note removed: page is now usable directly (forgot-password flow removed) */}
-
           <form onSubmit={handleSubmit} noValidate>
-            {/* Admin Email */}
             <div className="mb-4">
               <div className="relative">
                 <input
@@ -155,7 +144,6 @@ export function ResetPassword() {
               </div>
             </div>
 
-            {/* New Password */}
             <div className="mb-4">
               <div className="relative">
                 <input
@@ -209,7 +197,6 @@ export function ResetPassword() {
               </div>
             </div>
 
-            {/* Confirm New Password */}
             <div className="mb-6">
               <div className="relative">
                 <input
@@ -252,7 +239,6 @@ export function ResetPassword() {
               )}
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading || success}
@@ -269,7 +255,6 @@ export function ResetPassword() {
             </button>
           </form>
 
-          {/* Cancel */}
           <div className="mt-4 text-center">
             <button
               type="button"
@@ -281,7 +266,6 @@ export function ResetPassword() {
           </div>
         </div>
 
-        {/* Footer note */}
         <p className="text-center text-white/50 text-xs mt-5">
           BarangayHub · Barangay Daine II Management System
         </p>

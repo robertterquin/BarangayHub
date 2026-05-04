@@ -29,7 +29,6 @@ export function AdminLogin() {
       return;
     }
 
-    // Log the login activity — we need the user id from the session
     const { data } = await supabase.auth.getSession();
     if (data.session?.user.id) {
       await logLoginActivity(data.session.user.id);
@@ -43,7 +42,6 @@ export function AdminLogin() {
     <div
       className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-[#0052cc]"
     >
-      {/* Line grid */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -52,24 +50,19 @@ export function AdminLogin() {
           backgroundSize: '48px 48px',
         }}
       />
-      {/* Radial vignette to darken corners and lift center */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{ background: 'radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(0,30,100,0.45) 100%)' }}
       />
-      {/* Glowing accent blob — top right */}
       <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-blue-400/10 blur-3xl pointer-events-none" />
 
       <div className="relative w-full max-w-lg">
-        {/* Card bottom glow for floating feel */}
         <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-10 bg-black/25 blur-2xl rounded-full pointer-events-none" />
-        {/* Card */}
         <div
           className="bg-white rounded-2xl px-9 py-10 ring-1 ring-white/10"
           style={{ boxShadow: '0 8px 16px rgba(0,0,0,0.25), 0 32px 64px rgba(0,0,0,0.30), 0 0 0 1px rgba(255,255,255,0.08)' }}
         >
 
-          {/* Branding */}
           <div className="flex items-center gap-3 mb-7">
             <img
               src={heroImg}
@@ -82,13 +75,11 @@ export function AdminLogin() {
             </div>
           </div>
 
-          {/* Heading */}
           <div className="mb-6">
             <h1 className="text-gray-900 text-2xl font-bold">Administrator Login</h1>
             <p className="text-gray-400 text-sm mt-1">Authorized personnel only</p>
           </div>
 
-          {/* Error banner */}
           {error && (
             <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-5">
               <AlertCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
@@ -96,9 +87,7 @@ export function AdminLogin() {
             </div>
           )}
 
-          {/* Form */}
           <form onSubmit={handleSubmit} noValidate>
-            {/* Email */}
             <div className="mb-4">
               <div className="relative">
                 <input
@@ -125,7 +114,6 @@ export function AdminLogin() {
               </div>
             </div>
 
-            {/* Password */}
             <div className="mb-6">
               <div className="relative">
                 <input
@@ -160,7 +148,6 @@ export function AdminLogin() {
               </div>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
@@ -177,7 +164,6 @@ export function AdminLogin() {
             </button>
           </form>
 
-          {/* Footer */}
           <div className="mt-5 text-center">
             <button
               type="button"
