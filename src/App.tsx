@@ -10,7 +10,7 @@ import { Residents } from './pages/admin/management/Residents';
 import { DocumentRequests } from './pages/admin/management/DocumentRequests';
 import { Complaints } from './pages/admin/management/Complaints';
 import { Announcements } from './pages/admin/management/Announcements';
-//              import { Officials }          from './pages/admin/management/Officials';
+import { Officials } from './pages/admin/management/Officials';
 // Analytics:   import { Reports }            from './pages/admin/analytics/Reports';
 // System:      import { UserManagement }     from './pages/admin/system/UserManagement';
 //              import { ActivityLogs }       from './pages/admin/system/ActivityLogs';
@@ -43,6 +43,7 @@ function App() {
       <Route path="/admin/document-requests" element={<ProtectedRoute><DocumentRequests /></ProtectedRoute>} />
       <Route path="/admin/complaints" element={<ProtectedRoute><Complaints /></ProtectedRoute>} />
       <Route path="/admin/announcements" element={<ProtectedRoute><Announcements /></ProtectedRoute>} />
+      <Route path="/admin/officials" element={<ProtectedRoute><Officials /></ProtectedRoute>} />
       <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
       {/* Default redirect — points to dashboard during dev */}
