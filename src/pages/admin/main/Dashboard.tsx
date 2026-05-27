@@ -11,14 +11,27 @@ import {
 } from 'recharts';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
-// ── Mock data ────────────────────────────────────────────────────────────────
-
 interface StatCard {
   label: string;
   value: string;
   sub: string;
   accentColor: string;
   subColor: string;
+}
+
+interface RecentActivity {
+  id: string;
+  action: string;
+  detail: string;
+  time: string;
+  dotColor: string;
+}
+
+interface WorkflowItem {
+  label: string;
+  value: number;
+  color: string;
+  width: string;
 }
 
 const STAT_CARDS: StatCard[] = [
@@ -90,7 +103,36 @@ const MONTHLY_REQUESTS = [
   { month: 'Dec', requests: 83 },
 ];
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+const RECENT_ACTIVITY: RecentActivity[] = [
+  {
+    id: '1',
+    action: 'Approved barangay clearance',
+    detail: 'BD2-2026-0318 - Maria L. Santos',
+    time: '8 min ago',
+    dotColor: 'bg-green-500',
+  },
+  {
+    id: '2',
+    action: 'New complaint filed',
+    detail: 'Noise disturbance - Purok 3',
+    time: '25 min ago',
+    dotColor: 'bg-red-500',
+  },
+  {
+    id: '3',
+    action: 'Resident record updated',
+    detail: 'Pedro M. Flores contact details',
+    time: '1 hr ago',
+    dotColor: 'bg-yellow-400',
+  },
+];
+
+const WORKFLOW_ITEMS: WorkflowItem[] = [
+  { label: 'Pending Requests', value: 42, color: 'bg-orange-400', width: 'w-9/12' },
+  { label: 'Processing', value: 18, color: 'bg-blue-500', width: 'w-5/12' },
+  { label: 'Ready / Completed', value: 64, color: 'bg-green-500', width: 'w-full' },
+  { label: 'Open Complaints', value: 7, color: 'bg-red-500', width: 'w-2/12' },
+];
 
 function StatCardItem({ card }: { card: StatCard }) {
   return (
@@ -104,21 +146,34 @@ function StatCardItem({ card }: { card: StatCard }) {
   );
 }
 
-// ── Page ─────────────────────────────────────────────────────────────────────
+function RecentActivityItem({ item }: { item: RecentActivity }) {
+  return (
+    <div className="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50 px-3 py-3">
+      <span className={`mt-1 h-2.5 w-2.5 rounded-full ${item.dotColor}`} />
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-bold text-gray-800">{item.action}</p>
+        <p className="truncate text-xs font-medium text-gray-400">{item.detail}</p>
+      </div>
+      <span className="shrink-0 text-[11px] font-semibold text-gray-400">{item.time}</span>
+    </div>
+  );
+}
 
 export function Dashboard() {
   return (
     <AdminLayout title="Dashboard">
-      {/* Stat cards */}
+      <div className="mb-5 flex flex-col gap-1">
+        <h1 className="text-xl font-extrabold tracking-tight text-gray-950">Dashboard Overview</h1>
+        <p className="text-sm font-medium text-gray-400">Mock analytics snapshot for Barangay Daine II operations.</p>
+      </div>
+
       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         {STAT_CARDS.map((card) => (
           <StatCardItem key={card.label} card={card} />
         ))}
       </div>
 
-      {/* Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        {/* Bar chart — Residents by Purok */}
         <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
           <h2 className="text-gray-800 font-semibold text-sm mb-1">Total Residents by Purok</h2>
           <p className="text-gray-400 text-xs mb-5">Registered residents per purok</p>
@@ -147,9 +202,8 @@ export function Dashboard() {
           </ResponsiveContainer>
         </div>
 
-        {/* Area/Line chart — Monthly Document Requests */}
         <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-          <h2 className="text-gray-800 font-semibold text-sm mb-1">Monthly Document Requests – 2026</h2>
+          <h2 className="text-gray-800 font-semibold text-sm mb-1">Monthly Document Requests - 2026</h2>
           <p className="text-gray-400 text-xs mb-5">Documents requested per month</p>
           <ResponsiveContainer width="100%" height={240}>
             <AreaChart data={MONTHLY_REQUESTS} margin={{ top: 4, right: 8, bottom: 0, left: -10 }}>
@@ -189,6 +243,44 @@ export function Dashboard() {
             </AreaChart>
           </ResponsiveContainer>
         </div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm xl:col-span-2">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-bold text-gray-800">Recent Admin Activity</h2>
+              <p className="text-xs font-medium text-gray-400">Preview of future audit log feed</p>
+            </div>
+            <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-600">
+              Mock Data
+            </span>
+          </div>
+          <div className="space-y-3">
+            {RECENT_ACTIVITY.map((item) => (
+              <RecentActivityItem key={item.id} item={item} />
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <h2 className="text-sm font-bold text-gray-800">Workflow Snapshot</h2>
+          <p className="mb-5 text-xs font-medium text-gray-400">Today&apos;s queue health</p>
+
+          <div className="space-y-4">
+            {WORKFLOW_ITEMS.map((item) => (
+              <div key={item.label}>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <span className="text-xs font-bold text-gray-600">{item.label}</span>
+                  <span className="text-xs font-extrabold text-gray-900">{item.value}</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+                  <div className={`h-full rounded-full ${item.color} ${item.width}`} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </AdminLayout>
   );

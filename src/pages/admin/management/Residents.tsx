@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { Search, ChevronDown, X, UserPlus } from 'lucide-react';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 type Gender = 'Male' | 'Female';
 type CivilStatus = 'Single' | 'Married' | 'Widow' | 'Widower' | 'Separated';
 
@@ -32,8 +30,6 @@ interface ResidentFormState {
   citizenship: string;
   is_voter: boolean;
 }
-
-// ── Mock data ─────────────────────────────────────────────────────────────────
 
 const MOCK_RESIDENTS: ResidentRow[] = [
   {
@@ -105,7 +101,7 @@ const MOCK_RESIDENTS: ResidentRow[] = [
 
 const PUROKS = ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5', 'Purok 6'];
 const PAGE_SIZE = 5;
-const TOTAL_COUNT = 4821; // will reflect real DB total once connected
+const TOTAL_COUNT = 4821;
 
 const EMPTY_FORM: ResidentFormState = {
   full_name: '',
@@ -118,8 +114,6 @@ const EMPTY_FORM: ResidentFormState = {
   citizenship: 'Filipino',
   is_voter: false,
 };
-
-// ── Sub-components ────────────────────────────────────────────────────────────
 
 function FilterSelect({
   value,
@@ -140,8 +134,8 @@ function FilterSelect({
         className="appearance-none bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 pr-8 focus:outline-none focus:border-blue-500 cursor-pointer min-w-36"
       >
         <option value="">{placeholder}</option>
-        {options.map((o) => (
-          <option key={o} value={o}>{o}</option>
+        {options.map((option) => (
+          <option key={option} value={option}>{option}</option>
         ))}
       </select>
       <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -149,15 +143,24 @@ function FilterSelect({
   );
 }
 
-// ── Resident Modal ───────────────────────────────────────────────────────────
+function DetailField({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-blue-600 text-[10px] font-bold uppercase tracking-widest mb-0.5">{label}</p>
+      <p className="text-gray-900 font-semibold text-sm">{value || '-'}</p>
+    </div>
+  );
+}
 
 function ResidentModal({
   mode,
   resident,
+  onSave,
   onClose,
 }: {
   mode: 'add' | 'edit' | 'view';
   resident?: ResidentRow;
+  onSave: (form: ResidentFormState, residentId?: string) => void;
   onClose: () => void;
 }) {
   const [form, setForm] = useState<ResidentFormState>(
@@ -184,21 +187,14 @@ function ResidentModal({
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  // Helper for view-mode field pairs
-  function DetailField({ label, value }: { label: string; value: string }) {
-    return (
-      <div>
-        <p className="text-blue-600 text-[10px] font-bold uppercase tracking-widest mb-0.5">{label}</p>
-        <p className="text-gray-900 font-semibold text-sm">{value || '—'}</p>
-      </div>
-    );
+  function handleSubmit() {
+    if (!form.full_name.trim() || !form.address.trim()) return;
+    onSave(form, resident?.id);
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
-
-        {/* Blue gradient header */}
         <div className="bg-linear-to-r from-blue-800 to-blue-600 px-6 py-4 flex items-start justify-between">
           <div>
             <h2 className="text-white font-bold text-lg leading-tight">{title}</h2>
@@ -212,7 +208,6 @@ function ResidentModal({
           </button>
         </div>
 
-        {/* ── VIEW MODE ── */}
         {isView && resident && (
           <div className="px-6 py-5">
             <div className="grid grid-cols-2 gap-x-8 gap-y-4">
@@ -231,12 +226,9 @@ function ResidentModal({
           </div>
         )}
 
-        {/* ── ADD / EDIT MODE ── */}
         {!isView && (
           <>
             <div className="px-6 py-5 grid grid-cols-2 gap-x-4 gap-y-4">
-
-              {/* Full Name */}
               <div className="col-span-2">
                 <label className="block text-xs font-semibold text-gray-600 mb-1">
                   Full Name <span className="text-red-500">*</span>
@@ -250,7 +242,6 @@ function ResidentModal({
                 />
               </div>
 
-              {/* Gender */}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Gender</label>
                 <select
@@ -264,7 +255,6 @@ function ResidentModal({
                 </select>
               </div>
 
-              {/* Birthdate */}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Birthdate</label>
                 <input
@@ -275,7 +265,6 @@ function ResidentModal({
                 />
               </div>
 
-              {/* Complete Address */}
               <div className="col-span-2">
                 <label className="block text-xs font-semibold text-gray-600 mb-1">
                   Complete Address <span className="text-red-500">*</span>
@@ -289,7 +278,20 @@ function ResidentModal({
                 />
               </div>
 
-              {/* Civil Status */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Purok</label>
+                <select
+                  value={form.purok}
+                  onChange={(e) => handleChange('purok', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
+                >
+                  <option value="">Select purok</option>
+                  {PUROKS.map((purok) => (
+                    <option key={purok} value={purok}>{purok}</option>
+                  ))}
+                </select>
+              </div>
+
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Civil Status</label>
                 <select
@@ -298,13 +300,12 @@ function ResidentModal({
                   className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
                 >
                   <option value="">Select status</option>
-                  {(['Single', 'Married', 'Widow', 'Widower', 'Separated'] as CivilStatus[]).map((s) => (
-                    <option key={s} value={s}>{s}</option>
+                  {(['Single', 'Married', 'Widow', 'Widower', 'Separated'] as CivilStatus[]).map((status) => (
+                    <option key={status} value={status}>{status}</option>
                   ))}
                 </select>
               </div>
 
-              {/* Contact Number */}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Contact Number</label>
                 <input
@@ -316,7 +317,6 @@ function ResidentModal({
                 />
               </div>
 
-              {/* Citizenship */}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Citizenship</label>
                 <input
@@ -327,7 +327,6 @@ function ResidentModal({
                 />
               </div>
 
-              {/* Voter Status */}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Voter Status</label>
                 <select
@@ -341,10 +340,9 @@ function ResidentModal({
               </div>
             </div>
 
-            {/* Save button */}
             <div className="px-6 pb-5">
               <button
-                onClick={onClose}
+                onClick={handleSubmit}
                 className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-colors text-sm"
               >
                 {mode === 'add' ? 'Add Resident' : 'Save Changes'}
@@ -357,10 +355,8 @@ function ResidentModal({
   );
 }
 
-
-// ── Page ──────────────────────────────────────────────────────────────────────
-
 export function Residents() {
+  const [residents, setResidents] = useState<ResidentRow[]>(MOCK_RESIDENTS);
   const [search, setSearch] = useState('');
   const [purokFilter, setPurokFilter] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
@@ -368,18 +364,17 @@ export function Residents() {
   const [currentPage, setCurrentPage] = useState(1);
   const [modal, setModal] = useState<{ mode: 'add' | 'edit' | 'view'; resident?: ResidentRow } | null>(null);
 
-  // Client-side filtering on mock data
-  const filtered = MOCK_RESIDENTS.filter((r) => {
+  const filtered = residents.filter((resident) => {
     const matchSearch =
       search === '' ||
-      r.full_name.toLowerCase().includes(search.toLowerCase()) ||
-      r.reference_id.toLowerCase().includes(search.toLowerCase());
-    const matchPurok = purokFilter === '' || r.purok === purokFilter;
-    const matchGender = genderFilter === '' || r.gender === genderFilter;
+      resident.full_name.toLowerCase().includes(search.toLowerCase()) ||
+      resident.reference_id.toLowerCase().includes(search.toLowerCase());
+    const matchPurok = purokFilter === '' || resident.purok === purokFilter;
+    const matchGender = genderFilter === '' || resident.gender === genderFilter;
     const matchVoter =
       voterFilter === '' ||
-      (voterFilter === 'Voter' && r.is_voter) ||
-      (voterFilter === 'Non-Voter' && !r.is_voter);
+      (voterFilter === 'Voter' && resident.is_voter) ||
+      (voterFilter === 'Non-Voter' && !resident.is_voter);
     return matchSearch && matchPurok && matchGender && matchVoter;
   });
 
@@ -387,23 +382,65 @@ export function Residents() {
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const pageStart = (safeCurrentPage - 1) * PAGE_SIZE;
   const pageRows = filtered.slice(pageStart, pageStart + PAGE_SIZE);
-
-  // For display: use real total count when filters are clear, otherwise filtered count
   const displayTotal =
     search === '' && purokFilter === '' && genderFilter === '' && voterFilter === ''
       ? TOTAL_COUNT
       : filtered.length;
-  const displayStart = pageStart + 1;
+  const displayStart = filtered.length === 0 ? 0 : pageStart + 1;
   const displayEnd = Math.min(pageStart + PAGE_SIZE, filtered.length);
 
   function handlePageChange(dir: 'prev' | 'next') {
-    setCurrentPage((p) => (dir === 'prev' ? Math.max(1, p - 1) : Math.min(totalPages, p + 1)));
+    setCurrentPage((page) => (dir === 'prev' ? Math.max(1, page - 1) : Math.min(totalPages, page + 1)));
+  }
+
+  function handleSaveResident(form: ResidentFormState, residentId?: string) {
+    if (residentId) {
+      setResidents((rows) =>
+        rows.map((row) =>
+          row.id === residentId
+            ? {
+                ...row,
+                full_name: form.full_name.trim(),
+                birthdate: form.birthdate || row.birthdate,
+                address: form.address.trim(),
+                purok: form.purok || row.purok,
+                gender: form.gender || row.gender,
+                civil_status: form.civil_status || row.civil_status,
+                contact_number: form.contact_number || 'N/A',
+                citizenship: form.citizenship || 'Filipino',
+                is_voter: form.is_voter,
+              }
+            : row
+        )
+      );
+    } else {
+      const nextNumber = residents.length + 1;
+      const newResident: ResidentRow = {
+        id: String(Date.now()),
+        reference_id: `BD2-2026-${String(nextNumber).padStart(4, '0')}`,
+        full_name: form.full_name.trim(),
+        address: form.address.trim(),
+        gender: form.gender || 'Male',
+        birthdate: form.birthdate || 'Not set',
+        civil_status: form.civil_status || 'Single',
+        contact_number: form.contact_number || 'N/A',
+        citizenship: form.citizenship || 'Filipino',
+        is_voter: form.is_voter,
+        purok: form.purok || 'Purok 1',
+      };
+      setResidents((rows) => [newResident, ...rows]);
+      setCurrentPage(1);
+    }
+    setModal(null);
+  }
+
+  function handleDeleteResident(residentId: string) {
+    setResidents((rows) => rows.filter((row) => row.id !== residentId));
   }
 
   return (
     <>
       <AdminLayout title="Resident Management">
-        {/* Page header */}
         <div className="flex items-center justify-between mb-5">
           <h1 className="text-gray-800 font-bold text-xl">Resident Management</h1>
           <button
@@ -415,9 +452,7 @@ export function Residents() {
           </button>
         </div>
 
-        {/* Filters */}
         <div className="flex flex-wrap items-center gap-3 mb-5">
-          {/* Search */}
           <div className="relative flex-1 min-w-64">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
             <input
@@ -429,37 +464,18 @@ export function Residents() {
             />
           </div>
 
-          <FilterSelect
-            value={purokFilter}
-            onChange={(v) => { setPurokFilter(v); setCurrentPage(1); }}
-            options={PUROKS}
-            placeholder="All Puroks"
-          />
-          <FilterSelect
-            value={genderFilter}
-            onChange={(v) => { setGenderFilter(v); setCurrentPage(1); }}
-            options={['Male', 'Female']}
-            placeholder="All Gender"
-          />
-          <FilterSelect
-            value={voterFilter}
-            onChange={(v) => { setVoterFilter(v); setCurrentPage(1); }}
-            options={['Voter', 'Non-Voter']}
-            placeholder="All Voter Status"
-          />
+          <FilterSelect value={purokFilter} onChange={(v) => { setPurokFilter(v); setCurrentPage(1); }} options={PUROKS} placeholder="All Puroks" />
+          <FilterSelect value={genderFilter} onChange={(v) => { setGenderFilter(v); setCurrentPage(1); }} options={['Male', 'Female']} placeholder="All Gender" />
+          <FilterSelect value={voterFilter} onChange={(v) => { setVoterFilter(v); setCurrentPage(1); }} options={['Voter', 'Non-Voter']} placeholder="All Voter Status" />
         </div>
 
-        {/* Table */}
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-100 border-b border-gray-200">
                   {['ID', 'FULL NAME', 'ADDRESS', 'GENDER', 'BIRTHDATE', 'CIVIL STATUS', 'CONTACT', 'CITIZENSHIP', 'VOTER', 'ACTIONS'].map((col) => (
-                    <th
-                      key={col}
-                      className="text-left text-[11px] font-bold tracking-widest text-gray-600 uppercase px-4 py-3 whitespace-nowrap"
-                    >
+                    <th key={col} className="text-left text-[11px] font-bold tracking-widest text-gray-600 uppercase px-4 py-3 whitespace-nowrap">
                       {col}
                     </th>
                   ))}
@@ -468,64 +484,40 @@ export function Residents() {
               <tbody className="divide-y divide-gray-200">
                 {pageRows.length === 0 ? (
                   <tr>
-                      <td colSpan={10} className="text-center text-gray-400 py-10 text-sm">
+                    <td colSpan={10} className="text-center text-gray-400 py-10 text-sm">
                       No residents match your search.
                     </td>
                   </tr>
                 ) : (
-                  pageRows.map((r, i) => (
-                    <tr
-                      key={r.id}
-                      className={`transition-colors hover:bg-blue-50 ${
-                        i % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                      }`}
-                    >
-                      {/* ID */}
+                  pageRows.map((resident, index) => (
+                    <tr key={resident.id} className={`transition-colors hover:bg-blue-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-blue-600 font-mono text-xs font-bold">{r.reference_id}</span>
+                        <span className="text-blue-600 font-mono text-xs font-bold">{resident.reference_id}</span>
                       </td>
-                      {/* Full Name */}
                       <td className="px-4 py-3">
-                        <span className="text-gray-800 font-medium text-sm">{r.full_name}</span>
+                        <span className="text-gray-800 font-medium text-sm">{resident.full_name}</span>
                       </td>
-                      {/* Address */}
-                      <td className="px-4 py-3 text-gray-500 text-xs max-w-44">{r.address}</td>
-                      {/* Gender */}
-                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{r.gender}</td>
-                      {/* Birthdate */}
-                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{r.birthdate}</td>
-                      {/* Civil Status */}
-                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{r.civil_status}</td>
-                      {/* Contact */}
-                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{r.contact_number}</td>
-                      {/* Citizenship */}
-                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{r.citizenship}</td>
-                      {/* Voter badge */}
+                      <td className="px-4 py-3 text-gray-500 text-xs max-w-44">{resident.address}</td>
+                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{resident.gender}</td>
+                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{resident.birthdate}</td>
+                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{resident.civil_status}</td>
+                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{resident.contact_number}</td>
+                      <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{resident.citizenship}</td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        {r.is_voter ? (
-                          <span className="bg-green-50 text-green-600 border border-green-200 text-xs font-semibold px-2 py-0.5 rounded-full">
-                            Voter
-                          </span>
-                        ) : (
-                          <span className="bg-gray-100 text-gray-500 border border-gray-200 text-xs font-semibold px-2 py-0.5 rounded-full">
-                            Non-Voter
-                          </span>
-                        )}
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${resident.is_voter ? 'bg-green-50 text-green-600 border-green-200' : 'bg-gray-100 text-gray-500 border-gray-200'}`}>
+                          {resident.is_voter ? 'Voter' : 'Non-Voter'}
+                        </span>
                       </td>
-                      {/* Actions */}
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex flex-col gap-1">
-                          <button
-                            onClick={() => setModal({ mode: 'view', resident: r })}
-                            className="text-xs border border-gray-200 text-gray-600 hover:border-blue-400 hover:text-blue-600 rounded px-3 py-1 transition-colors"
-                          >
+                          <button onClick={() => setModal({ mode: 'view', resident })} className="text-xs border border-gray-200 text-gray-600 hover:border-blue-400 hover:text-blue-600 rounded px-3 py-1 transition-colors">
                             View
                           </button>
-                          <button
-                            onClick={() => setModal({ mode: 'edit', resident: r })}
-                            className="text-xs border border-gray-200 text-gray-600 hover:border-yellow-400 hover:text-yellow-600 rounded px-3 py-1 transition-colors"
-                          >
+                          <button onClick={() => setModal({ mode: 'edit', resident })} className="text-xs border border-gray-200 text-gray-600 hover:border-yellow-400 hover:text-yellow-600 rounded px-3 py-1 transition-colors">
                             Edit
+                          </button>
+                          <button onClick={() => handleDeleteResident(resident.id)} className="text-xs border border-red-100 text-red-500 hover:border-red-300 hover:bg-red-50 rounded px-3 py-1 transition-colors">
+                            Delete
                           </button>
                         </div>
                       </td>
@@ -536,36 +528,27 @@ export function Residents() {
             </table>
           </div>
 
-          {/* Pagination */}
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
             <span className="text-gray-400 text-xs">
-              Showing {filtered.length === 0 ? 0 : displayStart}–{displayEnd} of {displayTotal.toLocaleString()} residents
+              Showing {displayStart}-{displayEnd} of {displayTotal.toLocaleString()} residents
             </span>
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => handlePageChange('prev')}
-                disabled={safeCurrentPage === 1}
-                className="text-xs border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed rounded px-3 py-1.5 transition-colors"
-              >
-                ← Prev
+              <button onClick={() => handlePageChange('prev')} disabled={safeCurrentPage === 1} className="text-xs border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed rounded px-3 py-1.5 transition-colors">
+                Prev
               </button>
-              <button
-                onClick={() => handlePageChange('next')}
-                disabled={safeCurrentPage >= totalPages}
-                className="text-xs border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed rounded px-3 py-1.5 transition-colors"
-              >
-                Next →
+              <button onClick={() => handlePageChange('next')} disabled={safeCurrentPage >= totalPages} className="text-xs border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed rounded px-3 py-1.5 transition-colors">
+                Next
               </button>
             </div>
           </div>
         </div>
       </AdminLayout>
 
-      {/* Modal */}
       {modal && (
         <ResidentModal
           mode={modal.mode}
           resident={modal.resident}
+          onSave={handleSaveResident}
           onClose={() => setModal(null)}
         />
       )}

@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
 type AnnouncementStatus = 'published' | 'scheduled' | 'draft';
+type AnnouncementModalMode = 'add' | 'edit';
 
 interface AnnouncementRow {
   id: string;
@@ -10,6 +11,7 @@ interface AnnouncementRow {
   category: string;
   date_posted: string;
   status: AnnouncementStatus;
+  body: string;
 }
 
 interface AnnouncementFormState {
@@ -20,36 +22,53 @@ interface AnnouncementFormState {
   body: string;
 }
 
+interface AnnouncementModalState {
+  mode: AnnouncementModalMode;
+  announcement?: AnnouncementRow;
+}
+
 const MOCK_ANNOUNCEMENTS: AnnouncementRow[] = [
   {
     id: '1',
     title: 'Community Clean-up Drive - April 6',
     category: 'Event',
-    date_posted: 'Mar 15, 2025',
+    date_posted: '2025-03-15',
     status: 'published',
+    body: 'All residents are invited to join the community clean-up drive this April 6. Assembly will be at the barangay hall at 7:00 AM.',
   },
   {
     id: '2',
     title: 'Livelihood Skills Training - TESDA',
     category: 'Program',
-    date_posted: 'Jan 20, 2025',
+    date_posted: '2025-01-20',
     status: 'published',
+    body: 'TESDA livelihood skills training registration is now open for interested Barangay Daine II residents.',
   },
   {
     id: '3',
     title: 'Online Portal Now Live',
     category: 'System',
-    date_posted: 'Nov 5, 2024',
+    date_posted: '2024-11-05',
     status: 'published',
+    body: 'BarangayHub is now available for online document requests, tracking, announcements, and resident concerns.',
   },
   {
     id: '4',
     title: 'Senior Citizen Medical Mission',
     category: 'Health',
-    date_posted: 'Aug 18, 2024',
+    date_posted: '2024-08-18',
     status: 'scheduled',
+    body: 'A medical mission for senior citizens is scheduled at the barangay covered court. Please bring a valid ID and senior citizen card.',
   },
 ];
+
+const EMPTY_FORM: AnnouncementFormState = {
+  title: '',
+  category: '',
+  date_posted: new Date().toISOString().slice(0, 10),
+  status: 'draft',
+  body: '',
+};
 
 const STATUS_LABELS: Record<AnnouncementStatus, string> = {
   published: 'Published',
@@ -63,6 +82,29 @@ const STATUS_STYLES: Record<AnnouncementStatus, string> = {
   draft: 'bg-gray-100 text-gray-500 border border-gray-200',
 };
 
+function formatAnnouncementDate(value: string) {
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date);
+}
+
+function createFormFromAnnouncement(announcement?: AnnouncementRow): AnnouncementFormState {
+  if (!announcement) return EMPTY_FORM;
+
+  return {
+    title: announcement.title,
+    category: announcement.category,
+    date_posted: announcement.date_posted,
+    status: announcement.status,
+    body: announcement.body,
+  };
+}
+
 function StatusBadge({ status }: { status: AnnouncementStatus }) {
   return (
     <span className={`inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap ${STATUS_STYLES[status]}`}>
@@ -71,45 +113,64 @@ function StatusBadge({ status }: { status: AnnouncementStatus }) {
   );
 }
 
-function ActionButtons({ status }: { status: AnnouncementStatus }) {
+function ActionButtons({
+  status,
+  onEdit,
+  onPublish,
+  onUnpublish,
+  onDelete,
+}: {
+  status: AnnouncementStatus;
+  onEdit: () => void;
+  onPublish: () => void;
+  onUnpublish: () => void;
+  onDelete: () => void;
+}) {
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      <button className="px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors">
+      <button onClick={onEdit} className="px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors">
         Edit
       </button>
-      {status === 'scheduled' ? (
-        <button className="px-3 py-1 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 transition-colors">
-          Publish Now
-        </button>
-      ) : (
-        <button className="px-3 py-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 transition-colors">
+      {status === 'published' ? (
+        <button onClick={onUnpublish} className="px-3 py-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 transition-colors">
           Unpublish
         </button>
+      ) : (
+        <button onClick={onPublish} className="px-3 py-1 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 transition-colors">
+          Publish Now
+        </button>
       )}
-      <button className="px-3 py-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 transition-colors">
+      <button onClick={onDelete} className="px-3 py-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 transition-colors">
         Delete
       </button>
     </div>
   );
 }
 
-const EMPTY_FORM: AnnouncementFormState = {
-  title: '',
-  category: '',
-  date_posted: '',
-  status: 'draft',
-  body: '',
-};
-
 function AnnouncementModal({
+  modal,
   onClose,
+  onSave,
 }: {
+  modal: AnnouncementModalState;
   onClose: () => void;
+  onSave: (form: AnnouncementFormState, announcementId?: string) => void;
 }) {
-  const [form, setForm] = useState<AnnouncementFormState>(EMPTY_FORM);
+  const [form, setForm] = useState<AnnouncementFormState>(
+    createFormFromAnnouncement(modal.announcement)
+  );
+
+  const isEdit = modal.mode === 'edit';
+  const title = isEdit ? 'Edit Announcement' : 'Add Announcement';
+  const subtitle = isEdit ? 'Update announcement information' : 'Enter new announcement information';
 
   function handleChange<K extends keyof AnnouncementFormState>(field: K, value: AnnouncementFormState[K]) {
     setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function handleSubmit() {
+    if (!form.title.trim() || !form.category.trim() || !form.body.trim()) return;
+    onSave(form, modal.announcement?.id);
   }
 
   return (
@@ -117,8 +178,8 @@ function AnnouncementModal({
       <div className="bg-white rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden">
         <div className="bg-linear-to-r from-blue-800 to-blue-600 px-6 py-4 flex items-start justify-between">
           <div>
-            <h2 className="text-white font-bold text-2xl leading-tight">Add Announcement</h2>
-            <p className="text-blue-200 text-xs mt-1">Enter new announcement information</p>
+            <h2 className="text-white font-bold text-2xl leading-tight">{title}</h2>
+            <p className="text-blue-200 text-xs mt-1">{subtitle}</p>
           </div>
           <button
             onClick={onClose}
@@ -142,9 +203,11 @@ function AnnouncementModal({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Category</label>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                Category <span className="text-red-500">*</span>
+              </label>
               <select
                 value={form.category}
                 onChange={(e) => handleChange('category', e.target.value)}
@@ -184,7 +247,9 @@ function AnnouncementModal({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Announcement Body</label>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+              Announcement Body <span className="text-red-500">*</span>
+            </label>
             <textarea
               value={form.body}
               onChange={(e) => handleChange('body', e.target.value)}
@@ -197,10 +262,10 @@ function AnnouncementModal({
 
         <div className="px-6 pb-5">
           <button
-            onClick={onClose}
+            onClick={handleSubmit}
             className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-colors text-sm"
           >
-            Add Announcement
+            {isEdit ? 'Save Changes' : 'Add Announcement'}
           </button>
         </div>
       </div>
@@ -209,15 +274,68 @@ function AnnouncementModal({
 }
 
 export function Announcements() {
-  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [announcements, setAnnouncements] = useState<AnnouncementRow[]>(MOCK_ANNOUNCEMENTS);
+  const [modal, setModal] = useState<AnnouncementModalState | null>(null);
+
+  function handleSaveAnnouncement(form: AnnouncementFormState, announcementId?: string) {
+    if (announcementId) {
+      setAnnouncements((rows) =>
+        rows.map((row) =>
+          row.id === announcementId
+            ? {
+                ...row,
+                title: form.title.trim(),
+                category: form.category,
+                date_posted: form.date_posted,
+                status: form.status,
+                body: form.body.trim(),
+              }
+            : row
+        )
+      );
+    } else {
+      const newAnnouncement: AnnouncementRow = {
+        id: String(Date.now()),
+        title: form.title.trim(),
+        category: form.category,
+        date_posted: form.date_posted,
+        status: form.status,
+        body: form.body.trim(),
+      };
+      setAnnouncements((rows) => [newAnnouncement, ...rows]);
+    }
+
+    setModal(null);
+  }
+
+  function handleStatusChange(announcementId: string, status: AnnouncementStatus) {
+    setAnnouncements((rows) =>
+      rows.map((row) =>
+        row.id === announcementId
+          ? {
+              ...row,
+              status,
+              date_posted: status === 'published' ? new Date().toISOString().slice(0, 10) : row.date_posted,
+            }
+          : row
+      )
+    );
+  }
+
+  function handleDeleteAnnouncement(announcementId: string) {
+    setAnnouncements((rows) => rows.filter((row) => row.id !== announcementId));
+  }
 
   return (
     <>
       <AdminLayout title="Announcements">
         <div className="flex items-center justify-between mb-5">
-          <h1 className="text-gray-800 font-bold text-xl">Announcements</h1>
+          <div>
+            <h1 className="text-gray-800 font-bold text-xl">Announcements</h1>
+            <p className="text-gray-400 text-xs mt-1">{announcements.length} mock announcements ready for public posting</p>
+          </div>
           <button
-            onClick={() => setIsAddOpen(true)}
+            onClick={() => setModal({ mode: 'add' })}
             className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
           >
             + Post Announcement
@@ -240,26 +358,49 @@ export function Announcements() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {MOCK_ANNOUNCEMENTS.map((announcement) => (
-                  <tr key={announcement.id} className="hover:bg-blue-50 transition-colors">
-                    <td className="px-4 py-4 text-gray-900 font-semibold">{announcement.title}</td>
-                    <td className="px-4 py-4 text-gray-700">{announcement.category}</td>
-                    <td className="px-4 py-4 text-gray-700 whitespace-nowrap">{announcement.date_posted}</td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <StatusBadge status={announcement.status} />
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <ActionButtons status={announcement.status} />
+                {announcements.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-10 text-center text-gray-400 text-sm">
+                      No announcements yet. Post one to begin.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  announcements.map((announcement) => (
+                    <tr key={announcement.id} className="hover:bg-blue-50 transition-colors">
+                      <td className="px-4 py-4">
+                        <p className="text-gray-900 font-semibold">{announcement.title}</p>
+                        <p className="text-gray-400 text-xs line-clamp-1 mt-0.5">{announcement.body}</p>
+                      </td>
+                      <td className="px-4 py-4 text-gray-700">{announcement.category}</td>
+                      <td className="px-4 py-4 text-gray-700 whitespace-nowrap">{formatAnnouncementDate(announcement.date_posted)}</td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <StatusBadge status={announcement.status} />
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <ActionButtons
+                          status={announcement.status}
+                          onEdit={() => setModal({ mode: 'edit', announcement })}
+                          onPublish={() => handleStatusChange(announcement.id, 'published')}
+                          onUnpublish={() => handleStatusChange(announcement.id, 'draft')}
+                          onDelete={() => handleDeleteAnnouncement(announcement.id)}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
       </AdminLayout>
 
-      {isAddOpen && <AnnouncementModal onClose={() => setIsAddOpen(false)} />}
+      {modal && (
+        <AnnouncementModal
+          modal={modal}
+          onClose={() => setModal(null)}
+          onSave={handleSaveAnnouncement}
+        />
+      )}
     </>
   );
 }
