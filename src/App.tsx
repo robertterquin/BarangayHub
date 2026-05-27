@@ -13,8 +13,8 @@ import { Announcements } from './pages/admin/management/Announcements';
 import { Officials } from './pages/admin/management/Officials';
 import { Reports } from './pages/admin/analytics/Reports';
 import { UserManagement } from './pages/admin/system/UserManagement';
-//              import { ActivityLogs }       from './pages/admin/system/ActivityLogs';
-//              import { History }            from './pages/admin/system/History';
+import { ActivityLogs } from './pages/admin/system/ActivityLogs';
+import { History } from './pages/admin/system/History';
 //              import { Feedback }           from './pages/admin/system/Feedback';
 //              import { Settings }           from './pages/admin/system/Settings';
 
@@ -43,6 +43,8 @@ function App() {
       <Route path="/admin/officials" element={<ProtectedRoute><Officials /></ProtectedRoute>} />
       <Route path="/admin/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+      <Route path="/admin/activity-logs" element={<ProtectedRoute><ActivityLogs /></ProtectedRoute>} />
+      <Route path="/admin/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
       <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
       {/* Default redirect — points to dashboard during dev */}
