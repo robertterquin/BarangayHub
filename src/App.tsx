@@ -15,7 +15,7 @@ import { Reports } from './pages/admin/analytics/Reports';
 import { UserManagement } from './pages/admin/system/UserManagement';
 import { ActivityLogs } from './pages/admin/system/ActivityLogs';
 import { History } from './pages/admin/system/History';
-//              import { Feedback }           from './pages/admin/system/Feedback';
+import { Feedback } from './pages/admin/system/Feedback';
 //              import { Settings }           from './pages/admin/system/Settings';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -45,6 +45,7 @@ function App() {
       <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
       <Route path="/admin/activity-logs" element={<ProtectedRoute><ActivityLogs /></ProtectedRoute>} />
       <Route path="/admin/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+      <Route path="/admin/feedback" element={<ProtectedRoute><Feedback /></ProtectedRoute>} />
       <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
       {/* Default redirect — points to dashboard during dev */}
