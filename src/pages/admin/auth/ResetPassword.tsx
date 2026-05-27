@@ -3,29 +3,28 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, AlertCircle, Loader2, CheckCircle2, Circle, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 
-
 interface PasswordRule {
   label: string;
   test: (pw: string) => boolean;
 }
 
 const PASSWORD_RULES: PasswordRule[] = [
-  { label: 'Minimum 8 characters',          test: (pw) => pw.length >= 8 },
-  { label: 'At least one uppercase letter',  test: (pw) => /[A-Z]/.test(pw) },
-  { label: 'At least one lowercase letter',  test: (pw) => /[a-z]/.test(pw) },
-  { label: 'At least one number',            test: (pw) => /[0-9]/.test(pw) },
+  { label: 'Minimum 8 characters', test: (pw) => pw.length >= 8 },
+  { label: 'At least one uppercase letter', test: (pw) => /[A-Z]/.test(pw) },
+  { label: 'At least one lowercase letter', test: (pw) => /[a-z]/.test(pw) },
+  { label: 'At least one number', test: (pw) => /[0-9]/.test(pw) },
   { label: 'At least one special character', test: (pw) => /[^A-Za-z0-9]/.test(pw) },
 ];
 
-
-
 export function ResetPassword() {
   const navigate = useNavigate();
-  const { updatePassword } = useAuth();
+  const { user, signIn, signOut, updatePassword } = useAuth();
 
   const [email, setEmail] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,6 +33,7 @@ export function ResetPassword() {
 
   const allRulesPassed = PASSWORD_RULES.every((r) => r.test(newPassword));
   const passwordsMatch = newPassword === confirmPassword && confirmPassword.length > 0;
+  const needsCurrentPassword = !user;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -41,6 +41,10 @@ export function ResetPassword() {
 
     if (!email.trim()) {
       setError('Admin email is required.');
+      return;
+    }
+    if (needsCurrentPassword && !currentPassword) {
+      setError('Current password is required.');
       return;
     }
     if (!allRulesPassed) {
@@ -53,12 +57,25 @@ export function ResetPassword() {
     }
 
     setLoading(true);
+    if (needsCurrentPassword) {
+      const { error: signInError } = await signIn(email.trim(), currentPassword);
+      if (signInError) {
+        setLoading(false);
+        setError('Current admin password is incorrect.');
+        return;
+      }
+    }
+
     const { error: updateError } = await updatePassword(newPassword);
     setLoading(false);
 
     if (updateError) {
-      setError(updateError.message ?? 'Failed to update password. Try again.');
+      setError(updateError.message || 'Failed to update password. Try again.');
       return;
+    }
+
+    if (needsCurrentPassword) {
+      await signOut();
     }
 
     setSuccess(true);
@@ -66,9 +83,7 @@ export function ResetPassword() {
   }
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-[#0052cc]"
-    >
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden bg-[#0052cc]">
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -89,22 +104,26 @@ export function ResetPassword() {
           className="bg-white rounded-2xl px-9 py-10 ring-1 ring-white/10"
           style={{ boxShadow: '0 8px 16px rgba(0,0,0,0.25), 0 32px 64px rgba(0,0,0,0.30), 0 0 0 1px rgba(255,255,255,0.08)' }}
         >
-
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-2xl" aria-hidden>🔒</span>
+              <Lock size={24} className="text-[#0052cc]" />
               <h1 className="text-gray-900 text-2xl font-bold">Reset Password</h1>
             </div>
             <p className="text-gray-500 text-sm">
               Enter your admin email and a new password that meets security requirements.
             </p>
+            {needsCurrentPassword && (
+              <p className="text-blue-600 text-xs mt-2">
+                Enter the current admin password first so Supabase can verify the account.
+              </p>
+            )}
           </div>
 
           {success && (
             <div className="flex items-start gap-2 bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-5">
               <CheckCircle2 size={16} className="text-green-600 mt-0.5 shrink-0" />
               <p className="text-green-700 text-sm font-medium">
-                Password updated! Redirecting to login…
+                Password updated! Redirecting to login...
               </p>
             </div>
           )}
@@ -143,6 +162,43 @@ export function ResetPassword() {
                 </label>
               </div>
             </div>
+
+            {needsCurrentPassword && (
+              <div className="mb-4">
+                <div className="relative">
+                  <input
+                    id="current-password"
+                    type={showCurrent ? 'text' : 'password'}
+                    autoComplete="current-password"
+                    required
+                    disabled={success}
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder=" "
+                    className="peer w-full bg-[#e8f0fe] border border-transparent rounded-lg px-4 pt-5 pb-2 pl-10 pr-11 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:border-[#0052cc] focus:ring-1 focus:ring-[#0052cc]/40 transition-colors disabled:opacity-50"
+                  />
+                  <Lock
+                    size={16}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                    aria-hidden="true"
+                  />
+                  <label
+                    htmlFor="current-password"
+                    className="absolute left-10 top-2 text-[11px] text-gray-500 transition-all pointer-events-none peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-[11px] peer-focus:text-[#0052cc]"
+                  >
+                    Current Password
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrent((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label={showCurrent ? 'Hide password' : 'Show password'}
+                  >
+                    {showCurrent ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="mb-4">
               <div className="relative">
@@ -247,7 +303,7 @@ export function ResetPassword() {
               {loading ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
-                  Updating…
+                  Updating...
                 </>
               ) : (
                 'Reset Password'
@@ -267,7 +323,7 @@ export function ResetPassword() {
         </div>
 
         <p className="text-center text-white/50 text-xs mt-5">
-          BarangayHub · Barangay Daine II Management System
+          BarangayHub - Barangay Daine II Management System
         </p>
       </div>
     </div>

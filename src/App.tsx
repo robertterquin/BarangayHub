@@ -19,10 +19,7 @@ import { Officials } from './pages/admin/management/Officials';
 //              import { Settings }           from './pages/admin/system/Settings';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  // TODO: Remove DEV_BYPASS when Supabase backend is connected
-  const DEV_BYPASS = true;
   const { user, loading } = useAuth();
-  if (DEV_BYPASS) return <>{children}</>;
   if (loading) return <div className="min-h-screen bg-[#121417] flex items-center justify-center text-gray-400">Loading...</div>;
   if (!user) return <Navigate to="/admin/login" replace />;
   return <>{children}</>;

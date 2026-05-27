@@ -7,7 +7,7 @@ interface UseAuthReturn {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
-  sendPasswordReset: (email: string) => Promise<{ error: AuthError | null }>;
+  sendPasswordReset: (email: string, redirectTo?: string) => Promise<{ error: AuthError | null }>;
   updatePassword: (newPassword: string) => Promise<{ error: AuthError | null }>;
 }
 
@@ -39,8 +39,11 @@ export function useAuth(): UseAuthReturn {
     await supabase.auth.signOut();
   }, []);
 
-  const sendPasswordReset = useCallback(async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+  const sendPasswordReset = useCallback(async (email: string, redirectTo?: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      email,
+      redirectTo ? { redirectTo } : undefined
+    );
     return { error };
   }, []);
 
