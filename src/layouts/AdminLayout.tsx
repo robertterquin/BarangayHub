@@ -12,8 +12,6 @@ import {
   ScrollText,
   Settings,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
   Bell,
   Menu,
   Shield,
@@ -161,7 +159,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
         }`}
       >
         {/* Logo */}
-        <div className="flex items-center justify-between px-3 py-4 border-b border-[#2a2d35]">
+        <div className="flex items-center px-3 py-4 border-b border-[#2a2d35]">
           {!collapsed && (
             <div className="min-w-0">
               <span className="font-bold text-white text-lg tracking-tight block">
@@ -172,12 +170,6 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
               </span>
             </div>
           )}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-1 rounded text-gray-400 hover:text-white hover:bg-[#2a2d35] transition-colors shrink-0"
-          >
-            {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-          </button>
         </div>
 
         {/* Admin user */}
