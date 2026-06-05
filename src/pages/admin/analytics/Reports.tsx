@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Download, FileBarChart, FileText, Users, AlertTriangle, Building2 } from 'lucide-react';
+import { FileBarChart, FileText, Users, AlertTriangle, Building2 } from 'lucide-react';
+import { PageHeader, ReportCard } from '../../../components/admin';
+import { Button } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
-interface ReportCard {
+interface ReportItem {
   id: string;
   title: string;
   description: string;
@@ -12,7 +14,7 @@ interface ReportCard {
   accent: string;
 }
 
-const REPORT_CARDS: ReportCard[] = [
+const REPORT_CARDS: ReportItem[] = [
   {
     id: 'monthly-documents',
     title: 'Monthly Document Report',
@@ -51,68 +53,31 @@ const REPORT_CARDS: ReportCard[] = [
   },
 ];
 
-function ReportCardItem({
-  report,
-  onDownload,
-}: {
-  report: ReportCard;
-  onDownload: (report: ReportCard) => void;
-}) {
-  return (
-    <article className="flex min-h-40 flex-col rounded-2xl border border-blue-200 bg-blue-50/70 p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
-      <div className="mb-3 flex items-start justify-between gap-3">
-        <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${report.accent}`}>
-          {report.icon}
-        </div>
-        <span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-500">
-          PDF
-        </span>
-      </div>
-
-      <h2 className="text-sm font-extrabold text-blue-900">{report.title}</h2>
-      <p className="mt-1 flex-1 text-sm font-medium leading-relaxed text-slate-600">
-        {report.description}
-      </p>
-
-      <div className="mt-4 flex items-center justify-between gap-3">
-        <button
-          onClick={() => onDownload(report)}
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-700 px-4 py-2 text-xs font-extrabold text-white shadow-sm transition-colors hover:bg-blue-800"
-        >
-          <Download size={13} />
-          Download PDF
-        </button>
-      </div>
-    </article>
-  );
-}
-
 export function Reports() {
-  const [selectedReport, setSelectedReport] = useState<ReportCard | null>(null);
+  const [selectedReport, setSelectedReport] = useState<ReportItem | null>(null);
 
-  function handleMockDownload(report: ReportCard) {
+  function handleMockDownload(report: ReportItem) {
     setSelectedReport(report);
   }
 
   return (
     <AdminLayout title="Reports">
       <section className="space-y-5">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <FileBarChart size={20} className="text-blue-700" />
-            <h1 className="text-xl font-extrabold tracking-tight text-gray-950">Reports & Analytics</h1>
-          </div>
-          <p className="text-sm font-medium text-gray-400">
-            Generate mock report cards first, then connect these actions to Supabase and PDF export later.
-          </p>
-        </div>
+        <PageHeader
+          title="Reports & Analytics"
+          subtitle="Generate mock report cards first, then connect these actions to Supabase and PDF export later."
+          meta={<FileBarChart size={20} className="text-blue-700" />}
+        />
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           {REPORT_CARDS.map((report) => (
-            <ReportCardItem
+            <ReportCard
               key={report.id}
-              report={report}
-              onDownload={handleMockDownload}
+              title={report.title}
+              description={report.description}
+              icon={report.icon}
+              accent={report.accent}
+              onDownload={() => handleMockDownload(report)}
             />
           ))}
         </div>
@@ -128,12 +93,13 @@ export function Reports() {
                   File: {selectedReport.fileName} · Last generated {selectedReport.lastGenerated}
                 </p>
               </div>
-              <button
+              <Button
                 onClick={() => setSelectedReport(null)}
-                className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-bold text-gray-500 transition-colors hover:bg-gray-50"
+                variant="ghost"
+                size="sm"
               >
                 Dismiss
-              </button>
+              </Button>
             </div>
           </div>
         )}

@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Search, ChevronDown, X, UserPlus } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
+import { DetailField, FilterBar, PageHeader, StatusBadge } from '../../../components/admin';
+import { Button, Modal, Select, TableEmptyRow, TableHeader, TableShell } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
 type Gender = 'Male' | 'Female';
@@ -115,43 +117,6 @@ const EMPTY_FORM: ResidentFormState = {
   is_voter: false,
 };
 
-function FilterSelect({
-  value,
-  onChange,
-  options,
-  placeholder,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  options: string[];
-  placeholder: string;
-}) {
-  return (
-    <div className="relative">
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="appearance-none bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 pr-8 focus:outline-none focus:border-blue-500 cursor-pointer min-w-36"
-      >
-        <option value="">{placeholder}</option>
-        {options.map((option) => (
-          <option key={option} value={option}>{option}</option>
-        ))}
-      </select>
-      <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-    </div>
-  );
-}
-
-function DetailField({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-blue-600 text-[10px] font-bold uppercase tracking-widest mb-0.5">{label}</p>
-      <p className="text-gray-900 font-semibold text-sm">{value || '-'}</p>
-    </div>
-  );
-}
-
 function ResidentModal({
   mode,
   resident,
@@ -193,42 +158,26 @@ function ResidentModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
-        <div className="bg-linear-to-r from-blue-800 to-blue-600 px-6 py-4 flex items-start justify-between">
-          <div>
-            <h2 className="text-white font-bold text-lg leading-tight">{title}</h2>
-            <p className="text-blue-200 text-xs mt-0.5">{subtitle}</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-full text-white/70 hover:text-white hover:bg-white/20 transition-colors mt-0.5"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
+    <Modal title={title} subtitle={subtitle} onClose={onClose}>
         {isView && resident && (
-          <div className="px-6 py-5">
-            <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-              <DetailField label="Full Name" value={resident.full_name} />
-              <DetailField label="Gender" value={resident.gender} />
-              <DetailField label="Date of Birth" value={resident.birthdate} />
-              <DetailField label="Civil Status" value={resident.civil_status} />
-              <DetailField label="Contact Number" value={resident.contact_number} />
-              <DetailField label="Citizenship" value={resident.citizenship} />
-              <DetailField label="Voter Status" value={resident.is_voter ? 'Voter' : 'Non-Voter'} />
-              <div />
-              <div className="col-span-2">
-                <DetailField label="Complete Address" value={`${resident.address}, Brgy. Daine II`} />
-              </div>
+          <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+            <DetailField label="Full Name" value={resident.full_name} />
+            <DetailField label="Gender" value={resident.gender} />
+            <DetailField label="Date of Birth" value={resident.birthdate} />
+            <DetailField label="Civil Status" value={resident.civil_status} />
+            <DetailField label="Contact Number" value={resident.contact_number} />
+            <DetailField label="Citizenship" value={resident.citizenship} />
+            <DetailField label="Voter Status" value={resident.is_voter ? 'Voter' : 'Non-Voter'} />
+            <div />
+            <div className="col-span-2">
+              <DetailField label="Complete Address" value={`${resident.address}, Brgy. Daine II`} />
             </div>
           </div>
         )}
 
         {!isView && (
           <>
-            <div className="px-6 py-5 grid grid-cols-2 gap-x-4 gap-y-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-4">
               <div className="col-span-2">
                 <label className="block text-xs font-semibold text-gray-600 mb-1">
                   Full Name <span className="text-red-500">*</span>
@@ -340,18 +289,18 @@ function ResidentModal({
               </div>
             </div>
 
-            <div className="px-6 pb-5">
-              <button
+            <div className="pt-1">
+              <Button
                 onClick={handleSubmit}
-                className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-colors text-sm"
+                size="lg"
+                fullWidth
               >
                 {mode === 'add' ? 'Add Resident' : 'Save Changes'}
-              </button>
+              </Button>
             </div>
           </>
         )}
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -441,53 +390,46 @@ export function Residents() {
   return (
     <>
       <AdminLayout title="Resident Management">
-        <div className="flex items-center justify-between mb-5">
-          <h1 className="text-gray-800 font-bold text-xl">Resident Management</h1>
-          <button
+        <PageHeader
+          title="Resident Management"
+          action={(
+            <Button
             onClick={() => setModal({ mode: 'add' })}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
-          >
-            <UserPlus size={16} />
-            + Add Resident
-          </button>
-        </div>
+            className="rounded-lg bg-blue-600 hover:bg-blue-700"
+            >
+              <UserPlus size={16} />
+              + Add Resident
+            </Button>
+          )}
+        />
 
-        <div className="flex flex-wrap items-center gap-3 mb-5">
-          <div className="relative flex-1 min-w-64">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search by name or ID..."
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-              className="w-full bg-white border border-gray-200 text-gray-700 text-sm rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:border-blue-500 transition-colors"
-            />
-          </div>
+        <FilterBar
+          searchValue={search}
+          searchPlaceholder="Search by name or ID..."
+          onSearchChange={(value) => { setSearch(value); setCurrentPage(1); }}
+        >
+          <Select value={purokFilter} onChange={(e) => { setPurokFilter(e.target.value); setCurrentPage(1); }} className="min-w-36 border-gray-200 py-2">
+            <option value="">All Puroks</option>
+            {PUROKS.map((purok) => <option key={purok} value={purok}>{purok}</option>)}
+          </Select>
+          <Select value={genderFilter} onChange={(e) => { setGenderFilter(e.target.value); setCurrentPage(1); }} className="min-w-36 border-gray-200 py-2">
+            <option value="">All Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </Select>
+          <Select value={voterFilter} onChange={(e) => { setVoterFilter(e.target.value); setCurrentPage(1); }} className="min-w-36 border-gray-200 py-2">
+            <option value="">All Voter Status</option>
+            <option value="Voter">Voter</option>
+            <option value="Non-Voter">Non-Voter</option>
+          </Select>
+        </FilterBar>
 
-          <FilterSelect value={purokFilter} onChange={(v) => { setPurokFilter(v); setCurrentPage(1); }} options={PUROKS} placeholder="All Puroks" />
-          <FilterSelect value={genderFilter} onChange={(v) => { setGenderFilter(v); setCurrentPage(1); }} options={['Male', 'Female']} placeholder="All Gender" />
-          <FilterSelect value={voterFilter} onChange={(v) => { setVoterFilter(v); setCurrentPage(1); }} options={['Voter', 'Non-Voter']} placeholder="All Voter Status" />
-        </div>
-
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
+        <TableShell>
             <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-100 border-b border-gray-200">
-                  {['ID', 'FULL NAME', 'ADDRESS', 'GENDER', 'BIRTHDATE', 'CIVIL STATUS', 'CONTACT', 'CITIZENSHIP', 'VOTER', 'ACTIONS'].map((col) => (
-                    <th key={col} className="text-left text-[11px] font-bold tracking-widest text-gray-600 uppercase px-4 py-3 whitespace-nowrap">
-                      {col}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+              <TableHeader columns={['ID', 'FULL NAME', 'ADDRESS', 'GENDER', 'BIRTHDATE', 'CIVIL STATUS', 'CONTACT', 'CITIZENSHIP', 'VOTER', 'ACTIONS']} />
               <tbody className="divide-y divide-gray-200">
                 {pageRows.length === 0 ? (
-                  <tr>
-                    <td colSpan={10} className="text-center text-gray-400 py-10 text-sm">
-                      No residents match your search.
-                    </td>
-                  </tr>
+                  <TableEmptyRow colSpan={10} message="No residents match your search." />
                 ) : (
                   pageRows.map((resident, index) => (
                     <tr key={resident.id} className={`transition-colors hover:bg-blue-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
@@ -504,9 +446,7 @@ export function Residents() {
                       <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{resident.contact_number}</td>
                       <td className="px-4 py-3 text-gray-600 text-xs whitespace-nowrap">{resident.citizenship}</td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${resident.is_voter ? 'bg-green-50 text-green-600 border-green-200' : 'bg-gray-100 text-gray-500 border-gray-200'}`}>
-                          {resident.is_voter ? 'Voter' : 'Non-Voter'}
-                        </span>
+                        <StatusBadge label={resident.is_voter ? 'Voter' : 'Non-Voter'} tone={resident.is_voter ? 'green' : 'gray'} />
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex flex-col gap-1">
@@ -526,7 +466,6 @@ export function Residents() {
                 )}
               </tbody>
             </table>
-          </div>
 
           <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
             <span className="text-gray-400 text-xs">
@@ -541,7 +480,7 @@ export function Residents() {
               </button>
             </div>
           </div>
-        </div>
+        </TableShell>
       </AdminLayout>
 
       {modal && (

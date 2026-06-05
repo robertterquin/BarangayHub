@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { LockKeyhole, ShieldCheck, X } from 'lucide-react';
+import { LockKeyhole, ShieldCheck } from 'lucide-react';
+import { StatusBadge } from '../../../components/admin';
+import { Button, Input, Modal, Select, TableHeader, TableShell } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
 type UserRole = 'Admin';
@@ -31,8 +33,8 @@ const INITIAL_ADMIN_USER: AdminUser = {
   status: 'active',
 };
 
-const ROLE_STYLES: Record<UserRole, string> = {
-  Admin: 'bg-blue-50 text-blue-600 border border-blue-100',
+const ROLE_TONES: Record<UserRole, 'blue'> = {
+  Admin: 'blue',
 };
 
 const MFA_LABELS: Record<MfaStatus, string> = {
@@ -40,9 +42,9 @@ const MFA_LABELS: Record<MfaStatus, string> = {
   inactive: 'MFA Inactive',
 };
 
-const MFA_STYLES: Record<MfaStatus, string> = {
-  active: 'bg-green-50 text-green-600 border border-green-100',
-  inactive: 'bg-yellow-50 text-yellow-700 border border-yellow-100',
+const MFA_TONES: Record<MfaStatus, 'green' | 'yellow'> = {
+  active: 'green',
+  inactive: 'yellow',
 };
 
 const STATUS_LABELS: Record<AccountStatus, string> = {
@@ -50,9 +52,9 @@ const STATUS_LABELS: Record<AccountStatus, string> = {
   inactive: 'Inactive',
 };
 
-const STATUS_STYLES: Record<AccountStatus, string> = {
-  active: 'bg-green-50 text-green-600 border border-green-100',
-  inactive: 'bg-gray-100 text-gray-500 border border-gray-200',
+const STATUS_TONES: Record<AccountStatus, 'green' | 'gray'> = {
+  active: 'green',
+  inactive: 'gray',
 };
 
 function CredentialsModal({
@@ -81,57 +83,43 @@ function CredentialsModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl">
-        <div className="flex items-start justify-between bg-linear-to-r from-blue-800 to-blue-600 px-6 py-4">
-          <div>
-            <h2 className="text-lg font-bold leading-tight text-white">Edit Admin Credentials</h2>
-            <p className="mt-0.5 text-xs text-blue-200">Mock-only account settings for the single administrator.</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="mt-0.5 rounded-full p-1 text-white/70 transition-colors hover:bg-white/20 hover:text-white"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="space-y-4 px-6 py-5">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold text-gray-600">
-              Admin Email / Username <span className="text-red-500">*</span>
-            </label>
-            <input
-              value={form.username}
-              onChange={(e) => handleChange('username', e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
-            />
-          </div>
+    <Modal
+      title="Edit Admin Credentials"
+      subtitle="Mock-only account settings for the single administrator."
+      width="md"
+      onClose={onClose}
+      footer={(
+        <Button onClick={handleSubmit} fullWidth size="lg">
+          Save Mock Credentials
+        </Button>
+      )}
+    >
+        <div className="space-y-4">
+          <Input
+            label="Admin Email / Username"
+            requiredMark
+            value={form.username}
+            onChange={(e) => handleChange('username', e.target.value)}
+          />
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold text-gray-600">MFA Status</label>
-              <select
+            <Select
+                label="MFA Status"
                 value={form.mfa_status}
                 onChange={(e) => handleChange('mfa_status', e.target.value as MfaStatus)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
               >
                 <option value="active">MFA Active</option>
                 <option value="inactive">MFA Inactive</option>
-              </select>
-            </div>
+            </Select>
 
-            <div>
-              <label className="mb-1.5 block text-xs font-semibold text-gray-600">Account Status</label>
-              <select
+            <Select
+                label="Account Status"
                 value={form.status}
                 onChange={(e) => handleChange('status', e.target.value as AccountStatus)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
               >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
-              </select>
-            </div>
+            </Select>
           </div>
 
           <div className="rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3">
@@ -141,17 +129,7 @@ function CredentialsModal({
             </p>
           </div>
         </div>
-
-        <div className="px-6 pb-5">
-          <button
-            onClick={handleSubmit}
-            className="w-full rounded-lg bg-blue-700 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-800"
-          >
-            Save Mock Credentials
-          </button>
-        </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -195,58 +173,41 @@ export function UserManagement() {
               </p>
             </div>
 
-            <div className="overflow-hidden rounded-xl border border-gray-200">
-              <div className="overflow-x-auto">
+            <TableShell>
                 <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200 bg-gray-100">
-                      {['USERNAME', 'ROLE', 'MFA STATUS', 'LAST LOGIN', 'STATUS', 'ACTIONS'].map((col) => (
-                        <th
-                          key={col}
-                          className="whitespace-nowrap px-4 py-3 text-left text-[11px] font-extrabold uppercase tracking-widest text-gray-500"
-                        >
-                          {col}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
+                  <TableHeader columns={['USERNAME', 'ROLE', 'MFA STATUS', 'LAST LOGIN', 'STATUS', 'ACTIONS']} />
                   <tbody>
                     <tr className="bg-white transition-colors hover:bg-blue-50">
                       <td className="whitespace-nowrap px-4 py-4 font-bold text-gray-900">
                         {adminUser.username}
                       </td>
                       <td className="whitespace-nowrap px-4 py-4">
-                        <span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${ROLE_STYLES[adminUser.role]}`}>
-                          {adminUser.role}
-                        </span>
+                        <StatusBadge label={adminUser.role} tone={ROLE_TONES[adminUser.role]} />
                       </td>
                       <td className="whitespace-nowrap px-4 py-4">
-                        <span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${MFA_STYLES[adminUser.mfa_status]}`}>
-                          {MFA_LABELS[adminUser.mfa_status]}
-                        </span>
+                        <StatusBadge label={MFA_LABELS[adminUser.mfa_status]} tone={MFA_TONES[adminUser.mfa_status]} />
                       </td>
                       <td className="whitespace-nowrap px-4 py-4 font-semibold text-gray-600">
                         {adminUser.last_login}
                       </td>
                       <td className="whitespace-nowrap px-4 py-4">
-                        <span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${STATUS_STYLES[adminUser.status]}`}>
-                          {STATUS_LABELS[adminUser.status]}
-                        </span>
+                        <StatusBadge label={STATUS_LABELS[adminUser.status]} tone={STATUS_TONES[adminUser.status]} />
                       </td>
                       <td className="whitespace-nowrap px-4 py-4">
-                        <button
+                        <Button
                           onClick={() => setIsModalOpen(true)}
-                          className="inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-extrabold text-blue-700 transition-colors hover:bg-blue-100"
+                          variant="primary"
+                          size="sm"
+                          className="bg-blue-50 text-blue-700 hover:bg-blue-100"
                         >
                           <LockKeyhole size={13} />
                           Edit Credentials
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   </tbody>
                 </table>
-              </div>
-            </div>
+            </TableShell>
           </div>
         </section>
       </AdminLayout>

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { RotateCcw, Trash2 } from 'lucide-react';
+import { PageHeader, StatusBadge } from '../../../components/admin';
+import { Button } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
 type HistoryStatus = 'completed' | 'rejected' | 'resolved' | 'published';
@@ -110,11 +112,11 @@ const STATUS_LABELS: Record<HistoryStatus, string> = {
   published: 'Published',
 };
 
-const STATUS_STYLES: Record<HistoryStatus, string> = {
-  completed: 'bg-green-50 text-green-600 border border-green-100',
-  rejected: 'bg-red-50 text-red-600 border border-red-100',
-  resolved: 'bg-green-50 text-green-600 border border-green-100',
-  published: 'bg-green-50 text-green-600 border border-green-100',
+const STATUS_TONES: Record<HistoryStatus, 'green' | 'red'> = {
+  completed: 'green',
+  rejected: 'red',
+  resolved: 'green',
+  published: 'green',
 };
 
 const DOT_STYLES: Record<HistoryTone, string> = {
@@ -130,9 +132,7 @@ function HistoryRow({ item }: { item: HistoryItem }) {
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <p className="text-sm font-extrabold leading-snug text-gray-900">{item.title}</p>
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold ${STATUS_STYLES[item.status]}`}>
-            {STATUS_LABELS[item.status]}
-          </span>
+          <StatusBadge label={STATUS_LABELS[item.status]} tone={STATUS_TONES[item.status]} />
         </div>
         <p className="mt-1 text-xs font-semibold text-gray-400">{item.detail}</p>
       </div>
@@ -151,13 +151,14 @@ function HistorySection({
     <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
         <h2 className="text-sm font-extrabold text-gray-950">{section.title}</h2>
-        <button
+        <Button
           onClick={() => onDelete(section.id)}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-extrabold text-red-600 transition-colors hover:bg-red-100"
+          variant="danger"
+          size="sm"
         >
           <Trash2 size={12} />
           Delete History
-        </button>
+        </Button>
       </div>
 
       {section.items.length === 0 ? (
@@ -192,21 +193,21 @@ export function History() {
 
   return (
     <AdminLayout title="History">
-      <div className="mb-5 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-extrabold tracking-tight text-gray-950">History</h1>
-          <p className="mt-1 text-sm font-medium text-gray-400">
-            Mock archive records grouped by module before Supabase history integration.
-          </p>
-        </div>
-        <button
-          onClick={handleRestoreMockData}
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-50 px-4 py-2 text-xs font-extrabold text-blue-700 transition-colors hover:bg-blue-100"
-        >
-          <RotateCcw size={13} />
-          Restore Mock Data
-        </button>
-      </div>
+      <PageHeader
+        title="History"
+        subtitle="Mock archive records grouped by module before Supabase history integration."
+        action={(
+          <Button
+            onClick={handleRestoreMockData}
+            variant="primary"
+            size="sm"
+            className="bg-blue-50 text-blue-700 hover:bg-blue-100"
+          >
+            <RotateCcw size={13} />
+            Restore Mock Data
+          </Button>
+        )}
+      />
 
       <div className="space-y-4">
         {sections.map((section) => (

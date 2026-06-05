@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { RefreshCcw, ScrollText } from 'lucide-react';
+import { Button } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
 type ActivityLogType = 'login' | 'request' | 'approval' | 'edit' | 'complaint' | 'system';
@@ -114,13 +115,15 @@ export function ActivityLogs() {
             </p>
           </div>
 
-          <button
+          <Button
             onClick={handleRefresh}
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-50 px-4 py-2 text-xs font-extrabold text-blue-700 transition-colors hover:bg-blue-100"
+            variant="primary"
+            size="sm"
+            className="bg-blue-50 text-blue-700 hover:bg-blue-100"
           >
             <RefreshCcw size={14} />
             Refresh
-          </button>
+          </Button>
         </div>
 
         <ul className="divide-y-0">

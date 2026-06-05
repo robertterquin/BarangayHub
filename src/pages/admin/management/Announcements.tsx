@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { ActionGroup, PageHeader, StatusBadge } from '../../../components/admin';
+import { Button, Input, Modal, Select, TableEmptyRow, TableHeader, TableShell } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
 type AnnouncementStatus = 'published' | 'scheduled' | 'draft';
@@ -76,10 +77,10 @@ const STATUS_LABELS: Record<AnnouncementStatus, string> = {
   draft: 'Draft',
 };
 
-const STATUS_STYLES: Record<AnnouncementStatus, string> = {
-  published: 'bg-green-50 text-green-600 border border-green-200',
-  scheduled: 'bg-blue-50 text-blue-600 border border-blue-200',
-  draft: 'bg-gray-100 text-gray-500 border border-gray-200',
+const STATUS_TONES: Record<AnnouncementStatus, 'green' | 'blue' | 'gray'> = {
+  published: 'green',
+  scheduled: 'blue',
+  draft: 'gray',
 };
 
 function formatAnnouncementDate(value: string) {
@@ -105,14 +106,6 @@ function createFormFromAnnouncement(announcement?: AnnouncementRow): Announcemen
   };
 }
 
-function StatusBadge({ status }: { status: AnnouncementStatus }) {
-  return (
-    <span className={`inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap ${STATUS_STYLES[status]}`}>
-      {STATUS_LABELS[status]}
-    </span>
-  );
-}
-
 function ActionButtons({
   status,
   onEdit,
@@ -127,23 +120,23 @@ function ActionButtons({
   onDelete: () => void;
 }) {
   return (
-    <div className="flex items-center gap-2 flex-wrap">
-      <button onClick={onEdit} className="px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors">
+    <ActionGroup>
+      <Button onClick={onEdit} variant="primary" size="sm" className="rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100">
         Edit
-      </button>
+      </Button>
       {status === 'published' ? (
-        <button onClick={onUnpublish} className="px-3 py-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 transition-colors">
+        <Button onClick={onUnpublish} variant="danger" size="sm" className="rounded-md">
           Unpublish
-        </button>
+        </Button>
       ) : (
-        <button onClick={onPublish} className="px-3 py-1 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 rounded-md hover:bg-green-100 transition-colors">
+        <Button onClick={onPublish} variant="success" size="sm" className="rounded-md">
           Publish Now
-        </button>
+        </Button>
       )}
-      <button onClick={onDelete} className="px-3 py-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 transition-colors">
+      <Button onClick={onDelete} variant="danger" size="sm" className="rounded-md">
         Delete
-      </button>
-    </div>
+      </Button>
+    </ActionGroup>
   );
 }
 
@@ -174,44 +167,33 @@ function AnnouncementModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden">
-        <div className="bg-linear-to-r from-blue-800 to-blue-600 px-6 py-4 flex items-start justify-between">
-          <div>
-            <h2 className="text-white font-bold text-2xl leading-tight">{title}</h2>
-            <p className="text-blue-200 text-xs mt-1">{subtitle}</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-full text-white/70 hover:text-white hover:bg-white/20 transition-colors mt-0.5"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="px-6 py-5 space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-              Title <span className="text-red-500">*</span>
-            </label>
-            <input
+    <Modal
+      title={title}
+      subtitle={subtitle}
+      width="lg"
+      onClose={onClose}
+      footer={(
+        <Button onClick={handleSubmit} size="lg" fullWidth>
+          {isEdit ? 'Save Changes' : 'Add Announcement'}
+        </Button>
+      )}
+    >
+        <div className="space-y-4">
+          <Input
+              label="Title"
+              requiredMark
               type="text"
               value={form.title}
               onChange={(e) => handleChange('title', e.target.value)}
               placeholder="e.g. Community Clean-up Drive - April 6"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
-            />
-          </div>
+          />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5">
-                Category <span className="text-red-500">*</span>
-              </label>
-              <select
+              <Select
+                label="Category"
+                requiredMark
                 value={form.category}
                 onChange={(e) => handleChange('category', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
               >
                 <option value="">Select category</option>
                 <option value="Event">Event</option>
@@ -219,32 +201,25 @@ function AnnouncementModal({
                 <option value="System">System</option>
                 <option value="Health">Health</option>
                 <option value="Advisory">Advisory</option>
-              </select>
-            </div>
+              </Select>
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1.5">Date Posted</label>
-              <input
+              <Input
+                label="Date Posted"
                 type="date"
                 value={form.date_posted}
                 onChange={(e) => handleChange('date_posted', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
               />
-            </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Status</label>
-            <select
+          <Select
+              label="Status"
               value={form.status}
               onChange={(e) => handleChange('status', e.target.value as AnnouncementStatus)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-gray-800 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
             >
               <option value="draft">Draft</option>
               <option value="scheduled">Scheduled</option>
               <option value="published">Published</option>
-            </select>
-          </div>
+          </Select>
 
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1.5">
@@ -259,17 +234,7 @@ function AnnouncementModal({
             />
           </div>
         </div>
-
-        <div className="px-6 pb-5">
-          <button
-            onClick={handleSubmit}
-            className="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-colors text-sm"
-          >
-            {isEdit ? 'Save Changes' : 'Add Announcement'}
-          </button>
-        </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -329,41 +294,22 @@ export function Announcements() {
   return (
     <>
       <AdminLayout title="Announcements">
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <h1 className="text-gray-800 font-bold text-xl">Announcements</h1>
-            <p className="text-gray-400 text-xs mt-1">{announcements.length} mock announcements ready for public posting</p>
-          </div>
-          <button
-            onClick={() => setModal({ mode: 'add' })}
-            className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
-          >
-            + Post Announcement
-          </button>
-        </div>
+        <PageHeader
+          title="Announcements"
+          subtitle={`${announcements.length} mock announcements ready for public posting`}
+          action={(
+            <Button onClick={() => setModal({ mode: 'add' })} className="rounded-xl bg-blue-600 hover:bg-blue-700">
+              + Post Announcement
+            </Button>
+          )}
+        />
 
-        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
+        <TableShell className="rounded-2xl">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-100 border-b border-gray-200">
-                  {['TITLE', 'CATEGORY', 'DATE POSTED', 'STATUS', 'ACTIONS'].map((col) => (
-                    <th
-                      key={col}
-                      className="text-left text-[11px] font-bold tracking-widest text-gray-500 uppercase px-4 py-3 whitespace-nowrap"
-                    >
-                      {col}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+              <TableHeader columns={['TITLE', 'CATEGORY', 'DATE POSTED', 'STATUS', 'ACTIONS']} />
               <tbody className="divide-y divide-gray-200">
                 {announcements.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-4 py-10 text-center text-gray-400 text-sm">
-                      No announcements yet. Post one to begin.
-                    </td>
-                  </tr>
+                  <TableEmptyRow colSpan={5} message="No announcements yet. Post one to begin." />
                 ) : (
                   announcements.map((announcement) => (
                     <tr key={announcement.id} className="hover:bg-blue-50 transition-colors">
@@ -374,7 +320,7 @@ export function Announcements() {
                       <td className="px-4 py-4 text-gray-700">{announcement.category}</td>
                       <td className="px-4 py-4 text-gray-700 whitespace-nowrap">{formatAnnouncementDate(announcement.date_posted)}</td>
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <StatusBadge status={announcement.status} />
+                        <StatusBadge label={STATUS_LABELS[announcement.status]} tone={STATUS_TONES[announcement.status]} />
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <ActionButtons
@@ -390,8 +336,7 @@ export function Announcements() {
                 )}
               </tbody>
             </table>
-          </div>
-        </div>
+        </TableShell>
       </AdminLayout>
 
       {modal && (

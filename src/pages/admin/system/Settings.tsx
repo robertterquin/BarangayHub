@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { CheckCircle2, Circle, Eye, EyeOff, Info } from 'lucide-react';
+import { SettingsCard } from '../../../components/admin';
+import { Button, Input } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
 interface SystemSettingsState {
@@ -95,23 +97,6 @@ function SettingRow({
       <span className="text-base font-medium text-gray-800">{label}</span>
       <ToggleSwitch checked={checked} onChange={onChange} label={label} />
     </div>
-  );
-}
-
-function SettingsCard({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="min-h-72 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-extrabold text-gray-950">{title}</h2>
-      <div className="mt-3 border-t border-gray-200 pt-4">
-        {children}
-      </div>
-    </section>
   );
 }
 
@@ -282,34 +267,29 @@ export function Settings() {
               <div className="space-y-3">
                 {isEditingInfo ? (
                   <>
-                    <input
+                    <Input
                       value={barangayInfo.barangay}
                       onChange={(event) => updateBarangayInfo('barangay', event.target.value)}
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800 outline-none focus:border-blue-500"
                       placeholder="Barangay"
                     />
-                    <input
+                    <Input
                       value={barangayInfo.municipality}
                       onChange={(event) => updateBarangayInfo('municipality', event.target.value)}
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800 outline-none focus:border-blue-500"
                       placeholder="Municipality"
                     />
-                    <input
+                    <Input
                       value={barangayInfo.adminEmail}
                       onChange={(event) => updateBarangayInfo('adminEmail', event.target.value)}
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800 outline-none focus:border-blue-500"
                       placeholder="Admin Email"
                     />
-                    <input
+                    <Input
                       value={barangayInfo.systemVersion}
                       onChange={(event) => updateBarangayInfo('systemVersion', event.target.value)}
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800 outline-none focus:border-blue-500"
                       placeholder="System Version"
                     />
-                    <input
+                    <Input
                       value={barangayInfo.serviceSince}
                       onChange={(event) => updateBarangayInfo('serviceSince', event.target.value)}
-                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-800 outline-none focus:border-blue-500"
                       placeholder="In Service Since"
                     />
                   </>
@@ -323,13 +303,14 @@ export function Settings() {
                   </>
                 )}
 
-                <button
+                <Button
                   type="button"
                   onClick={isEditingInfo ? handleSaveInfo : () => setIsEditingInfo(true)}
-                  className="mt-3 w-full rounded-xl bg-blue-700 py-3 text-sm font-extrabold text-white transition-colors hover:bg-blue-800"
+                  fullWidth
+                  className="mt-3 rounded-xl"
                 >
                   {isEditingInfo ? 'Save Info' : 'Update Info'}
-                </button>
+                </Button>
                 <SaveNotice message={infoNotice} />
               </div>
             </SettingsCard>
@@ -386,12 +367,14 @@ export function Settings() {
                     />
                   </div>
 
-                  <button
+                  <Button
                     type="submit"
-                    className="w-full rounded-xl bg-blue-700 py-3.5 text-sm font-extrabold text-white transition-colors hover:bg-blue-800"
+                    size="lg"
+                    fullWidth
+                    className="rounded-xl"
                   >
                     Save Email
-                  </button>
+                  </Button>
                 </form>
                 <SaveNotice message={emailNotice} />
               </div>
@@ -462,12 +445,14 @@ export function Settings() {
                     />
                   </div>
 
-                  <button
+                  <Button
                     type="submit"
-                    className="w-full rounded-xl bg-blue-700 py-3.5 text-sm font-extrabold text-white transition-colors hover:bg-blue-800"
+                    size="lg"
+                    fullWidth
+                    className="rounded-xl"
                   >
                     Save Password
-                  </button>
+                  </Button>
                 </form>
                 <SaveNotice message={passwordNotice} />
               </div>

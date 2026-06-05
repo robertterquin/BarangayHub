@@ -9,9 +9,10 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
+import { PageHeader, StatCard } from '../../../components/admin';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
-interface StatCard {
+interface StatCardData {
   label: string;
   value: string;
   sub: string;
@@ -34,7 +35,7 @@ interface WorkflowItem {
   width: string;
 }
 
-const STAT_CARDS: StatCard[] = [
+const STAT_CARDS: StatCardData[] = [
   {
     label: 'TOTAL RESIDENTS',
     value: '4,821',
@@ -134,18 +135,6 @@ const WORKFLOW_ITEMS: WorkflowItem[] = [
   { label: 'Open Complaints', value: 7, color: 'bg-red-500', width: 'w-2/12' },
 ];
 
-function StatCardItem({ card }: { card: StatCard }) {
-  return (
-    <div
-      className={`bg-white border border-gray-200 rounded-xl p-5 border-l-4 ${card.accentColor} flex flex-col gap-1 shadow-sm`}
-    >
-      <p className="text-gray-400 text-xs font-semibold tracking-widest uppercase">{card.label}</p>
-      <p className="text-gray-800 text-3xl font-bold tracking-tight">{card.value}</p>
-      <p className={`text-xs font-medium ${card.subColor}`}>{card.sub}</p>
-    </div>
-  );
-}
-
 function RecentActivityItem({ item }: { item: RecentActivity }) {
   return (
     <div className="flex items-start gap-3 rounded-lg border border-gray-100 bg-gray-50 px-3 py-3">
@@ -162,14 +151,14 @@ function RecentActivityItem({ item }: { item: RecentActivity }) {
 export function Dashboard() {
   return (
     <AdminLayout title="Dashboard">
-      <div className="mb-5 flex flex-col gap-1">
-        <h1 className="text-xl font-extrabold tracking-tight text-gray-950">Dashboard Overview</h1>
-        <p className="text-sm font-medium text-gray-400">Mock analytics snapshot for Barangay Daine II operations.</p>
-      </div>
+      <PageHeader
+        title="Dashboard Overview"
+        subtitle="Mock analytics snapshot for Barangay Daine II operations."
+      />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         {STAT_CARDS.map((card) => (
-          <StatCardItem key={card.label} card={card} />
+          <StatCard key={card.label} {...card} />
         ))}
       </div>
 

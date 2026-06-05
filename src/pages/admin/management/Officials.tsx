@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { X, UserPlus } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
+import { ActionGroup, PageHeader, StatusBadge } from '../../../components/admin';
+import { Button, Input, Modal, Select } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
 type OfficialAccent = 'gold' | 'blue';
@@ -204,22 +206,20 @@ function OfficialCard({
         </div>
         <p className={`text-[11px] font-extrabold uppercase tracking-wide ${styles.role}`}>{official.role}</p>
         <h2 className="mt-1 text-sm font-extrabold text-gray-950">{official.name}</h2>
-        <span className={`mt-3 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ${official.is_active ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
-          {official.is_active ? 'Active' : 'Inactive'}
-        </span>
+        <StatusBadge label={official.is_active ? 'Active' : 'Inactive'} tone={official.is_active ? 'green' : 'gray'} />
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-1.5">
-        <button onClick={onEdit} className="rounded-md border border-blue-100 bg-blue-50 px-2 py-1 text-[11px] font-bold text-blue-700 hover:bg-blue-100 transition-colors">
+      <ActionGroup className="mt-4 justify-center">
+        <Button onClick={onEdit} variant="primary" size="sm" className="rounded-md bg-blue-50 text-[11px] text-blue-700 hover:bg-blue-100">
           Edit
-        </button>
-        <button onClick={onToggleStatus} className="rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-[11px] font-bold text-gray-600 hover:bg-gray-100 transition-colors">
+        </Button>
+        <Button onClick={onToggleStatus} variant="secondary" size="sm" className="rounded-md text-[11px]">
           {official.is_active ? 'Pause' : 'Active'}
-        </button>
-        <button onClick={onRemove} className="rounded-md border border-red-100 bg-red-50 px-2 py-1 text-[11px] font-bold text-red-600 hover:bg-red-100 transition-colors">
+        </Button>
+        <Button onClick={onRemove} variant="danger" size="sm" className="rounded-md text-[11px]">
           Remove
-        </button>
-      </div>
+        </Button>
+      </ActionGroup>
     </article>
   );
 }
@@ -257,70 +257,53 @@ function OfficialModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl">
-        <div className="bg-linear-to-r from-blue-800 to-blue-600 px-6 py-4 flex items-start justify-between">
-          <div>
-            <h2 className="text-lg font-bold leading-tight text-white">{isEdit ? 'Edit Official' : 'Add Official'}</h2>
-            <p className="mt-0.5 text-xs text-blue-200">{isEdit ? 'Update barangay official details' : 'Enter new barangay official information'}</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="mt-0.5 rounded-full p-1 text-white/70 transition-colors hover:bg-white/20 hover:text-white"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 px-6 py-5">
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold text-gray-600">
-              Initials <span className="text-red-500">*</span>
-            </label>
-            <input
+    <Modal
+      title={isEdit ? 'Edit Official' : 'Add Official'}
+      subtitle={isEdit ? 'Update barangay official details' : 'Enter new barangay official information'}
+      width="md"
+      onClose={onClose}
+      footer={(
+        <Button onClick={handleSubmit} fullWidth size="lg">
+          {isEdit ? 'Save Changes' : 'Add Official'}
+        </Button>
+      )}
+    >
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+              label="Initials"
+              requiredMark
               value={form.initials}
               onChange={(e) => handleChange('initials', e.target.value.toUpperCase())}
               placeholder="e.g. K8"
               maxLength={4}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
-            />
-          </div>
+          />
 
-          <div>
-            <label className="mb-1.5 block text-xs font-semibold text-gray-600">Accent</label>
-            <select
+          <Select
+              label="Accent"
               value={form.accent}
               onChange={(e) => handleChange('accent', e.target.value as OfficialAccent)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
             >
               <option value="blue">Blue</option>
               <option value="gold">Gold</option>
-            </select>
-          </div>
+          </Select>
 
-          <div className="col-span-2">
-            <label className="mb-1.5 block text-xs font-semibold text-gray-600">
-              Full Name <span className="text-red-500">*</span>
-            </label>
-            <input
+          <Input
+              label="Full Name"
+              requiredMark
               value={form.name}
               onChange={(e) => handleChange('name', e.target.value)}
               placeholder="e.g. Hon. Maria L. Santos"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
-            />
-          </div>
+              containerClassName="col-span-2"
+          />
 
-          <div className="col-span-2">
-            <label className="mb-1.5 block text-xs font-semibold text-gray-600">
-              Position / Committee <span className="text-red-500">*</span>
-            </label>
-            <input
+          <Input
+              label="Position / Committee"
+              requiredMark
               value={form.role}
               onChange={(e) => handleChange('role', e.target.value)}
               placeholder="e.g. Kagawad - Agriculture"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
-            />
-          </div>
+              containerClassName="col-span-2"
+          />
 
           <label className="col-span-2 flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm font-semibold text-gray-700">
             <input
@@ -332,17 +315,7 @@ function OfficialModal({
             Active official
           </label>
         </div>
-
-        <div className="px-6 pb-5">
-          <button
-            onClick={handleSubmit}
-            className="w-full rounded-lg bg-blue-700 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-800"
-          >
-            {isEdit ? 'Save Changes' : 'Add Official'}
-          </button>
-        </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -399,24 +372,19 @@ export function Officials() {
     <>
       <AdminLayout title="Barangay Officials">
         <section className="space-y-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-xl font-extrabold tracking-tight text-gray-950">
-                Barangay Officials - Daine II
-              </h1>
-              <p className="mt-0.5 text-sm font-medium text-slate-400">
-                {activeCount} active officials in service since 2009
-              </p>
-            </div>
-
-            <button
+          <PageHeader
+            title="Barangay Officials - Daine II"
+            subtitle={`${activeCount} active officials in service since 2009`}
+            action={(
+              <Button
               onClick={() => setModal({ mode: 'add' })}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                className="rounded-xl bg-blue-600 hover:bg-blue-700"
             >
               <UserPlus size={16} />
               Add Official
-            </button>
-          </div>
+              </Button>
+            )}
+          />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {officials.map((official) => (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Search, ChevronDown, X } from 'lucide-react';
+import { ActionGroup, DetailField, FilterBar, StatusBadge } from '../../../components/admin';
+import { Button, Modal, Select, TableEmptyRow, TableHeader, TableShell } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
 type RequestStatus = 'pending' | 'processing' | 'completed' | 'rejected';
@@ -47,13 +48,6 @@ const STATUS_LABELS: Record<RequestStatus, string> = {
   processing: 'Processing',
   completed: 'Completed',
   rejected: 'Rejected',
-};
-
-const STATUS_BG: Record<RequestStatus, string> = {
-  pending: 'bg-orange-50 text-orange-600 border border-orange-200',
-  processing: 'bg-blue-50 text-blue-600 border border-blue-200',
-  completed: 'bg-green-50 text-green-600 border border-green-200',
-  rejected: 'bg-red-50 text-red-600 border border-red-200',
 };
 
 const PAGE_SIZE = 5;
@@ -121,48 +115,12 @@ const MOCK_REQUESTS: DocumentRequestRow[] = [
   },
 ];
 
-function FilterSelect({
-  value,
-  onChange,
-  placeholder,
-  children,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  placeholder: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="relative">
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="appearance-none bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 pr-8 focus:outline-none focus:border-blue-500 cursor-pointer min-w-36"
-      >
-        <option value="">{placeholder}</option>
-        {children}
-      </select>
-      <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-    </div>
-  );
-}
-
-function DetailField({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-blue-600 text-[10px] font-bold uppercase tracking-widest mb-0.5">{label}</p>
-      <p className="text-gray-900 font-semibold text-sm">{value || '-'}</p>
-    </div>
-  );
-}
-
-function StatusBadge({ status }: { status: RequestStatus }) {
-  return (
-    <span className={`inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap ${STATUS_BG[status]}`}>
-      {STATUS_LABELS[status]}
-    </span>
-  );
-}
+const STATUS_TONES: Record<RequestStatus, 'orange' | 'blue' | 'green' | 'red'> = {
+  pending: 'orange',
+  processing: 'blue',
+  completed: 'green',
+  rejected: 'red',
+};
 
 function ActionButtons({
   status,
@@ -174,36 +132,36 @@ function ActionButtons({
   onView: () => void;
 }) {
   return (
-    <div className="flex items-center gap-1.5 flex-wrap">
+    <ActionGroup className="gap-1.5">
       {status === 'pending' && (
         <>
-          <button onClick={() => onStatusChange('processing')} className="px-2.5 py-1 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 rounded hover:bg-green-100 transition-colors">
+          <Button onClick={() => onStatusChange('processing')} variant="success" size="sm" className="rounded">
             Approve
-          </button>
-          <button onClick={() => onStatusChange('rejected')} className="px-2.5 py-1 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded hover:bg-red-100 transition-colors">
+          </Button>
+          <Button onClick={() => onStatusChange('rejected')} variant="danger" size="sm" className="rounded">
             Reject
-          </button>
+          </Button>
         </>
       )}
       {status === 'processing' && (
-        <button onClick={() => onStatusChange('completed')} className="px-2.5 py-1 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 rounded hover:bg-green-100 transition-colors">
+        <Button onClick={() => onStatusChange('completed')} variant="success" size="sm" className="rounded">
           Complete
-        </button>
+        </Button>
       )}
       {status === 'rejected' && (
-        <button onClick={() => onStatusChange('pending')} className="px-2.5 py-1 text-xs font-semibold text-orange-700 bg-orange-50 border border-orange-200 rounded hover:bg-orange-100 transition-colors">
+        <Button onClick={() => onStatusChange('pending')} variant="warning" size="sm" className="rounded">
           Reopen
-        </button>
+        </Button>
       )}
       {status === 'completed' && (
-        <button className="px-2.5 py-1 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 transition-colors">
+        <Button variant="primary" size="sm" className="rounded bg-blue-50 text-blue-700 hover:bg-blue-100">
           Print
-        </button>
+        </Button>
       )}
-      <button onClick={onView} className="px-2.5 py-1 text-xs font-semibold text-gray-600 bg-gray-100 border border-gray-200 rounded hover:bg-gray-200 transition-colors">
+      <Button onClick={onView} variant="secondary" size="sm" className="rounded">
         View
-      </button>
-    </div>
+      </Button>
+    </ActionGroup>
   );
 }
 
@@ -215,23 +173,22 @@ function RequestViewModal({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
-        <div className="bg-linear-to-r from-blue-800 to-blue-600 px-6 py-4 flex items-start justify-between">
-          <div>
-            <h2 className="text-white font-bold text-lg leading-tight">Request Details</h2>
-            <p className="text-blue-200 text-xs mt-0.5">{request.ref_no}</p>
-          </div>
-          <button onClick={onClose} className="p-1 rounded-full text-white/70 hover:text-white hover:bg-white/20 transition-colors mt-0.5">
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="px-6 py-5 grid grid-cols-2 gap-x-8 gap-y-4">
+    <Modal
+      title="Request Details"
+      subtitle={request.ref_no}
+      width="sm"
+      onClose={onClose}
+      footer={(
+        <Button onClick={onClose} variant="ghost" fullWidth>
+          Close
+        </Button>
+      )}
+    >
+        <div className="grid grid-cols-2 gap-x-8 gap-y-4">
           <DetailField label="Reference No." value={request.ref_no} />
           <div>
             <p className="text-blue-600 text-[10px] font-bold uppercase tracking-widest mb-0.5">Status</p>
-            <StatusBadge status={request.status} />
+            <StatusBadge label={STATUS_LABELS[request.status]} tone={STATUS_TONES[request.status]} />
           </div>
           <DetailField label="Resident" value={request.resident_name} />
           <DetailField label="Document Type" value={DOC_LABELS[request.document_type]} />
@@ -246,14 +203,7 @@ function RequestViewModal({
             <DetailField label="Notes" value={request.notes} />
           </div>
         </div>
-
-        <div className="px-6 pb-5">
-          <button onClick={onClose} className="w-full border border-gray-200 text-gray-600 hover:bg-gray-50 font-semibold py-2.5 rounded-lg transition-colors text-sm">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -321,49 +271,33 @@ export function DocumentRequests() {
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 px-6 py-4 border-b border-gray-100">
-            <div className="relative flex-1 min-w-64">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-                placeholder="Search by name or ref no..."
-                className="w-full bg-white border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            <FilterSelect value={typeFilter} onChange={(v) => { setTypeFilter(v); setCurrentPage(1); }} placeholder="All Types">
+          <FilterBar
+            searchValue={search}
+            searchPlaceholder="Search by name or ref no..."
+            onSearchChange={(value) => { setSearch(value); setCurrentPage(1); }}
+            className="mb-0 border-b border-gray-100 px-6 py-4"
+          >
+            <Select value={typeFilter} onChange={(e) => { setTypeFilter(e.target.value); setCurrentPage(1); }} className="min-w-36 border-gray-200 py-2">
+              <option value="">All Types</option>
               {DOC_TYPE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
-            </FilterSelect>
+            </Select>
 
-            <FilterSelect value={statusFilter} onChange={(v) => { setStatusFilter(v); setCurrentPage(1); }} placeholder="All Status">
+            <Select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }} className="min-w-36 border-gray-200 py-2">
+              <option value="">All Status</option>
               {STATUS_OPTIONS.map((status) => (
                 <option key={status} value={status}>{STATUS_LABELS[status]}</option>
               ))}
-            </FilterSelect>
-          </div>
+            </Select>
+          </FilterBar>
 
-          <div className="overflow-x-auto">
+          <TableShell className="rounded-none border-0 shadow-none">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-100 border-b border-gray-200">
-                  {['REF NO.', 'RESIDENT', 'DOCUMENT', 'DATE REQUESTED', 'TIME', 'STATUS', 'PICKED UP', 'ACTIONS'].map((col) => (
-                    <th key={col} className="px-4 py-3 text-left text-[11px] font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                      {col}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+              <TableHeader columns={['REF NO.', 'RESIDENT', 'DOCUMENT', 'DATE REQUESTED', 'TIME', 'STATUS', 'PICKED UP', 'ACTIONS']} />
               <tbody className="divide-y divide-gray-200">
                 {pageRows.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="px-4 py-10 text-center text-gray-400 text-sm">
-                      No requests match your search.
-                    </td>
-                  </tr>
+                  <TableEmptyRow colSpan={8} message="No requests match your search." />
                 ) : (
                   pageRows.map((row) => (
                     <tr key={row.id} className="hover:bg-blue-50 transition-colors">
@@ -377,7 +311,7 @@ export function DocumentRequests() {
                       <td className="px-4 py-3 whitespace-nowrap text-gray-600">{row.date_requested}</td>
                       <td className="px-4 py-3 whitespace-nowrap text-gray-600">{row.time_requested}</td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <StatusBadge status={row.status} />
+                        <StatusBadge label={STATUS_LABELS[row.status]} tone={STATUS_TONES[row.status]} />
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-gray-500">{row.picked_up_date ?? '-'}</td>
                       <td className="px-4 py-3 whitespace-nowrap">
@@ -392,7 +326,7 @@ export function DocumentRequests() {
                 )}
               </tbody>
             </table>
-          </div>
+          </TableShell>
 
           <div className="flex items-center justify-between px-6 py-3 border-t border-gray-100">
             <p className="text-xs text-gray-400">

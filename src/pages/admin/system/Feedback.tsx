@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Inbox, RotateCcw } from 'lucide-react';
+import { StatusBadge } from '../../../components/admin';
+import { Button } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
 type FeedbackStatus = 'pending' | 'reviewed' | 'under_review';
@@ -60,10 +62,10 @@ const STATUS_LABELS: Record<FeedbackStatus, string> = {
   under_review: 'Under Review',
 };
 
-const STATUS_STYLES: Record<FeedbackStatus, string> = {
-  pending: 'bg-orange-50 text-orange-500 border border-orange-100',
-  reviewed: 'bg-green-50 text-green-600 border border-green-100',
-  under_review: 'bg-blue-50 text-blue-600 border border-blue-100',
+const STATUS_TONES: Record<FeedbackStatus, 'orange' | 'green' | 'blue'> = {
+  pending: 'orange',
+  reviewed: 'green',
+  under_review: 'blue',
 };
 
 const DOT_STYLES: Record<FeedbackTone, string> = {
@@ -92,27 +94,28 @@ function FeedbackRow({
         <div className="mt-1.5 flex flex-wrap items-center gap-2">
           <span className="text-sm font-semibold text-gray-400">{feedback.submitted_at}</span>
           <span className="text-gray-300">-</span>
-          <span className={`rounded-full px-3 py-1 text-xs font-extrabold ${STATUS_STYLES[feedback.status]}`}>
-            {STATUS_LABELS[feedback.status]}
-          </span>
+          <StatusBadge label={STATUS_LABELS[feedback.status]} tone={STATUS_TONES[feedback.status]} />
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2">
           {feedback.status !== 'under_review' && (
-            <button
+            <Button
               onClick={() => onStatusChange(feedback.id, 'under_review')}
-              className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-extrabold text-blue-700 transition-colors hover:bg-blue-100"
+              variant="primary"
+              size="sm"
+              className="bg-blue-50 text-blue-700 hover:bg-blue-100"
             >
               Mark Under Review
-            </button>
+            </Button>
           )}
           {feedback.status !== 'reviewed' && (
-            <button
+            <Button
               onClick={() => onStatusChange(feedback.id, 'reviewed')}
-              className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-extrabold text-green-700 transition-colors hover:bg-green-100"
+              variant="success"
+              size="sm"
             >
               Mark Reviewed
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -149,13 +152,15 @@ export function Feedback() {
 
           <div className="flex items-center gap-3">
             <span className="hidden text-sm font-semibold text-gray-400 sm:inline">From public portal</span>
-            <button
+            <Button
               onClick={handleRestoreMockData}
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-xs font-extrabold text-blue-700 transition-colors hover:bg-blue-100"
+              variant="primary"
+              size="sm"
+              className="bg-blue-50 text-blue-700 hover:bg-blue-100"
             >
               <RotateCcw size={13} />
               Reset
-            </button>
+            </Button>
           </div>
         </div>
 
