@@ -74,10 +74,10 @@ function ToggleSwitch({
       onClick={onChange}
       aria-label={label}
       aria-pressed={checked}
-      className={`relative h-8 w-14 rounded-full transition-colors ${checked ? 'bg-blue-600' : 'bg-gray-200'}`}
+      className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${checked ? 'bg-blue-600' : 'bg-gray-200'}`}
     >
       <span
-        className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow-sm transition-transform ${checked ? 'translate-x-7' : 'translate-x-1'}`}
+        className={`absolute left-0 top-1 h-6 w-6 rounded-full bg-white shadow-sm transition-transform ${checked ? 'translate-x-7' : 'translate-x-1'}`}
       />
     </button>
   );
