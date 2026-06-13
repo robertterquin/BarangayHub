@@ -4,7 +4,7 @@ import { Eye, EyeOff, AlertCircle, Loader2, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 import { logLoginActivity } from '../../../services/adminService';
 import { supabase } from '../../../services/supabase';
-import heroImg from '../../../assets/hero.png';
+import { AppLogo } from '../../../components/ui';
 
 export function AdminLogin() {
   const navigate = useNavigate();
@@ -64,11 +64,7 @@ export function AdminLogin() {
         >
 
           <div className="flex items-center gap-3 mb-7">
-            <img
-              src={heroImg}
-              alt="Barangay Daine II seal"
-              className="w-12 h-12 rounded-full object-cover shrink-0 border border-gray-200"
-            />
+            <AppLogo className="h-12 w-12 shrink-0 border border-gray-200 shadow-sm" />
             <div>
               <p className="text-[#0052cc] font-bold text-lg leading-tight">BarangayHub</p>
               <p className="text-gray-400 text-xs tracking-wide">Brgy. Daine II · Indang, Cavite</p>

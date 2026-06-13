@@ -17,6 +17,7 @@ import {
   Shield,
   History,
 } from 'lucide-react';
+import { AppLogo } from '../components/ui';
 import { supabase } from '../services/supabase';
 
 interface Notification {
@@ -159,7 +160,10 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
         }`}
       >
         {/* Logo */}
-        <div className="flex items-center px-3 py-4 border-b border-[#2a2d35]">
+        <div className={`flex items-center border-b border-[#2a2d35] ${collapsed ? 'justify-center px-2 py-3' : 'gap-3 px-3 py-4'}`}>
+          <AppLogo
+            className={`${collapsed ? 'h-9 w-9' : 'h-11 w-11'} shrink-0 border-2 border-white/80 shadow-sm`}
+          />
           {!collapsed && (
             <div className="min-w-0">
               <span className="font-bold text-white text-lg tracking-tight block">

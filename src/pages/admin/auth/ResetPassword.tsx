@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, AlertCircle, Loader2, CheckCircle2, Circle, Mail, Lock } from 'lucide-react';
+import { AppLogo } from '../../../components/ui';
 import { useAuth } from '../../../hooks/useAuth';
 
 interface PasswordRule {
@@ -104,6 +105,14 @@ export function ResetPassword() {
           className="bg-white rounded-2xl px-9 py-10 ring-1 ring-white/10"
           style={{ boxShadow: '0 8px 16px rgba(0,0,0,0.25), 0 32px 64px rgba(0,0,0,0.30), 0 0 0 1px rgba(255,255,255,0.08)' }}
         >
+          <div className="mb-7 flex items-center gap-3">
+            <AppLogo className="h-12 w-12 shrink-0 border border-gray-200 shadow-sm" />
+            <div>
+              <p className="text-lg font-bold leading-tight text-[#0052cc]">BarangayHub</p>
+              <p className="text-xs tracking-wide text-gray-400">Brgy. Daine II · Indang, Cavite</p>
+            </div>
+          </div>
+
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-1">
               <Lock size={24} className="text-[#0052cc]" />

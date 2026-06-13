@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import { AppLogo } from '../components/ui';
 
 interface NavItem {
   label: string;
@@ -23,9 +24,12 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       <header className="bg-blue-700 text-white shadow-md">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           {/* Logo */}
-          <NavLink to="/" className="font-bold text-xl tracking-tight">
-            Barangay<span className="text-blue-200">Hub</span>
-            <span className="ml-2 text-sm font-normal text-blue-300">Daine II</span>
+          <NavLink to="/" className="flex items-center gap-3">
+            <AppLogo className="h-11 w-11 shrink-0 border-2 border-white/80 shadow-sm" />
+            <span className="font-bold text-xl tracking-tight">
+              Barangay<span className="text-blue-200">Hub</span>
+              <span className="ml-2 text-sm font-normal text-blue-300">Daine II</span>
+            </span>
           </NavLink>
 
           {/* Desktop nav */}
