@@ -172,185 +172,195 @@ export function Settings() {
         subtitle="Manage barangay information and administrator credentials."
       />
 
-      <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-12">
-        <div className="space-y-5 xl:col-span-5">
-          <SettingsCard title="Barangay Information" className="min-h-0">
-            <div className="space-y-3">
-              {isEditingInfo ? (
-                <>
-                  <Input
-                    label="Barangay"
-                    value={barangayInfo.barangay}
-                    onChange={(event) => updateBarangayInfo('barangay', event.target.value)}
-                    placeholder="Barangay"
-                  />
-                  <Input
-                    label="Municipality"
-                    value={barangayInfo.municipality}
-                    onChange={(event) => updateBarangayInfo('municipality', event.target.value)}
-                    placeholder="Municipality"
-                  />
-                  <Input
-                    label="In Service Since"
-                    value={barangayInfo.serviceSince}
-                    onChange={(event) => updateBarangayInfo('serviceSince', event.target.value)}
-                    placeholder="Year"
-                  />
-                  <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
-                    <p className="text-xs font-bold uppercase tracking-wide text-gray-400">System Version</p>
-                    <p className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.systemVersion}</p>
-                    <p className="mt-1 text-xs font-medium text-gray-400">Managed by the application release.</p>
-                  </div>
-                </>
-              ) : (
-                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div className="rounded-xl bg-gray-50 px-4 py-3">
-                    <dt className="text-xs font-bold uppercase tracking-wide text-gray-400">Barangay</dt>
-                    <dd className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.barangay}</dd>
-                  </div>
-                  <div className="rounded-xl bg-gray-50 px-4 py-3">
-                    <dt className="text-xs font-bold uppercase tracking-wide text-gray-400">Municipality</dt>
-                    <dd className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.municipality}</dd>
-                  </div>
-                  <div className="rounded-xl bg-gray-50 px-4 py-3">
-                    <dt className="text-xs font-bold uppercase tracking-wide text-gray-400">System Version</dt>
-                    <dd className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.systemVersion}</dd>
-                  </div>
-                  <div className="rounded-xl bg-gray-50 px-4 py-3">
-                    <dt className="text-xs font-bold uppercase tracking-wide text-gray-400">In Service Since</dt>
-                    <dd className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.serviceSince}</dd>
-                  </div>
-                </dl>
-              )}
-
-              <Button
-                type="button"
-                onClick={isEditingInfo ? handleSaveInfo : () => setIsEditingInfo(true)}
-                fullWidth
-                className="mt-3 rounded-xl"
-              >
-                {isEditingInfo ? 'Save Information' : 'Update Information'}
-              </Button>
-              <SaveNotice message={infoNotice} />
-            </div>
-          </SettingsCard>
-
-          <SettingsCard title="Change Email" className="min-h-0">
-            <form onSubmit={handleSaveEmail} className="space-y-4">
-              <Input
-                id="current-email"
-                label="Current Email"
-                value={emailForm.currentEmail}
-                readOnly
-                className="bg-gray-50"
-              />
-
-              <Input
-                id="new-email"
-                label="New Email"
-                requiredMark
-                type="email"
-                value={emailForm.newEmail}
-                onChange={(event) => setEmailForm((current) => ({ ...current, newEmail: event.target.value }))}
-                placeholder="New email address"
-              />
-
-              <Input
-                id="confirm-email"
-                label="Confirm New Email"
-                requiredMark
-                type="email"
-                value={emailForm.confirmEmail}
-                onChange={(event) => setEmailForm((current) => ({ ...current, confirmEmail: event.target.value }))}
-                placeholder="Confirm new email"
-                className={
-                  emailForm.confirmEmail.length > 0 && !emailsMatch
-                    ? 'border-red-300 focus:border-red-400 focus:ring-red-300/40'
-                    : ''
-                }
-              />
-
-              <Button type="submit" size="lg" fullWidth className="rounded-xl">
-                Save Email
-              </Button>
-            </form>
-            <SaveNotice message={emailNotice} />
-          </SettingsCard>
-        </div>
-
-        <div className="xl:col-span-7">
-          <SettingsCard title="Change Password" className="min-h-0">
-            <form onSubmit={handleSavePassword} className="space-y-5">
-              <div>
-                <label htmlFor="settings-current-password" className="mb-2 block text-sm font-extrabold text-gray-600">Current Password</label>
-                <PasswordInput
-                  id="settings-current-password"
-                  value={passwordForm.currentPassword}
-                  placeholder="Enter current password"
-                  visible={showCurrentPassword}
-                  onToggleVisible={() => setShowCurrentPassword((current) => !current)}
-                  onChange={(value) => setPasswordForm((current) => ({ ...current, currentPassword: value }))}
+      <div className="space-y-5">
+        <SettingsCard title="Barangay Information" className="min-h-0">
+          <div className="space-y-3">
+            {isEditingInfo ? (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <Input
+                  label="Barangay"
+                  value={barangayInfo.barangay}
+                  onChange={(event) => updateBarangayInfo('barangay', event.target.value)}
+                  placeholder="Barangay"
                 />
+                <Input
+                  label="Municipality"
+                  value={barangayInfo.municipality}
+                  onChange={(event) => updateBarangayInfo('municipality', event.target.value)}
+                  placeholder="Municipality"
+                />
+                <Input
+                  label="In Service Since"
+                  value={barangayInfo.serviceSince}
+                  onChange={(event) => updateBarangayInfo('serviceSince', event.target.value)}
+                  placeholder="Year"
+                />
+                <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 md:col-span-3">
+                  <p className="text-xs font-bold uppercase tracking-wide text-gray-400">System Version</p>
+                  <p className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.systemVersion}</p>
+                  <p className="mt-1 text-xs font-medium text-gray-400">Managed by the application release.</p>
+                </div>
+              </div>
+            ) : (
+              <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-xl bg-gray-50 px-4 py-3">
+                  <dt className="text-xs font-bold uppercase tracking-wide text-gray-400">Barangay</dt>
+                  <dd className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.barangay}</dd>
+                </div>
+                <div className="rounded-xl bg-gray-50 px-4 py-3">
+                  <dt className="text-xs font-bold uppercase tracking-wide text-gray-400">Municipality</dt>
+                  <dd className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.municipality}</dd>
+                </div>
+                <div className="rounded-xl bg-gray-50 px-4 py-3">
+                  <dt className="text-xs font-bold uppercase tracking-wide text-gray-400">System Version</dt>
+                  <dd className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.systemVersion}</dd>
+                </div>
+                <div className="rounded-xl bg-gray-50 px-4 py-3">
+                  <dt className="text-xs font-bold uppercase tracking-wide text-gray-400">In Service Since</dt>
+                  <dd className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.serviceSince}</dd>
+                </div>
+              </dl>
+            )}
+
+            <Button
+              type="button"
+              onClick={isEditingInfo ? handleSaveInfo : () => setIsEditingInfo(true)}
+              fullWidth
+              className="mt-3 rounded-xl"
+            >
+              {isEditingInfo ? 'Save Information' : 'Update Information'}
+            </Button>
+            <SaveNotice message={infoNotice} />
+          </div>
+        </SettingsCard>
+
+        <SettingsCard title="Account Credentials" className="min-h-0">
+          <div className="grid grid-cols-1 gap-7 xl:grid-cols-2 xl:gap-8">
+            <section className="xl:pr-8">
+              <div className="mb-4">
+                <h3 className="text-sm font-extrabold text-gray-900">Change Email</h3>
+                <p className="mt-1 text-xs font-medium text-gray-400">Update the email used to sign in to the admin portal.</p>
               </div>
 
-              <div>
-                <label htmlFor="settings-new-password" className="mb-2 block text-sm font-extrabold text-gray-600">
-                  New Password <span className="text-red-500">*</span>
-                </label>
-                <PasswordInput
-                  id="settings-new-password"
-                  value={passwordForm.newPassword}
-                  placeholder="New password"
-                  visible={showNewPassword}
-                  onToggleVisible={() => setShowNewPassword((current) => !current)}
-                  onChange={(value) => setPasswordForm((current) => ({ ...current, newPassword: value }))}
+              <form onSubmit={handleSaveEmail} className="space-y-4">
+                <Input
+                  id="current-email"
+                  label="Current Email"
+                  value={emailForm.currentEmail}
+                  readOnly
+                  className="bg-gray-50"
                 />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Input
+                    id="new-email"
+                    label="New Email"
+                    requiredMark
+                    type="email"
+                    value={emailForm.newEmail}
+                    onChange={(event) => setEmailForm((current) => ({ ...current, newEmail: event.target.value }))}
+                    placeholder="New email address"
+                  />
+                  <Input
+                    id="confirm-email"
+                    label="Confirm New Email"
+                    requiredMark
+                    type="email"
+                    value={emailForm.confirmEmail}
+                    onChange={(event) => setEmailForm((current) => ({ ...current, confirmEmail: event.target.value }))}
+                    placeholder="Confirm new email"
+                    className={
+                      emailForm.confirmEmail.length > 0 && !emailsMatch
+                        ? 'border-red-300 focus:border-red-400 focus:ring-red-300/40'
+                        : ''
+                    }
+                  />
+                </div>
+                <Button type="submit" fullWidth className="rounded-xl">
+                  Save Email
+                </Button>
+              </form>
+              <SaveNotice message={emailNotice} />
+            </section>
+
+            <section className="border-t border-gray-200 pt-6 xl:border-l xl:border-t-0 xl:pl-8 xl:pt-0">
+              <div className="mb-4">
+                <h3 className="text-sm font-extrabold text-gray-900">Change Password</h3>
+                <p className="mt-1 text-xs font-medium text-gray-400">Use a strong password that is not shared with other accounts.</p>
               </div>
 
-              <div className="rounded-xl border border-blue-100 bg-blue-50/70 px-5 py-4">
-                <p className="mb-2 text-sm font-extrabold text-gray-600">Password must have:</p>
-                <div className="space-y-1.5">
-                  {PASSWORD_RULES.map((rule) => {
-                    const passed = rule.test(passwordForm.newPassword);
-                    return (
-                      <div key={rule.label} className="flex items-center gap-2">
-                        {passed ? (
-                          <CheckCircle2 size={14} className="shrink-0 text-blue-700" />
-                        ) : (
-                          <Circle size={14} className="shrink-0 text-gray-300" />
-                        )}
-                        <span className={`text-sm font-medium ${passed ? 'text-blue-700' : 'text-gray-500'}`}>
-                          {rule.label}
-                        </span>
-                      </div>
-                    );
-                  })}
-                    </div>
+              <form onSubmit={handleSavePassword} className="space-y-4">
+                <div>
+                  <label htmlFor="settings-current-password" className="mb-2 block text-sm font-extrabold text-gray-600">Current Password</label>
+                  <PasswordInput
+                    id="settings-current-password"
+                    value={passwordForm.currentPassword}
+                    placeholder="Enter current password"
+                    visible={showCurrentPassword}
+                    onToggleVisible={() => setShowCurrentPassword((current) => !current)}
+                    onChange={(value) => setPasswordForm((current) => ({ ...current, currentPassword: value }))}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="settings-new-password" className="mb-2 block text-sm font-extrabold text-gray-600">
+                      New Password <span className="text-red-500">*</span>
+                    </label>
+                    <PasswordInput
+                      id="settings-new-password"
+                      value={passwordForm.newPassword}
+                      placeholder="New password"
+                      visible={showNewPassword}
+                      onToggleVisible={() => setShowNewPassword((current) => !current)}
+                      onChange={(value) => setPasswordForm((current) => ({ ...current, newPassword: value }))}
+                    />
                   </div>
+                  <div>
+                    <label htmlFor="settings-confirm-password" className="mb-2 block text-sm font-extrabold text-gray-600">
+                      Confirm New Password <span className="text-red-500">*</span>
+                    </label>
+                    <PasswordInput
+                      id="settings-confirm-password"
+                      value={passwordForm.confirmPassword}
+                      placeholder="Confirm new password"
+                      visible={showConfirmPassword}
+                      onToggleVisible={() => setShowConfirmPassword((current) => !current)}
+                      onChange={(value) => setPasswordForm((current) => ({ ...current, confirmPassword: value }))}
+                    />
+                  </div>
+                </div>
 
-              <div>
-                <label htmlFor="settings-confirm-password" className="mb-2 block text-sm font-extrabold text-gray-600">
-                  Confirm New Password <span className="text-red-500">*</span>
-                </label>
-                <PasswordInput
-                  id="settings-confirm-password"
-                  value={passwordForm.confirmPassword}
-                  placeholder="Confirm new password"
-                  visible={showConfirmPassword}
-                  onToggleVisible={() => setShowConfirmPassword((current) => !current)}
-                  onChange={(value) => setPasswordForm((current) => ({ ...current, confirmPassword: value }))}
-                />
-              </div>
+                <div className="rounded-xl border border-blue-100 bg-blue-50/70 px-5 py-4">
+                  <p className="mb-2 text-sm font-extrabold text-gray-600">Password must have:</p>
+                  <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                    {PASSWORD_RULES.map((rule) => {
+                      const passed = rule.test(passwordForm.newPassword);
+                      return (
+                        <div key={rule.label} className="flex items-center gap-2">
+                          {passed ? (
+                            <CheckCircle2 size={14} className="shrink-0 text-blue-700" />
+                          ) : (
+                            <Circle size={14} className="shrink-0 text-gray-300" />
+                          )}
+                          <span className={`text-sm font-medium ${passed ? 'text-blue-700' : 'text-gray-500'}`}>
+                            {rule.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
 
-              <Button type="submit" size="lg" fullWidth className="rounded-xl">
-                Save Password
-              </Button>
-            </form>
-            <SaveNotice message={passwordNotice} />
-          </SettingsCard>
-        </div>
+                <Button type="submit" fullWidth className="rounded-xl">
+                  Save Password
+                </Button>
+              </form>
+              <SaveNotice message={passwordNotice} />
+            </section>
+          </div>
+        </SettingsCard>
 
-        <div className="flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-5 py-4 text-sm text-blue-800 xl:col-span-12">
+        <div className="flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-5 py-4 text-sm text-blue-800">
           <Info size={18} className="mt-0.5 shrink-0" />
           <p>
             Barangay information and credential forms are using local state for now. They can be connected after the Supabase schema and service layer are finalized.
