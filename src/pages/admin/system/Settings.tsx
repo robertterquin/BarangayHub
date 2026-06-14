@@ -235,14 +235,14 @@ export function Settings() {
         </SettingsCard>
 
         <SettingsCard title="Account Credentials" className="min-h-0">
-          <div className="grid grid-cols-1 gap-7 xl:grid-cols-2 xl:gap-8">
-            <section className="xl:pr-8">
+          <div className="grid grid-cols-1 items-stretch gap-7 xl:grid-cols-2 xl:gap-8">
+            <section className="flex flex-col xl:pr-8">
               <div className="mb-4">
                 <h3 className="text-sm font-extrabold text-gray-900">Change Email</h3>
                 <p className="mt-1 text-xs font-medium text-gray-400">Update the email used to sign in to the admin portal.</p>
               </div>
 
-              <form onSubmit={handleSaveEmail} className="space-y-4">
+              <form onSubmit={handleSaveEmail} className="flex flex-1 flex-col gap-4">
                 <Input
                   id="current-email"
                   label="Current Email"
@@ -275,20 +275,22 @@ export function Settings() {
                     }
                   />
                 </div>
-                <Button type="submit" fullWidth className="rounded-xl">
+                <Button type="submit" fullWidth className="mt-auto rounded-xl">
                   Save Email
                 </Button>
               </form>
-              <SaveNotice message={emailNotice} />
+              <div className="min-h-14">
+                <SaveNotice message={emailNotice} />
+              </div>
             </section>
 
-            <section className="border-t border-gray-200 pt-6 xl:border-l xl:border-t-0 xl:pl-8 xl:pt-0">
+            <section className="flex flex-col border-t border-gray-200 pt-6 xl:border-l xl:border-t-0 xl:pl-8 xl:pt-0">
               <div className="mb-4">
                 <h3 className="text-sm font-extrabold text-gray-900">Change Password</h3>
                 <p className="mt-1 text-xs font-medium text-gray-400">Use a strong password that is not shared with other accounts.</p>
               </div>
 
-              <form onSubmit={handleSavePassword} className="space-y-4">
+              <form onSubmit={handleSavePassword} className="flex flex-1 flex-col gap-4">
                 <div>
                   <label htmlFor="settings-current-password" className="mb-2 block text-sm font-extrabold text-gray-600">Current Password</label>
                   <PasswordInput
@@ -351,11 +353,13 @@ export function Settings() {
                   </div>
                 </div>
 
-                <Button type="submit" fullWidth className="rounded-xl">
+                <Button type="submit" fullWidth className="mt-auto rounded-xl">
                   Save Password
                 </Button>
               </form>
-              <SaveNotice message={passwordNotice} />
+              <div className="min-h-14">
+                <SaveNotice message={passwordNotice} />
+              </div>
             </section>
           </div>
         </SettingsCard>
