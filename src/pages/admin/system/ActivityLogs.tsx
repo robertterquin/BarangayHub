@@ -1,6 +1,4 @@
-import { useState } from 'react';
-import { RefreshCcw, ScrollText } from 'lucide-react';
-import { Button } from '../../../components/ui';
+import { ScrollText } from 'lucide-react';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
 type ActivityLogType = 'login' | 'request' | 'approval' | 'edit' | 'complaint' | 'system';
@@ -83,24 +81,6 @@ function ActivityLogRow({ entry }: { entry: ActivityLogEntry }) {
 }
 
 export function ActivityLogs() {
-  const [logs, setLogs] = useState<ActivityLogEntry[]>(MOCK_ACTIVITY_LOGS);
-  const [lastRefresh, setLastRefresh] = useState('Just now');
-
-  function handleRefresh() {
-    const refreshEntry: ActivityLogEntry = {
-      id: `refresh-${Date.now()}`,
-      message: 'System: Activity logs refreshed from mock data',
-      time: 'Just now',
-      log_type: 'system',
-    };
-
-    setLogs((current) => [refreshEntry, ...current]);
-    setLastRefresh(new Date().toLocaleTimeString('en-PH', {
-      hour: '2-digit',
-      minute: '2-digit',
-    }));
-  }
-
   return (
     <AdminLayout title="Activity Logs">
       <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -111,23 +91,13 @@ export function ActivityLogs() {
               <h1 className="text-base font-extrabold text-gray-950">Activity Logs</h1>
             </div>
             <p className="mt-1 text-xs font-medium text-gray-400">
-              Mock immutable audit trail. Last refreshed: {lastRefresh}
+              Mock immutable audit trail before Supabase activity log integration.
             </p>
           </div>
-
-          <Button
-            onClick={handleRefresh}
-            variant="primary"
-            size="sm"
-            className="bg-blue-50 text-blue-700 hover:bg-blue-100"
-          >
-            <RefreshCcw size={14} />
-            Refresh
-          </Button>
         </div>
 
         <ul className="divide-y-0">
-          {logs.map((entry) => (
+          {MOCK_ACTIVITY_LOGS.map((entry) => (
             <ActivityLogRow key={entry.id} entry={entry} />
           ))}
         </ul>

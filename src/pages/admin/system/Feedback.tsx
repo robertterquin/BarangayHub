@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Inbox, RotateCcw } from 'lucide-react';
+import { Inbox } from 'lucide-react';
 import { StatusBadge } from '../../../components/admin';
 import { Button } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
@@ -134,10 +134,6 @@ export function Feedback() {
     );
   }
 
-  function handleRestoreMockData() {
-    setFeedbackList(INITIAL_FEEDBACK);
-  }
-
   return (
     <AdminLayout title="Feedback & Suggestions">
       <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -150,18 +146,7 @@ export function Feedback() {
             <p className="mt-1 text-sm font-medium text-gray-400">Review suggestions, bug reports, and commendations from the public portal.</p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="hidden text-sm font-semibold text-gray-400 sm:inline">From public portal</span>
-            <Button
-              onClick={handleRestoreMockData}
-              variant="primary"
-              size="sm"
-              className="bg-blue-50 text-blue-700 hover:bg-blue-100"
-            >
-              <RotateCcw size={13} />
-              Reset
-            </Button>
-          </div>
+          <span className="hidden text-sm font-semibold text-gray-400 sm:inline">From public portal</span>
         </div>
 
         <ul>

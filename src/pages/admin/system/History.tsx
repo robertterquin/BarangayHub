@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { RotateCcw, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { PageHeader, StatusBadge } from '../../../components/admin';
 import { Button } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
@@ -187,26 +187,11 @@ export function History() {
     );
   }
 
-  function handleRestoreMockData() {
-    setSections(INITIAL_HISTORY_SECTIONS);
-  }
-
   return (
     <AdminLayout title="History">
       <PageHeader
         title="History"
         subtitle="Mock archive records grouped by module before Supabase history integration."
-        action={(
-          <Button
-            onClick={handleRestoreMockData}
-            variant="primary"
-            size="sm"
-            className="bg-blue-50 text-blue-700 hover:bg-blue-100"
-          >
-            <RotateCcw size={13} />
-            Restore Mock Data
-          </Button>
-        )}
       />
 
       <div className="space-y-4">
