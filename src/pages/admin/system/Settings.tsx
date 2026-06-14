@@ -1,20 +1,12 @@
 import { useState } from 'react';
 import { CheckCircle2, Circle, Eye, EyeOff, Info } from 'lucide-react';
-import { SettingsCard } from '../../../components/admin';
+import { PageHeader, SettingsCard } from '../../../components/admin';
 import { Button, Input } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
-
-interface SystemSettingsState {
-  mfaEnabled: boolean;
-  ipWhitelistEnabled: boolean;
-  autoBackupEnabled: boolean;
-  darkModeEnabled: boolean;
-}
 
 interface BarangayInfoState {
   barangay: string;
   municipality: string;
-  adminEmail: string;
   systemVersion: string;
   serviceSince: string;
 }
@@ -36,20 +28,14 @@ interface PasswordRule {
   test: (password: string) => boolean;
 }
 
-const INITIAL_SYSTEM_SETTINGS: SystemSettingsState = {
-  mfaEnabled: true,
-  ipWhitelistEnabled: false,
-  autoBackupEnabled: true,
-  darkModeEnabled: false,
-};
-
 const INITIAL_BARANGAY_INFO: BarangayInfoState = {
   barangay: 'Daine II',
   municipality: 'Indang, Cavite',
-  adminEmail: 'admin@brgy.daine2.gov',
   systemVersion: 'MIS v1.0',
   serviceSince: '2009',
 };
+
+const INITIAL_ADMIN_EMAIL = 'admin@brgy.daine2.gov';
 
 const PASSWORD_RULES: PasswordRule[] = [
   { label: 'Minimum 8 characters', test: (password) => password.length >= 8 },
@@ -58,47 +44,6 @@ const PASSWORD_RULES: PasswordRule[] = [
   { label: 'At least one number', test: (password) => /[0-9]/.test(password) },
   { label: 'At least one special character', test: (password) => /[^A-Za-z0-9]/.test(password) },
 ];
-
-function ToggleSwitch({
-  checked,
-  onChange,
-  label,
-}: {
-  checked: boolean;
-  onChange: () => void;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onChange}
-      aria-label={label}
-      aria-pressed={checked}
-      className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${checked ? 'bg-blue-600' : 'bg-gray-200'}`}
-    >
-      <span
-        className={`absolute left-0 top-1 h-6 w-6 rounded-full bg-white shadow-sm transition-transform ${checked ? 'translate-x-7' : 'translate-x-1'}`}
-      />
-    </button>
-  );
-}
-
-function SettingRow({
-  label,
-  checked,
-  onChange,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: () => void;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-4 py-2">
-      <span className="text-base font-medium text-gray-800">{label}</span>
-      <ToggleSwitch checked={checked} onChange={onChange} label={label} />
-    </div>
-  );
-}
 
 function PasswordInput({
   id,
@@ -149,11 +94,10 @@ function SaveNotice({ message }: { message: string | null }) {
 }
 
 export function Settings() {
-  const [systemSettings, setSystemSettings] = useState<SystemSettingsState>(INITIAL_SYSTEM_SETTINGS);
   const [barangayInfo, setBarangayInfo] = useState<BarangayInfoState>(INITIAL_BARANGAY_INFO);
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [emailForm, setEmailForm] = useState<EmailFormState>({
-    currentEmail: INITIAL_BARANGAY_INFO.adminEmail,
+    currentEmail: INITIAL_ADMIN_EMAIL,
     newEmail: '',
     confirmEmail: '',
   });
@@ -172,10 +116,6 @@ export function Settings() {
   const allPasswordRulesPassed = PASSWORD_RULES.every((rule) => rule.test(passwordForm.newPassword));
   const passwordsMatch = passwordForm.newPassword === passwordForm.confirmPassword && passwordForm.confirmPassword.length > 0;
   const emailsMatch = emailForm.newEmail === emailForm.confirmEmail && emailForm.confirmEmail.length > 0;
-
-  function updateSetting(field: keyof SystemSettingsState) {
-    setSystemSettings((current) => ({ ...current, [field]: !current[field] }));
-  }
 
   function updateBarangayInfo(field: keyof BarangayInfoState, value: string) {
     setBarangayInfo((current) => ({ ...current, [field]: value }));
@@ -200,7 +140,6 @@ export function Settings() {
       newEmail: '',
       confirmEmail: '',
     });
-    setBarangayInfo((current) => ({ ...current, adminEmail: emailForm.newEmail.trim() }));
     setEmailNotice('Admin email saved locally.');
   }
 
@@ -228,242 +167,193 @@ export function Settings() {
 
   return (
     <AdminLayout title="Settings">
-      <div className="space-y-8">
-        <section>
-          <h1 className="mb-5 text-2xl font-extrabold tracking-tight text-gray-950">System Settings</h1>
+      <PageHeader
+        title="System Settings"
+        subtitle="Manage barangay information and administrator credentials."
+      />
 
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
-            <SettingsCard title="Security">
-              <div className="space-y-2">
-                <SettingRow
-                  label="Multi-Factor Authentication"
-                  checked={systemSettings.mfaEnabled}
-                  onChange={() => updateSetting('mfaEnabled')}
-                />
-                <SettingRow
-                  label="IP Whitelist Mode"
-                  checked={systemSettings.ipWhitelistEnabled}
-                  onChange={() => updateSetting('ipWhitelistEnabled')}
+      <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-12">
+        <div className="space-y-5 xl:col-span-5">
+          <SettingsCard title="Barangay Information" className="min-h-0">
+            <div className="space-y-3">
+              {isEditingInfo ? (
+                <>
+                  <Input
+                    label="Barangay"
+                    value={barangayInfo.barangay}
+                    onChange={(event) => updateBarangayInfo('barangay', event.target.value)}
+                    placeholder="Barangay"
+                  />
+                  <Input
+                    label="Municipality"
+                    value={barangayInfo.municipality}
+                    onChange={(event) => updateBarangayInfo('municipality', event.target.value)}
+                    placeholder="Municipality"
+                  />
+                  <Input
+                    label="In Service Since"
+                    value={barangayInfo.serviceSince}
+                    onChange={(event) => updateBarangayInfo('serviceSince', event.target.value)}
+                    placeholder="Year"
+                  />
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                    <p className="text-xs font-bold uppercase tracking-wide text-gray-400">System Version</p>
+                    <p className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.systemVersion}</p>
+                    <p className="mt-1 text-xs font-medium text-gray-400">Managed by the application release.</p>
+                  </div>
+                </>
+              ) : (
+                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl bg-gray-50 px-4 py-3">
+                    <dt className="text-xs font-bold uppercase tracking-wide text-gray-400">Barangay</dt>
+                    <dd className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.barangay}</dd>
+                  </div>
+                  <div className="rounded-xl bg-gray-50 px-4 py-3">
+                    <dt className="text-xs font-bold uppercase tracking-wide text-gray-400">Municipality</dt>
+                    <dd className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.municipality}</dd>
+                  </div>
+                  <div className="rounded-xl bg-gray-50 px-4 py-3">
+                    <dt className="text-xs font-bold uppercase tracking-wide text-gray-400">System Version</dt>
+                    <dd className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.systemVersion}</dd>
+                  </div>
+                  <div className="rounded-xl bg-gray-50 px-4 py-3">
+                    <dt className="text-xs font-bold uppercase tracking-wide text-gray-400">In Service Since</dt>
+                    <dd className="mt-1 text-sm font-extrabold text-gray-900">{barangayInfo.serviceSince}</dd>
+                  </div>
+                </dl>
+              )}
+
+              <Button
+                type="button"
+                onClick={isEditingInfo ? handleSaveInfo : () => setIsEditingInfo(true)}
+                fullWidth
+                className="mt-3 rounded-xl"
+              >
+                {isEditingInfo ? 'Save Information' : 'Update Information'}
+              </Button>
+              <SaveNotice message={infoNotice} />
+            </div>
+          </SettingsCard>
+
+          <SettingsCard title="Change Email" className="min-h-0">
+            <form onSubmit={handleSaveEmail} className="space-y-4">
+              <Input
+                id="current-email"
+                label="Current Email"
+                value={emailForm.currentEmail}
+                readOnly
+                className="bg-gray-50"
+              />
+
+              <Input
+                id="new-email"
+                label="New Email"
+                requiredMark
+                type="email"
+                value={emailForm.newEmail}
+                onChange={(event) => setEmailForm((current) => ({ ...current, newEmail: event.target.value }))}
+                placeholder="New email address"
+              />
+
+              <Input
+                id="confirm-email"
+                label="Confirm New Email"
+                requiredMark
+                type="email"
+                value={emailForm.confirmEmail}
+                onChange={(event) => setEmailForm((current) => ({ ...current, confirmEmail: event.target.value }))}
+                placeholder="Confirm new email"
+                className={
+                  emailForm.confirmEmail.length > 0 && !emailsMatch
+                    ? 'border-red-300 focus:border-red-400 focus:ring-red-300/40'
+                    : ''
+                }
+              />
+
+              <Button type="submit" size="lg" fullWidth className="rounded-xl">
+                Save Email
+              </Button>
+            </form>
+            <SaveNotice message={emailNotice} />
+          </SettingsCard>
+        </div>
+
+        <div className="xl:col-span-7">
+          <SettingsCard title="Change Password" className="min-h-0">
+            <form onSubmit={handleSavePassword} className="space-y-5">
+              <div>
+                <label htmlFor="settings-current-password" className="mb-2 block text-sm font-extrabold text-gray-600">Current Password</label>
+                <PasswordInput
+                  id="settings-current-password"
+                  value={passwordForm.currentPassword}
+                  placeholder="Enter current password"
+                  visible={showCurrentPassword}
+                  onToggleVisible={() => setShowCurrentPassword((current) => !current)}
+                  onChange={(value) => setPasswordForm((current) => ({ ...current, currentPassword: value }))}
                 />
               </div>
-            </SettingsCard>
 
-            <SettingsCard title="System">
-              <div className="space-y-2">
-                <SettingRow
-                  label="Auto Backup"
-                  checked={systemSettings.autoBackupEnabled}
-                  onChange={() => updateSetting('autoBackupEnabled')}
+              <div>
+                <label htmlFor="settings-new-password" className="mb-2 block text-sm font-extrabold text-gray-600">
+                  New Password <span className="text-red-500">*</span>
+                </label>
+                <PasswordInput
+                  id="settings-new-password"
+                  value={passwordForm.newPassword}
+                  placeholder="New password"
+                  visible={showNewPassword}
+                  onToggleVisible={() => setShowNewPassword((current) => !current)}
+                  onChange={(value) => setPasswordForm((current) => ({ ...current, newPassword: value }))}
                 />
-                <SettingRow
-                  label="Dark Mode"
-                  checked={systemSettings.darkModeEnabled}
-                  onChange={() => updateSetting('darkModeEnabled')}
-                />
               </div>
-            </SettingsCard>
 
-            <SettingsCard title="Barangay Info">
-              <div className="space-y-3">
-                {isEditingInfo ? (
-                  <>
-                    <Input
-                      value={barangayInfo.barangay}
-                      onChange={(event) => updateBarangayInfo('barangay', event.target.value)}
-                      placeholder="Barangay"
-                    />
-                    <Input
-                      value={barangayInfo.municipality}
-                      onChange={(event) => updateBarangayInfo('municipality', event.target.value)}
-                      placeholder="Municipality"
-                    />
-                    <Input
-                      value={barangayInfo.adminEmail}
-                      onChange={(event) => updateBarangayInfo('adminEmail', event.target.value)}
-                      placeholder="Admin Email"
-                    />
-                    <Input
-                      value={barangayInfo.systemVersion}
-                      onChange={(event) => updateBarangayInfo('systemVersion', event.target.value)}
-                      placeholder="System Version"
-                    />
-                    <Input
-                      value={barangayInfo.serviceSince}
-                      onChange={(event) => updateBarangayInfo('serviceSince', event.target.value)}
-                      placeholder="In Service Since"
-                    />
-                  </>
-                ) : (
-                  <>
-                    <p className="text-base text-gray-700"><span className="font-extrabold text-gray-950">Barangay:</span> {barangayInfo.barangay}</p>
-                    <p className="text-base text-gray-700"><span className="font-extrabold text-gray-950">Municipality:</span> {barangayInfo.municipality}</p>
-                    <p className="text-base text-gray-700"><span className="font-extrabold text-gray-950">Admin Email:</span> {barangayInfo.adminEmail}</p>
-                    <p className="text-base text-gray-700"><span className="font-extrabold text-gray-950">System Version:</span> {barangayInfo.systemVersion}</p>
-                    <p className="text-base text-gray-700"><span className="font-extrabold text-gray-950">In Service Since:</span> {barangayInfo.serviceSince}</p>
-                  </>
-                )}
-
-                <Button
-                  type="button"
-                  onClick={isEditingInfo ? handleSaveInfo : () => setIsEditingInfo(true)}
-                  fullWidth
-                  className="mt-3 rounded-xl"
-                >
-                  {isEditingInfo ? 'Save Info' : 'Update Info'}
-                </Button>
-                <SaveNotice message={infoNotice} />
-              </div>
-            </SettingsCard>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="mb-5 text-2xl font-extrabold tracking-tight text-gray-950">Change Credentials</h2>
-
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-            <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-extrabold text-gray-950">Change Username / Email</h3>
-              <div className="mt-3 border-t border-gray-200 pt-5">
-                <form onSubmit={handleSaveEmail} className="space-y-4">
-                  <div>
-                    <label htmlFor="current-email" className="mb-2 block text-sm font-extrabold text-gray-600">Current Email</label>
-                    <input
-                      id="current-email"
-                      value={emailForm.currentEmail}
-                      readOnly
-                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-800 outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="new-email" className="mb-2 block text-sm font-extrabold text-gray-600">
-                      New Email <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="new-email"
-                      type="email"
-                      value={emailForm.newEmail}
-                      onChange={(event) => setEmailForm((current) => ({ ...current, newEmail: event.target.value }))}
-                      placeholder="New email address"
-                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-800 outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="confirm-email" className="mb-2 block text-sm font-extrabold text-gray-600">
-                      Confirm New Email <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="confirm-email"
-                      type="email"
-                      value={emailForm.confirmEmail}
-                      onChange={(event) => setEmailForm((current) => ({ ...current, confirmEmail: event.target.value }))}
-                      placeholder="Confirm new email"
-                      className={`w-full rounded-xl border bg-white px-4 py-3 text-sm font-medium text-gray-800 outline-none transition-colors focus:ring-1 ${
-                        emailForm.confirmEmail.length > 0 && !emailsMatch
-                          ? 'border-red-300 focus:border-red-400 focus:ring-red-300/40'
-                          : 'border-gray-200 focus:border-blue-500 focus:ring-blue-500/30'
-                      }`}
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    size="lg"
-                    fullWidth
-                    className="rounded-xl"
-                  >
-                    Save Email
-                  </Button>
-                </form>
-                <SaveNotice message={emailNotice} />
-              </div>
-            </section>
-
-            <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-extrabold text-gray-950">Change Password</h3>
-              <div className="mt-3 border-t border-gray-200 pt-5">
-                <form onSubmit={handleSavePassword} className="space-y-4">
-                  <div>
-                    <label htmlFor="settings-current-password" className="mb-2 block text-sm font-extrabold text-gray-600">Current Password</label>
-                    <PasswordInput
-                      id="settings-current-password"
-                      value={passwordForm.currentPassword}
-                      placeholder="Enter current password"
-                      visible={showCurrentPassword}
-                      onToggleVisible={() => setShowCurrentPassword((current) => !current)}
-                      onChange={(value) => setPasswordForm((current) => ({ ...current, currentPassword: value }))}
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="settings-new-password" className="mb-2 block text-sm font-extrabold text-gray-600">
-                      New Password <span className="text-red-500">*</span>
-                    </label>
-                    <PasswordInput
-                      id="settings-new-password"
-                      value={passwordForm.newPassword}
-                      placeholder="New password"
-                      visible={showNewPassword}
-                      onToggleVisible={() => setShowNewPassword((current) => !current)}
-                      onChange={(value) => setPasswordForm((current) => ({ ...current, newPassword: value }))}
-                    />
-                  </div>
-
-                  <div className="rounded-xl bg-blue-50/70 px-5 py-4">
-                    <p className="mb-2 text-sm font-extrabold text-gray-600">Password must have:</p>
-                    <div className="space-y-1.5">
-                      {PASSWORD_RULES.map((rule) => {
-                        const passed = rule.test(passwordForm.newPassword);
-                        return (
-                          <div key={rule.label} className="flex items-center gap-2">
-                            {passed ? (
-                              <CheckCircle2 size={14} className="shrink-0 text-blue-700" />
-                            ) : (
-                              <Circle size={14} className="shrink-0 text-gray-300" />
-                            )}
-                            <span className={`text-sm font-medium ${passed ? 'text-blue-700' : 'text-gray-500'}`}>
-                              {rule.label}
-                            </span>
-                          </div>
-                        );
-                      })}
+              <div className="rounded-xl border border-blue-100 bg-blue-50/70 px-5 py-4">
+                <p className="mb-2 text-sm font-extrabold text-gray-600">Password must have:</p>
+                <div className="space-y-1.5">
+                  {PASSWORD_RULES.map((rule) => {
+                    const passed = rule.test(passwordForm.newPassword);
+                    return (
+                      <div key={rule.label} className="flex items-center gap-2">
+                        {passed ? (
+                          <CheckCircle2 size={14} className="shrink-0 text-blue-700" />
+                        ) : (
+                          <Circle size={14} className="shrink-0 text-gray-300" />
+                        )}
+                        <span className={`text-sm font-medium ${passed ? 'text-blue-700' : 'text-gray-500'}`}>
+                          {rule.label}
+                        </span>
+                      </div>
+                    );
+                  })}
                     </div>
                   </div>
 
-                  <div>
-                    <label htmlFor="settings-confirm-password" className="mb-2 block text-sm font-extrabold text-gray-600">
-                      Confirm New Password <span className="text-red-500">*</span>
-                    </label>
-                    <PasswordInput
-                      id="settings-confirm-password"
-                      value={passwordForm.confirmPassword}
-                      placeholder="Confirm new password"
-                      visible={showConfirmPassword}
-                      onToggleVisible={() => setShowConfirmPassword((current) => !current)}
-                      onChange={(value) => setPasswordForm((current) => ({ ...current, confirmPassword: value }))}
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    size="lg"
-                    fullWidth
-                    className="rounded-xl"
-                  >
-                    Save Password
-                  </Button>
-                </form>
-                <SaveNotice message={passwordNotice} />
+              <div>
+                <label htmlFor="settings-confirm-password" className="mb-2 block text-sm font-extrabold text-gray-600">
+                  Confirm New Password <span className="text-red-500">*</span>
+                </label>
+                <PasswordInput
+                  id="settings-confirm-password"
+                  value={passwordForm.confirmPassword}
+                  placeholder="Confirm new password"
+                  visible={showConfirmPassword}
+                  onToggleVisible={() => setShowConfirmPassword((current) => !current)}
+                  onChange={(value) => setPasswordForm((current) => ({ ...current, confirmPassword: value }))}
+                />
               </div>
-            </section>
-          </div>
-        </section>
 
-        <div className="flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-5 py-4 text-sm text-blue-800">
+              <Button type="submit" size="lg" fullWidth className="rounded-xl">
+                Save Password
+              </Button>
+            </form>
+            <SaveNotice message={passwordNotice} />
+          </SettingsCard>
+        </div>
+
+        <div className="flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-5 py-4 text-sm text-blue-800 xl:col-span-12">
           <Info size={18} className="mt-0.5 shrink-0" />
           <p>
-            These settings are using dummy/local state for now. Real MFA, email, password, and system preference updates can be connected after the Supabase schema and service layer are finalized.
+            Barangay information and credential forms are using local state for now. They can be connected after the Supabase schema and service layer are finalized.
           </p>
         </div>
       </div>

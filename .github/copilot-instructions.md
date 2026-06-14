@@ -29,7 +29,7 @@
 ### Backend / Database
 
 - **Supabase** (PostgreSQL)
-  - **Auth:** Email-based admin login with MFA (Multi-Factor Authentication).
+  - **Auth:** Email-and-password admin login through Supabase Auth.
   - **RLS (Row-Level Security):** Residents can only access their own requests via Reference ID. Public users have **no** access to `residents` or `activity_logs`.
   - **Realtime:** Enabled for live sidebar badge counts (e.g., pending document requests, new complaints).
   - **Storage:** Used for uploaded attachments on complaint/blotter submissions.
@@ -75,7 +75,7 @@ src/
       UserManagement.tsx    # Manage admin/staff accounts & roles
       Reports.tsx           # PDF/CSV generation cards
       ActivityLogs.tsx      # Immutable audit trail timeline
-      Settings.tsx          # Admin profile, credentials, MFA
+      Settings.tsx          # Admin profile and credentials
 
     public/
       LandingPage.tsx       # Resident homepage + announcements
@@ -98,7 +98,7 @@ src/
     reportService.ts        # PDF/CSV generation helpers
 
   hooks/
-    useAuth.ts              # Admin session management + MFA state
+    useAuth.ts              # Admin session management
     useStats.ts             # Live badge counts via Supabase Realtime
     useResidents.ts         # Paginated/filtered resident queries
     useRequests.ts          # Document request state management
@@ -131,7 +131,7 @@ src/
 
 | # | Page / Feature | Description |
 |---|---|---|
-| 1 | **Admin Login** | Email + password with MFA. Sessions managed via Supabase Auth. |
+| 1 | **Admin Login** | Email-and-password login with sessions managed through Supabase Auth. |
 | 2 | **Dashboard** | Summary stats (total residents, pending requests, open complaints, recent activity). Real-time badge counts. |
 | 3 | **Resident Management** | Full CRUD for 4,800+ residents. Fuzzy search by name, purok, voter status. Bulk import via CSV. |
 | 4 | **Document Requests** | Process queue with workflow stages: Pending → Processing → Ready for Pickup → Completed. Per-request notes. |
@@ -141,7 +141,7 @@ src/
 | 8 | **User Management** | Add/remove admin/staff accounts. Assign roles (Secretary, Staff). Toggle account status. |
 | 9 | **Reports** | Generate PDF/CSV reports: Monthly Documents, Census Summary, Complaint Report, Annual Summary. |
 | 10 | **Activity Logs & History** | Immutable, color-coded audit trail. Blue: Login. Green: Approval. Red: Rejection/Complaint. Yellow: Edit. |
-| 11 | **Settings** | Admin profile, password change, MFA toggle, system preferences. |
+| 11 | **Settings** | Barangay information, admin email, and password management. |
 | 12 | **Logout** | Secure session termination via Supabase `signOut()`. Redirect to login. |
 
 ---
@@ -314,7 +314,6 @@ SYSTEM       → User Management, Settings
 
 - Digital clock (live, updated every second).
 - Global search bar.
-- MFA status badge.
 - Notification bell with real-time count badges.
 
 ---

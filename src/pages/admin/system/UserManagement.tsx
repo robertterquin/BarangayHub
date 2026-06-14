@@ -1,26 +1,22 @@
 import { useState } from 'react';
-import { LockKeyhole, ShieldCheck } from 'lucide-react';
+import { Settings2, ShieldCheck } from 'lucide-react';
 import { StatusBadge } from '../../../components/admin';
-import { Button, Input, Modal, Select, TableHeader, TableShell } from '../../../components/ui';
+import { Button, Modal, Select, TableHeader, TableShell } from '../../../components/ui';
 import { AdminLayout } from '../../../layouts/AdminLayout';
 
 type UserRole = 'Admin';
-type MfaStatus = 'active' | 'inactive';
 type AccountStatus = 'active' | 'inactive';
 
 interface AdminUser {
   id: string;
   username: string;
   role: UserRole;
-  mfa_status: MfaStatus;
   last_login: string;
   status: AccountStatus;
 }
 
-interface CredentialsForm {
-  username: string;
+interface AccountForm {
   role: UserRole;
-  mfa_status: MfaStatus;
   status: AccountStatus;
 }
 
@@ -28,23 +24,12 @@ const INITIAL_ADMIN_USER: AdminUser = {
   id: 'admin-001',
   username: 'admin@brgy.daine2.gov',
   role: 'Admin',
-  mfa_status: 'active',
   last_login: 'Today, 8:45 AM',
   status: 'active',
 };
 
 const ROLE_TONES: Record<UserRole, 'blue'> = {
   Admin: 'blue',
-};
-
-const MFA_LABELS: Record<MfaStatus, string> = {
-  active: 'MFA Active',
-  inactive: 'MFA Inactive',
-};
-
-const MFA_TONES: Record<MfaStatus, 'green' | 'yellow'> = {
-  active: 'green',
-  inactive: 'yellow',
 };
 
 const STATUS_LABELS: Record<AccountStatus, string> = {
@@ -57,61 +42,47 @@ const STATUS_TONES: Record<AccountStatus, 'green' | 'gray'> = {
   inactive: 'gray',
 };
 
-function CredentialsModal({
+function AccountModal({
   user,
   onClose,
   onSave,
 }: {
   user: AdminUser;
   onClose: () => void;
-  onSave: (form: CredentialsForm) => void;
+  onSave: (form: AccountForm) => void;
 }) {
-  const [form, setForm] = useState<CredentialsForm>({
-    username: user.username,
+  const [form, setForm] = useState<AccountForm>({
     role: user.role,
-    mfa_status: user.mfa_status,
     status: user.status,
   });
 
-  function handleChange<K extends keyof CredentialsForm>(field: K, value: CredentialsForm[K]) {
+  function handleChange<K extends keyof AccountForm>(field: K, value: AccountForm[K]) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
   function handleSubmit() {
-    if (!form.username.trim()) return;
-    onSave({ ...form, username: form.username.trim() });
+    onSave(form);
   }
 
   return (
     <Modal
-      title="Edit Admin Credentials"
-      subtitle="Mock-only account settings for the single administrator."
+      title="Edit Admin Account"
+      subtitle="Manage account role and availability. Email and password changes belong in Settings."
       width="md"
       onClose={onClose}
       footer={(
         <Button onClick={handleSubmit} fullWidth size="lg">
-          Save Mock Credentials
+          Save Account Settings
         </Button>
       )}
     >
         <div className="space-y-4">
-          <Input
-            label="Admin Email / Username"
-            requiredMark
-            value={form.username}
-            onChange={(e) => handleChange('username', e.target.value)}
-          />
+          <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+            <p className="text-xs font-bold uppercase tracking-wide text-gray-400">Admin Account</p>
+            <p className="mt-1 break-all text-sm font-extrabold text-gray-900">{user.username}</p>
+          </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Select
-                label="MFA Status"
-                value={form.mfa_status}
-                onChange={(e) => handleChange('mfa_status', e.target.value as MfaStatus)}
-              >
-                <option value="active">MFA Active</option>
-                <option value="inactive">MFA Inactive</option>
-            </Select>
-
+          <div>
             <Select
                 label="Account Status"
                 value={form.status}
@@ -137,12 +108,10 @@ export function UserManagement() {
   const [adminUser, setAdminUser] = useState<AdminUser>(INITIAL_ADMIN_USER);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  function handleSaveCredentials(form: CredentialsForm) {
+  function handleSaveAccount(form: AccountForm) {
     setAdminUser((current) => ({
       ...current,
-      username: form.username,
       role: form.role,
-      mfa_status: form.mfa_status,
       status: form.status,
       last_login: 'Today, 8:45 AM',
     }));
@@ -175,7 +144,7 @@ export function UserManagement() {
 
             <TableShell>
                 <table className="w-full text-sm">
-                  <TableHeader columns={['USERNAME', 'ROLE', 'MFA STATUS', 'LAST LOGIN', 'STATUS', 'ACTIONS']} />
+                  <TableHeader columns={['USERNAME', 'ROLE', 'LAST LOGIN', 'STATUS', 'ACTIONS']} />
                   <tbody>
                     <tr className="bg-white transition-colors hover:bg-blue-50">
                       <td className="whitespace-nowrap px-4 py-4 font-bold text-gray-900">
@@ -183,9 +152,6 @@ export function UserManagement() {
                       </td>
                       <td className="whitespace-nowrap px-4 py-4">
                         <StatusBadge label={adminUser.role} tone={ROLE_TONES[adminUser.role]} />
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-4">
-                        <StatusBadge label={MFA_LABELS[adminUser.mfa_status]} tone={MFA_TONES[adminUser.mfa_status]} />
                       </td>
                       <td className="whitespace-nowrap px-4 py-4 font-semibold text-gray-600">
                         {adminUser.last_login}
@@ -200,8 +166,8 @@ export function UserManagement() {
                           size="sm"
                           className="bg-blue-50 text-blue-700 hover:bg-blue-100"
                         >
-                          <LockKeyhole size={13} />
-                          Edit Credentials
+                          <Settings2 size={13} />
+                          Account Settings
                         </Button>
                       </td>
                     </tr>
@@ -213,10 +179,10 @@ export function UserManagement() {
       </AdminLayout>
 
       {isModalOpen && (
-        <CredentialsModal
+        <AccountModal
           user={adminUser}
           onClose={() => setIsModalOpen(false)}
-          onSave={handleSaveCredentials}
+          onSave={handleSaveAccount}
         />
       )}
     </>

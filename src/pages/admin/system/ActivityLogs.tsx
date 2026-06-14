@@ -15,7 +15,7 @@ interface ActivityLogEntry {
 const MOCK_ACTIVITY_LOGS: ActivityLogEntry[] = [
   {
     id: '1',
-    message: 'admin logged in via MFA - IP: 192.168.1.xx',
+    message: 'admin logged in - IP: 192.168.1.xx',
     time: 'Today, 8:45 AM',
     log_type: 'login',
   },
