@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, AlertCircle, Loader2, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
-import { logLoginActivity } from '../../../services/adminService';
-import { supabase } from '../../../services/supabase';
 import { AppLogo } from '../../../components/ui';
 
 export function AdminLogin() {
@@ -27,11 +25,6 @@ export function AdminLogin() {
       setError('Invalid email or password. Please try again.');
       setLoading(false);
       return;
-    }
-
-    const { data } = await supabase.auth.getSession();
-    if (data.session?.user.id) {
-      await logLoginActivity(data.session.user.id);
     }
 
     navigate('/admin/dashboard', { replace: true });

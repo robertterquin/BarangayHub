@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -18,21 +18,16 @@ import {
   History,
 } from 'lucide-react';
 import { AppLogo } from '../components/ui';
-import { supabase } from '../services/supabase';
-
-interface Notification {
-  id: string;
-  message: string;
-  sub: string;
-  time: string;
-  color: 'red' | 'yellow' | 'blue';
-}
-
-const MOCK_NOTIFICATIONS: Notification[] = [
-  { id: '1', message: 'New request – Maria Santos (BD2-2026-0318)', sub: 'Today, 9:02 AM', time: '9:02 AM', color: 'red' },
-  { id: '2', message: 'New complaint – Noise Disturbance, Purok 3', sub: 'Today, 10:01 AM', time: '10:01 AM', color: 'yellow' },
-  { id: '3', message: 'New resident registered – Eduardo Garcia, Purok 3', sub: 'Today, 2:00 PM', time: '2:00 PM', color: 'blue' },
-];
+import { useAuth } from '../hooks/useAuth';
+import { useStats } from '../hooks/useStats';
+import {
+  getNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
+  subscribeToNotificationChanges,
+} from '../services/adminService';
+import type { Notification as AdminNotification, NotificationType } from '../types/database';
+import { formatTimeAgo } from '../utils/formatters';
 
 interface NavItem {
   label: string;
@@ -47,8 +42,8 @@ const MAIN_NAV: NavItem[] = [
 
 const MANAGEMENT_NAV: NavItem[] = [
   { label: 'Resident Management', to: '/admin/residents', icon: <Users size={18} /> },
-  { label: 'Document Requests', to: '/admin/document-requests', icon: <FileText size={18} />, badge: 42 },
-  { label: 'Complaints / Blotter', to: '/admin/complaints', icon: <AlertTriangle size={18} />, badge: 7 },
+  { label: 'Document Requests', to: '/admin/document-requests', icon: <FileText size={18} /> },
+  { label: 'Complaints / Blotter', to: '/admin/complaints', icon: <AlertTriangle size={18} /> },
   { label: 'Announcements', to: '/admin/announcements', icon: <Megaphone size={18} /> },
   { label: 'Barangay Officials', to: '/admin/officials', icon: <Shield size={18} /> },
 ];
@@ -65,7 +60,17 @@ const SYSTEM_NAV: NavItem[] = [
   { label: 'Settings', to: '/admin/settings', icon: <Settings size={18} /> },
 ];
 
-function NavSection({ label, items, collapsed }: { label: string; items: NavItem[]; collapsed: boolean }) {
+function NavSection({
+  label,
+  items,
+  collapsed,
+  badges = {},
+}: {
+  label: string;
+  items: NavItem[];
+  collapsed: boolean;
+  badges?: Record<string, number>;
+}) {
   return (
     <div className="mb-4">
       {!collapsed && (
@@ -73,29 +78,30 @@ function NavSection({ label, items, collapsed }: { label: string; items: NavItem
           {label}
         </p>
       )}
-      {items.map((item) => (
-        <NavLink
-          key={item.to}
-          to={item.to}
-          className={({ isActive }) =>
-            `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-              isActive
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-400 hover:bg-[#2a2d35] hover:text-white'
-            }`
-          }
-        >
-          {item.icon}
-          {!collapsed && (
-            <span className="flex-1">{item.label}</span>
-          )}
-          {!collapsed && item.badge !== undefined && (
-            <span className="ml-auto bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-5 text-center leading-none">
-              {item.badge}
-            </span>
-          )}
-        </NavLink>
-      ))}
+      {items.map((item) => {
+        const badge = badges[item.to] ?? item.badge;
+        return (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                isActive
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-400 hover:bg-[#2a2d35] hover:text-white'
+              }`
+            }
+          >
+            {item.icon}
+            {!collapsed && <span className="flex-1">{item.label}</span>}
+            {!collapsed && badge !== undefined && badge > 0 && (
+              <span className="ml-auto min-w-5 rounded-full bg-red-500 px-1.5 py-0.5 text-center text-xs font-bold leading-none text-white">
+                {badge > 99 ? '99+' : badge}
+              </span>
+            )}
+          </NavLink>
+        );
+      })}
     </div>
   );
 }
@@ -109,8 +115,24 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
   const [collapsed, setCollapsed] = useState(false);
   const [time, setTime] = useState(new Date());
   const [notifOpen, setNotifOpen] = useState(false);
+  const [notifications, setNotifications] = useState<AdminNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationsLoading, setNotificationsLoading] = useState(true);
   const notifRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { profile, signOut } = useAuth();
+  const { pendingRequests, openComplaints } = useStats();
+
+  const loadNotifications = useCallback(async () => {
+    const { data, count } = await getNotifications({
+      page: 0,
+      pageSize: 6,
+      unreadOnly: true,
+    });
+    setNotifications(data ?? []);
+    setUnreadCount(count ?? 0);
+    setNotificationsLoading(false);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -127,9 +149,37 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    queueMicrotask(() => {
+      void loadNotifications();
+    });
+    return subscribeToNotificationChanges(() => {
+      void loadNotifications();
+    });
+  }, [loadNotifications]);
+
   async function handleLogout() {
-    await supabase.auth.signOut();
+    await signOut();
     navigate('/admin/login');
+  }
+
+  async function handleNotificationClick(notification: AdminNotification) {
+    await markNotificationRead(notification.id);
+    setNotifOpen(false);
+    void loadNotifications();
+
+    const routes: Partial<Record<string, string>> = {
+      document_requests: '/admin/document-requests',
+      complaints: '/admin/complaints',
+      feedback: '/admin/feedback',
+    };
+    const route = notification.entity_type ? routes[notification.entity_type] : undefined;
+    if (route) navigate(route);
+  }
+
+  async function handleMarkAllRead() {
+    await markAllNotificationsRead();
+    void loadNotifications();
   }
 
   const clockStr = time.toLocaleTimeString('en-PH', {
@@ -145,10 +195,24 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
     day: 'numeric',
   });
 
-  const dotColor: Record<'red' | 'yellow' | 'blue', string> = {
-    red: 'bg-red-500',
-    yellow: 'bg-yellow-400',
-    blue: 'bg-blue-500',
+  const dotColor: Record<NotificationType, string> = {
+    document_request: 'bg-blue-500',
+    complaint: 'bg-red-500',
+    feedback: 'bg-yellow-400',
+    system: 'bg-gray-400',
+  };
+  const displayName = profile?.display_name || 'Admin';
+  const email = profile?.email || 'Administrator';
+  const initials =
+    displayName
+      .split(/\s+/)
+      .map((part) => part[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase() || 'AD';
+  const managementBadges = {
+    '/admin/document-requests': pendingRequests,
+    '/admin/complaints': openComplaints,
   };
 
   return (
@@ -182,20 +246,20 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
             <div className="flex items-center gap-2.5">
               <div className="relative shrink-0">
                 <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
-                  AD
+                  {initials}
                 </div>
                 <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#1a1c23]" />
               </div>
               <div className="min-w-0">
-                <p className="text-white text-sm font-semibold truncate">Admin</p>
-                <p className="text-gray-500 text-xs truncate">admin@brgy.daine2.gov</p>
+                <p className="text-white text-sm font-semibold truncate">{displayName}</p>
+                <p className="text-gray-500 text-xs truncate">{email}</p>
               </div>
             </div>
           </div>
         ) : (
           <div className="flex justify-center py-3 border-b border-[#2a2d35]">
             <div className="relative">
-              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">AD</div>
+              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">{initials}</div>
               <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-[#1a1c23]" />
             </div>
           </div>
@@ -204,7 +268,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
           <NavSection label="Main" items={MAIN_NAV} collapsed={collapsed} />
-          <NavSection label="Management" items={MANAGEMENT_NAV} collapsed={collapsed} />
+          <NavSection label="Management" items={MANAGEMENT_NAV} collapsed={collapsed} badges={managementBadges} />
           <NavSection label="Analytics" items={ANALYTICS_NAV} collapsed={collapsed} />
           <NavSection label="System" items={SYSTEM_NAV} collapsed={collapsed} />
         </nav>
@@ -260,9 +324,11 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
                 className="relative p-1.5 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
               >
                 <Bell size={18} />
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
-                  {MOCK_NOTIFICATIONS.length}
-                </span>
+                {unreadCount > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
               </button>
 
               {/* Notification dropdown */}
@@ -270,21 +336,50 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
                 <div className="absolute right-0 top-10 w-80 bg-white border border-gray-200 rounded-xl shadow-2xl z-50">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                     <span className="text-gray-800 font-semibold text-sm">Admin Notifications</span>
-                    <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                      {MOCK_NOTIFICATIONS.length}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {unreadCount > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => void handleMarkAllRead()}
+                          className="text-[11px] font-bold text-blue-600 hover:text-blue-800"
+                        >
+                          Mark all read
+                        </button>
+                      )}
+                      <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-bold text-white">
+                        {unreadCount}
+                      </span>
+                    </div>
                   </div>
-                  <ul className="py-2">
-                    {MOCK_NOTIFICATIONS.map((n) => (
-                      <li key={n.id} className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors">
-                        <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${dotColor[n.color]}`} />
-                        <div>
-                          <p className="text-gray-800 text-xs font-medium leading-snug">{n.message}</p>
-                          <p className="text-gray-400 text-xs mt-0.5">{n.sub}</p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+                  {notificationsLoading ? (
+                    <p className="px-4 py-8 text-center text-xs font-medium text-gray-400">Loading notifications...</p>
+                  ) : notifications.length > 0 ? (
+                    <ul className="py-2">
+                      {notifications.map((notification) => (
+                        <li key={notification.id}>
+                          <button
+                            type="button"
+                            onClick={() => void handleNotificationClick(notification)}
+                            className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50"
+                          >
+                            <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${dotColor[notification.type]}`} />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-bold leading-snug text-gray-800">{notification.title}</p>
+                              <p className="mt-0.5 line-clamp-2 text-xs text-gray-500">{notification.message}</p>
+                              <p className="mt-1 text-[11px] font-medium text-gray-400">
+                                {formatTimeAgo(notification.created_at)}
+                              </p>
+                            </div>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="px-4 py-10 text-center">
+                      <p className="text-sm font-semibold text-gray-600">You&apos;re all caught up</p>
+                      <p className="mt-1 text-xs text-gray-400">New resident submissions will appear here.</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

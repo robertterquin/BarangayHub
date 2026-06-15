@@ -1,71 +1,106 @@
 import { supabase } from './supabase';
-import type { DocumentRequest, Complaint, Feedback } from '../types/database';
-import { generateReferenceId } from '../utils/idGenerator';
+import type {
+  SubmitComplaintPayload,
+  SubmitDocumentRequestPayload,
+  SubmitFeedbackPayload,
+} from '../types/database';
 
-// ─── Document Request Submission ──────────────────────────────────────────────
+const COMPLAINT_BUCKET = 'complaint-attachments';
 
-export async function submitDocumentRequest(
-  payload: Pick<DocumentRequest, 'document_type' | 'purpose'> & { full_name: string }
-): Promise<{ trackingCode: string | null; error: unknown }> {
-  const trackingCode = await generateReferenceId('document_requests', 'tracking_code');
-
-  const { error } = await supabase.from('document_requests').insert({
-    tracking_code: trackingCode,
-    document_type: payload.document_type,
-    purpose: payload.purpose,
-    status: 'pending',
-    resident_id: null,
-  });
-
-  if (error) return { trackingCode: null, error };
-  return { trackingCode, error: null };
+function createStoragePath(file: File): string {
+  const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
+  return `public/${crypto.randomUUID()}.${extension}`;
 }
 
-// ─── Track Request Status ─────────────────────────────────────────────────────
+export async function submitDocumentRequest(payload: SubmitDocumentRequestPayload) {
+  const { data, error } = await supabase.rpc('submit_document_request', {
+    p_requester_name: payload.requesterName,
+    p_birthdate: payload.birthdate,
+    p_gender: payload.gender,
+    p_address: payload.address,
+    p_purok: payload.purok,
+    p_contact_number: payload.contactNumber,
+    p_email: payload.email ?? null,
+    p_document_type: payload.documentType,
+    p_other_document_type: payload.otherDocumentType ?? null,
+    p_purpose: payload.purpose,
+  });
+
+  return {
+    data: data?.[0] ?? null,
+    trackingCode: data?.[0]?.tracking_code ?? null,
+    error,
+  };
+}
 
 export async function trackRequest(trackingCode: string) {
-  return supabase
-    .from('document_requests')
-    .select('tracking_code, document_type, status, requested_at, updated_at')
-    .eq('tracking_code', trackingCode)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc('track_document_request', {
+    p_tracking_code: trackingCode.trim().toUpperCase(),
+  });
+  return { data: data?.[0] ?? null, error };
 }
 
-// ─── Complaint Submission ─────────────────────────────────────────────────────
+export async function uploadComplaintAttachment(file: File) {
+  const path = createStoragePath(file);
+  const { data, error } = await supabase.storage
+    .from(COMPLAINT_BUCKET)
+    .upload(path, file, { cacheControl: '3600', upsert: false });
 
-export async function submitComplaint(
-  payload: Pick<Complaint, 'complainant_name' | 'respondent_name' | 'description' | 'urgency'>
-): Promise<{ referenceId: string | null; error: unknown }> {
-  const referenceId = await generateReferenceId('complaints', 'reference_id');
+  return { data: data ? { path: data.path } : null, error };
+}
 
-  const { error } = await supabase.from('complaints').insert({
-    reference_id: referenceId,
-    ...payload,
-    status: 'open',
-    attachment_url: null,
+export async function submitComplaint(payload: SubmitComplaintPayload) {
+  const { data, error } = await supabase.rpc('submit_complaint', {
+    p_title: payload.title,
+    p_description: payload.description,
+    p_complainant_name: payload.complainantName,
+    p_respondent_name: payload.respondentName ?? null,
+    p_complainant_contact: payload.complainantContact,
+    p_complainant_address: payload.complainantAddress,
+    p_purok: payload.purok,
+    p_incident_date: payload.incidentDate ?? null,
+    p_incident_location: payload.incidentLocation ?? null,
+    p_attachment_url: payload.attachmentUrl ?? null,
   });
 
-  if (error) return { referenceId: null, error };
-  return { referenceId, error: null };
+  return {
+    data: data?.[0] ?? null,
+    referenceId: data?.[0]?.reference_id ?? null,
+    error,
+  };
 }
 
-// ─── Public Announcements ─────────────────────────────────────────────────────
-
-export async function getPublishedAnnouncements() {
+export async function getPublishedAnnouncements(limit = 20) {
   return supabase
     .from('announcements')
     .select('*')
-    .eq('is_published', true)
-    .order('published_at', { ascending: false });
+    .eq('status', 'published')
+    .lte('published_at', new Date().toISOString())
+    .order('published_at', { ascending: false })
+    .limit(limit);
 }
 
-// ─── Feedback Submission ──────────────────────────────────────────────────────
+export async function getPublicOfficials() {
+  return supabase
+    .from('officials')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order', { ascending: true });
+}
 
-export async function submitFeedback(
-  payload: Pick<Feedback, 'message' | 'is_anonymous' | 'resident_name'>
-) {
-  return supabase.from('feedback').insert({
-    ...payload,
-    submitted_at: new Date().toISOString(),
+export async function getPublicSystemSettings() {
+  return supabase.from('system_settings').select('*').eq('id', 1).single();
+}
+
+export async function submitFeedback(payload: SubmitFeedbackPayload) {
+  const { data, error } = await supabase.rpc('submit_feedback', {
+    p_resident_name: payload.residentName ?? null,
+    p_contact_number: payload.contactNumber ?? null,
+    p_email: payload.email ?? null,
+    p_is_anonymous: payload.isAnonymous,
+    p_category: payload.category,
+    p_message: payload.message,
   });
+
+  return { data: data ?? null, error };
 }

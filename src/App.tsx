@@ -19,9 +19,9 @@ import { Feedback } from './pages/admin/system/Feedback';
 import { Settings } from './pages/admin/system/Settings';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, isActiveAdmin, loading } = useAuth();
   if (loading) return <div className="min-h-screen bg-[#121417] flex items-center justify-center text-gray-400">Loading...</div>;
-  if (!user) return <Navigate to="/admin/login" replace />;
+  if (!user || !isActiveAdmin) return <Navigate to="/admin/login" replace />;
   return <>{children}</>;
 }
 
