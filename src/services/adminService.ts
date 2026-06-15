@@ -522,7 +522,22 @@ export async function getFeedback(
 
   if (options.status) query = query.eq('status', options.status);
   if (options.category) query = query.eq('category', options.category);
+
+  const search = options.search?.trim();
+  if (search) {
+    query = query.or(
+      `resident_name.ilike.%${search}%,email.ilike.%${search}%,contact_number.ilike.%${search}%,message.ilike.%${search}%`
+    );
+  }
+
   return query;
+}
+
+export async function getPendingFeedbackCount() {
+  return supabase
+    .from('feedback')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'pending');
 }
 
 export async function updateFeedback(id: string, updates: FeedbackUpdate) {
