@@ -238,6 +238,13 @@ export async function getDocumentRequests(
   return query;
 }
 
+export async function getPendingDocumentRequestCount() {
+  return supabase
+    .from('document_requests')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'pending');
+}
+
 export async function updateDocumentRequest(id: string, updates: DocumentRequestUpdate) {
   const { data: authData } = await supabase.auth.getUser();
   return supabase
@@ -258,6 +265,17 @@ export async function updateRequestStatus(
 
 export async function deleteDocumentRequest(id: string) {
   return supabase.from('document_requests').delete().eq('id', id);
+}
+
+export function subscribeToDocumentRequestChanges(onChange: () => void) {
+  const channel = supabase
+    .channel(`document-requests-${crypto.randomUUID()}`)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'document_requests' }, onChange)
+    .subscribe();
+
+  return () => {
+    void supabase.removeChannel(channel);
+  };
 }
 
 export async function getOfficials(options: PageOptions & { activeOnly?: boolean } = {}) {
@@ -318,6 +336,13 @@ export async function getComplaints(
   return query;
 }
 
+export async function getActiveComplaintCount() {
+  return supabase
+    .from('complaints')
+    .select('id', { count: 'exact', head: true })
+    .in('status', ['open', 'under_review']);
+}
+
 export async function updateComplaint(id: string, updates: ComplaintUpdate) {
   return supabase.from('complaints').update(updates).eq('id', id).select().single();
 }
@@ -332,6 +357,17 @@ export async function updateComplaintStatus(
 
 export async function deleteComplaint(id: string) {
   return supabase.from('complaints').delete().eq('id', id);
+}
+
+export function subscribeToComplaintChanges(onChange: () => void) {
+  const channel = supabase
+    .channel(`complaints-${crypto.randomUUID()}`)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'complaints' }, onChange)
+    .subscribe();
+
+  return () => {
+    void supabase.removeChannel(channel);
+  };
 }
 
 export async function getAnnouncements(
@@ -370,6 +406,17 @@ export async function updateAnnouncement(id: string, updates: AnnouncementUpdate
 
 export async function deleteAnnouncement(id: string) {
   return supabase.from('announcements').delete().eq('id', id);
+}
+
+export function subscribeToAnnouncementChanges(onChange: () => void) {
+  const channel = supabase
+    .channel(`announcements-${crypto.randomUUID()}`)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, onChange)
+    .subscribe();
+
+  return () => {
+    void supabase.removeChannel(channel);
+  };
 }
 
 export async function getFeedback(
@@ -614,7 +661,13 @@ export async function uploadAnnouncementImage(file: File) {
 }
 
 export async function deleteAnnouncementImage(path: string) {
-  return supabase.storage.from(ANNOUNCEMENT_BUCKET).remove([path]);
+  const publicMarker = `/storage/v1/object/public/${ANNOUNCEMENT_BUCKET}/`;
+  const imagePath = path.includes(publicMarker)
+    ? decodeURIComponent(path.split(publicMarker)[1] ?? '')
+    : path;
+
+  if (!imagePath) return { data: null, error: new Error('Invalid announcement image path.') };
+  return supabase.storage.from(ANNOUNCEMENT_BUCKET).remove([imagePath]);
 }
 
 export async function getComplaintAttachmentUrl(path: string, expiresIn = 3600) {
