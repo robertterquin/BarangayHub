@@ -11,6 +11,7 @@ import type {
   DocumentRequestUpdate,
   FeedbackStatus,
   FeedbackUpdate,
+  LogType,
   NotificationUpdate,
   DocumentType,
   FeedbackCategory,
@@ -53,6 +54,10 @@ export interface DashboardSnapshot extends DashboardStats {
   residentsByPurok: DashboardChartPoint[];
   monthlyRequests: DashboardChartPoint[];
   recentActivity: ActivityLog[];
+}
+
+export interface AdminEmailUpdateResult {
+  confirmationRequired: boolean;
 }
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -144,13 +149,91 @@ export async function getSystemSettings() {
 }
 
 export async function updateSystemSettings(updates: SystemSettingsUpdate) {
-  const { data: authData } = await supabase.auth.getUser();
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError || !authData.user) {
+    return { data: null, error: authError ?? new Error('No authenticated user.') };
+  }
+
   return supabase
     .from('system_settings')
-    .update({ ...updates, updated_by: authData.user?.id ?? null })
+    .update({ ...updates, updated_by: authData.user.id })
     .eq('id', 1)
     .select()
     .single();
+}
+
+async function reauthenticateCurrentAdmin(currentPassword: string) {
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError || !authData.user?.email) {
+    return {
+      user: null,
+      error: authError ?? new Error('The authenticated account does not have an email address.'),
+    };
+  }
+
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: authData.user.email,
+    password: currentPassword,
+  });
+
+  return {
+    user: signInError ? null : authData.user,
+    error: signInError,
+  };
+}
+
+export async function changeCurrentAdminEmail(
+  currentPassword: string,
+  newEmail: string
+): Promise<{ data: AdminEmailUpdateResult | null; error: unknown }> {
+  const verification = await reauthenticateCurrentAdmin(currentPassword);
+  if (verification.error || !verification.user) {
+    return { data: null, error: verification.error };
+  }
+
+  const normalizedEmail = newEmail.trim().toLowerCase();
+  const { data: updateData, error: updateError } = await supabase.auth.updateUser({
+    email: normalizedEmail,
+  });
+  if (updateError) return { data: null, error: updateError };
+
+  const profileResult = await updateCurrentAdminProfile({ email: normalizedEmail });
+  if (profileResult.error) return { data: null, error: profileResult.error };
+
+  return {
+    data: {
+      confirmationRequired:
+        updateData.user.email?.toLowerCase() !== normalizedEmail,
+    },
+    error: null,
+  };
+}
+
+export async function changeCurrentAdminPassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<{ data: boolean; error: unknown }> {
+  const verification = await reauthenticateCurrentAdmin(currentPassword);
+  if (verification.error || !verification.user) {
+    return { data: false, error: verification.error };
+  }
+
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+  if (updateError) return { data: false, error: updateError };
+
+  const { error: logError } = await supabase.from('activity_logs').insert({
+    admin_id: verification.user.id,
+    admin_email: verification.user.email,
+    action: 'Admin password changed',
+    entity_type: 'auth',
+    entity_id: verification.user.id,
+    log_type: 'edit',
+    details: { field: 'password' },
+  });
+
+  return { data: !logError, error: logError };
 }
 
 export interface ResidentQueryOptions extends PageOptions {
@@ -454,7 +537,9 @@ export async function deleteFeedback(id: string) {
   return supabase.from('feedback').delete().eq('id', id);
 }
 
-export async function getActivityLogs(options: PageOptions = {}): Promise<{
+export async function getActivityLogs(
+  options: PageOptions & { logType?: LogType } = {}
+): Promise<{
   data: ActivityLog[] | null;
   count: number | null;
   error: unknown;
@@ -470,8 +555,24 @@ export async function getActivityLogs(options: PageOptions = {}): Promise<{
   if (search) {
     query = query.or(`action.ilike.%${search}%,admin_email.ilike.%${search}%,entity_type.ilike.%${search}%`);
   }
+  if (options.logType) query = query.eq('log_type', options.logType);
 
   return query;
+}
+
+export function subscribeToActivityLogChanges(onChange: () => void) {
+  const channel = supabase
+    .channel(`activity-logs-${crypto.randomUUID()}`)
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'activity_logs' },
+      onChange
+    )
+    .subscribe();
+
+  return () => {
+    void supabase.removeChannel(channel);
+  };
 }
 
 export async function getNotifications(
