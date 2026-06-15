@@ -13,6 +13,10 @@ drop policy if exists "Admin can upload announcement images" on storage.objects;
 drop policy if exists "Admin can read announcement images" on storage.objects;
 drop policy if exists "Admin can update announcement images" on storage.objects;
 drop policy if exists "Admin can delete announcement images" on storage.objects;
+drop policy if exists "Public can read official photos" on storage.objects;
+drop policy if exists "Admin can upload official photos" on storage.objects;
+drop policy if exists "Admin can update official photos" on storage.objects;
+drop policy if exists "Admin can delete official photos" on storage.objects;
 
 -- Remove BarangayHub tables from the Realtime publication before dropping them.
 do $$
@@ -127,7 +131,7 @@ drop type if exists public.admin_role;
 -- are not silently deleted. Empty them from Supabase Storage before rerunning
 -- this reset if you want the buckets removed too.
 delete from storage.buckets as bucket
-where bucket.id in ('complaint-attachments', 'announcement-images')
+where bucket.id in ('complaint-attachments', 'announcement-images', 'official-photos')
   and not exists (
     select 1
     from storage.objects as object

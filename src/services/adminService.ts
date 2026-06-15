@@ -58,6 +58,7 @@ export interface DashboardSnapshot extends DashboardStats {
 const DEFAULT_PAGE_SIZE = 20;
 const ANNOUNCEMENT_BUCKET = 'announcement-images';
 const COMPLAINT_BUCKET = 'complaint-attachments';
+const OFFICIAL_PHOTO_BUCKET = 'official-photos';
 const DASHBOARD_PUROKS = ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5', 'Purok 6'];
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -290,6 +291,13 @@ export async function getOfficials(options: PageOptions & { activeOnly?: boolean
   if (options.activeOnly) query = query.eq('is_active', true);
   if (options.search?.trim()) query = query.ilike('full_name', `%${options.search.trim()}%`);
   return query;
+}
+
+export async function getActiveOfficialCount() {
+  return supabase
+    .from('officials')
+    .select('id', { count: 'exact', head: true })
+    .eq('is_active', true);
 }
 
 export async function createOfficial(official: OfficialInsert) {
@@ -668,6 +676,29 @@ export async function deleteAnnouncementImage(path: string) {
 
   if (!imagePath) return { data: null, error: new Error('Invalid announcement image path.') };
   return supabase.storage.from(ANNOUNCEMENT_BUCKET).remove([imagePath]);
+}
+
+export async function uploadOfficialPhoto(file: File) {
+  const path = createStoragePath(file, 'officials');
+  const { data, error } = await supabase.storage
+    .from(OFFICIAL_PHOTO_BUCKET)
+    .upload(path, file, { cacheControl: '3600', upsert: false });
+
+  if (error) return { data: null, error };
+  const { data: publicUrl } = supabase.storage
+    .from(OFFICIAL_PHOTO_BUCKET)
+    .getPublicUrl(data.path);
+  return { data: { path: data.path, publicUrl: publicUrl.publicUrl }, error: null };
+}
+
+export async function deleteOfficialPhoto(path: string) {
+  const publicMarker = `/storage/v1/object/public/${OFFICIAL_PHOTO_BUCKET}/`;
+  const photoPath = path.includes(publicMarker)
+    ? decodeURIComponent(path.split(publicMarker)[1] ?? '')
+    : path;
+
+  if (!photoPath) return { data: null, error: new Error('Invalid official photo path.') };
+  return supabase.storage.from(OFFICIAL_PHOTO_BUCKET).remove([photoPath]);
 }
 
 export async function getComplaintAttachmentUrl(path: string, expiresIn = 3600) {
