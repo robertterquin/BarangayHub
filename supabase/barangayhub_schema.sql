@@ -696,7 +696,9 @@ begin
   if tg_table_name = 'admin_profiles' then
     if tg_op = 'UPDATE'
        and new.email is not distinct from old.email
-       and new.display_name is not distinct from old.display_name then
+       and new.display_name is not distinct from old.display_name
+       and new.role is not distinct from old.role
+       and new.status is not distinct from old.status then
       return new;
     end if;
   end if;
@@ -717,7 +719,15 @@ begin
   v_action := initcap(replace(tg_table_name, '_', ' ')) || ' ' || lower(tg_op);
 
   if tg_op = 'UPDATE' then
-    if tg_table_name = 'document_requests' then
+    if tg_table_name = 'admin_profiles' then
+      v_details := v_details || jsonb_build_object(
+        'target_email', new.email,
+        'previous_status', old.status,
+        'new_status', new.status,
+        'previous_role', old.role,
+        'new_role', new.role
+      );
+    elsif tg_table_name = 'document_requests' then
       v_details := v_details || jsonb_build_object(
         'previous_status', old.status,
         'new_status', new.status
@@ -1174,6 +1184,21 @@ to authenticated
 using (id = (select auth.uid()) and (select public.is_active_admin()))
 with check (id = (select auth.uid()) and role = 'admin');
 
+drop policy if exists "Admin can read admin profiles" on public.admin_profiles;
+create policy "Admin can read admin profiles"
+on public.admin_profiles
+for select
+to authenticated
+using ((select public.is_active_admin()));
+
+drop policy if exists "Admin can update admin profiles" on public.admin_profiles;
+create policy "Admin can update admin profiles"
+on public.admin_profiles
+for update
+to authenticated
+using ((select public.is_active_admin()))
+with check (role = 'admin');
+
 drop policy if exists "Public can read barangay settings" on public.system_settings;
 create policy "Public can read barangay settings"
 on public.system_settings
@@ -1284,7 +1309,7 @@ grant select on public.officials to anon;
 grant select on public.announcements to anon;
 
 grant select on public.admin_profiles to authenticated;
-grant update (email, display_name, last_login_at)
+grant update (email, display_name, last_login_at, role, status)
   on public.admin_profiles to authenticated;
 grant select, insert, update on public.system_settings to authenticated;
 grant select, insert, update, delete on public.residents to authenticated;

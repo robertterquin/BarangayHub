@@ -2,6 +2,7 @@ import { supabase } from './supabase';
 import { generateReferenceId } from '../utils/idGenerator';
 import type {
   ActivityLog,
+  AccountStatus,
   AdminProfileUpdate,
   AnnouncementInsert,
   AnnouncementStatus,
@@ -60,6 +61,10 @@ export interface AdminEmailUpdateResult {
   confirmationRequired: boolean;
 }
 
+export interface AdminProfileQueryOptions extends PageOptions {
+  status?: AccountStatus;
+}
+
 const DEFAULT_PAGE_SIZE = 20;
 const ANNOUNCEMENT_BUCKET = 'announcement-images';
 const COMPLAINT_BUCKET = 'complaint-attachments';
@@ -109,6 +114,60 @@ export async function updateCurrentAdminProfile(updates: AdminProfileUpdate) {
     .eq('id', authData.user.id)
     .select()
     .single();
+}
+
+export async function getAdminProfiles(options: AdminProfileQueryOptions = {}) {
+  const { from, to } = getPageRange(options);
+  let query = supabase
+    .from('admin_profiles')
+    .select('*', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(from, to);
+
+  const search = options.search?.trim();
+  if (search) {
+    query = query.or(`email.ilike.%${search}%,display_name.ilike.%${search}%`);
+  }
+  if (options.status) query = query.eq('status', options.status);
+
+  return query;
+}
+
+export async function getActiveAdminProfileCount() {
+  return supabase
+    .from('admin_profiles')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'active');
+}
+
+export async function updateAdminProfile(id: string, updates: AdminProfileUpdate) {
+  const allowedUpdates: AdminProfileUpdate = {
+    display_name: updates.display_name,
+    role: updates.role,
+    status: updates.status,
+  };
+
+  return supabase
+    .from('admin_profiles')
+    .update(allowedUpdates)
+    .eq('id', id)
+    .select()
+    .single();
+}
+
+export function subscribeToAdminProfileChanges(onChange: () => void) {
+  const channel = supabase
+    .channel(`admin-profiles-${crypto.randomUUID()}`)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'admin_profiles' },
+      onChange
+    )
+    .subscribe();
+
+  return () => {
+    void supabase.removeChannel(channel);
+  };
 }
 
 export async function recordAdminLogin() {
