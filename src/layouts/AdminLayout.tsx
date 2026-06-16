@@ -15,7 +15,6 @@ import {
   Bell,
   Menu,
   Shield,
-  History,
 } from 'lucide-react';
 import { AppLogo } from '../components/ui';
 import { useAuth } from '../hooks/useAuth';
@@ -54,8 +53,7 @@ const ANALYTICS_NAV: NavItem[] = [
 
 const SYSTEM_NAV: NavItem[] = [
   { label: 'User Management', to: '/admin/users', icon: <UserCog size={18} /> },
-  { label: 'Activity Logs', to: '/admin/activity-logs', icon: <ScrollText size={18} /> },
-  { label: 'History', to: '/admin/history', icon: <History size={18} /> },
+  { label: 'Activity History', to: '/admin/activity-logs', icon: <ScrollText size={18} /> },
   { label: 'Feedback & Suggestions', to: '/admin/feedback', icon: <MessageSquare size={18} /> },
   { label: 'Settings', to: '/admin/settings', icon: <Settings size={18} /> },
 ];
