@@ -2,9 +2,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { AdminLogin } from './pages/admin/auth/Login';
 import { ResetPassword } from './pages/admin/auth/ResetPassword';
-
-// ── Add page imports here as you build them ─────────────────────────────────
-// Public:      import { LandingPage }        from './pages/public/LandingPage';
 import { Dashboard } from './pages/admin/main/Dashboard';
 import { Residents } from './pages/admin/management/Residents';
 import { DocumentRequests } from './pages/admin/management/DocumentRequests';
@@ -16,10 +13,27 @@ import { UserManagement } from './pages/admin/system/UserManagement';
 import { ActivityLogs } from './pages/admin/system/ActivityLogs';
 import { Feedback } from './pages/admin/system/Feedback';
 import { Settings } from './pages/admin/system/Settings';
+import {
+  LandingPage,
+  PublicAnnouncements,
+  PublicFeedback,
+  PublicOfficials,
+  RequestDocument,
+  SelectService,
+  SubmissionSuccess,
+  SubmitComplaint,
+  TrackStatus,
+} from './pages/public';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isActiveAdmin, loading } = useAuth();
-  if (loading) return <div className="min-h-screen bg-[#121417] flex items-center justify-center text-gray-400">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#121417] text-gray-400">
+        Loading...
+      </div>
+    );
+  }
   if (!user || !isActiveAdmin) return <Navigate to="/admin/login" replace />;
   return <>{children}</>;
 }
@@ -27,14 +41,18 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <Routes>
-      {/* ── Public routes ─────────────────────────────── */}
-      {/* <Route path="/" element={<LandingPage />} /> */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/select-service" element={<SelectService />} />
+      <Route path="/request-document" element={<RequestDocument />} />
+      <Route path="/submission-success" element={<SubmissionSuccess />} />
+      <Route path="/track-status" element={<TrackStatus />} />
+      <Route path="/submit-complaint" element={<SubmitComplaint />} />
+      <Route path="/announcements" element={<PublicAnnouncements />} />
+      <Route path="/officials" element={<PublicOfficials />} />
+      <Route path="/feedback" element={<PublicFeedback />} />
 
-      {/* ── Admin auth ────────────────────────────────── */}
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin/reset-password" element={<ResetPassword />} />
-
-      {/* ── Admin protected routes ────────────────────── */}
       <Route path="/admin/residents" element={<ProtectedRoute><Residents /></ProtectedRoute>} />
       <Route path="/admin/document-requests" element={<ProtectedRoute><DocumentRequests /></ProtectedRoute>} />
       <Route path="/admin/complaints" element={<ProtectedRoute><Complaints /></ProtectedRoute>} />
@@ -48,8 +66,7 @@ function App() {
       <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
-      {/* Default redirect — points to dashboard during dev */}
-      <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
