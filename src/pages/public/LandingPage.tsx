@@ -1,6 +1,30 @@
-import { useState } from 'react';
-import { Home, Layers, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import {
+  ArrowRight,
+  FileText,
+  Home,
+  Layers,
+  Megaphone,
+  Search,
+  Send,
+  X,
+} from 'lucide-react';
 import { PublicLayout } from '../../layouts/PublicLayout';
+import { getPublishedAnnouncements } from '../../services/publicService';
+import type { Announcement } from '../../types/database';
+import { formatDate } from '../../utils/formatters';
 
 const STATS = [
   {
@@ -16,15 +40,15 @@ const STATS = [
     accent: 'border-t-yellow-400',
   },
   {
-    label: 'COMPLETED',
-    value: '318',
-    caption: 'This month',
+    label: 'ANNOUNCEMENTS',
+    value: '24',
+    caption: 'Published updates',
     accent: 'border-t-emerald-500',
   },
   {
-    label: 'PENDING',
-    value: '42',
-    caption: 'To be processed',
+    label: 'SERVICES',
+    value: '6',
+    caption: 'Available online',
     accent: 'border-t-red-500',
   },
   {
@@ -33,6 +57,51 @@ const STATS = [
     caption: 'All puroks',
     accent: 'border-t-violet-500',
   },
+];
+
+const QUICK_SERVICES = [
+  {
+    title: 'Request Document',
+    description: 'Apply for barangay certificates and clearances online.',
+    to: '/request-document',
+    icon: <FileText size={22} />,
+  },
+  {
+    title: 'Track Request',
+    description: 'Check your document request using your tracking code.',
+    to: '/track-status',
+    icon: <Search size={22} />,
+  },
+  {
+    title: 'Submit Complaint',
+    description: 'Send a complaint or blotter report to the barangay.',
+    to: '/submit-complaint',
+    icon: <Send size={22} />,
+  },
+];
+
+const RESIDENTS_BY_PUROK = [
+  { purok: 'Purok 1', residents: 905 },
+  { purok: 'Purok 2', residents: 785 },
+  { purok: 'Purok 3', residents: 860 },
+  { purok: 'Purok 4', residents: 740 },
+  { purok: 'Purok 5', residents: 812 },
+  { purok: 'Purok 6', residents: 690 },
+];
+
+const MONTHLY_DOCUMENT_REQUESTS = [
+  { month: 'Jan', requests: 62 },
+  { month: 'Feb', requests: 78 },
+  { month: 'Mar', requests: 55 },
+  { month: 'Apr', requests: 90 },
+  { month: 'May', requests: 94 },
+  { month: 'Jun', requests: 81 },
+  { month: 'Jul', requests: 75 },
+  { month: 'Aug', requests: 103 },
+  { month: 'Sep', requests: 88 },
+  { month: 'Oct', requests: 96 },
+  { month: 'Nov', requests: 70 },
+  { month: 'Dec', requests: 84 },
 ];
 
 const OFFICIAL_PLATFORMS = [
@@ -61,8 +130,40 @@ const SERVICE_HISTORY = [
   },
 ];
 
+function getAnnouncementDate(announcement: Announcement) {
+  return formatDate(announcement.published_at ?? announcement.created_at);
+}
+
 export function LandingPage() {
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [announcementsLoading, setAnnouncementsLoading] = useState(true);
+  const [announcementsError, setAnnouncementsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadAnnouncements() {
+      setAnnouncementsLoading(true);
+      const { data, error } = await getPublishedAnnouncements(3);
+      if (!isMounted) return;
+
+      if (error) {
+        setAnnouncements([]);
+        setAnnouncementsError('Latest announcements are temporarily unavailable.');
+      } else {
+        setAnnouncements((data ?? []) as Announcement[]);
+        setAnnouncementsError(null);
+      }
+      setAnnouncementsLoading(false);
+    }
+
+    void loadAnnouncements();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <PublicLayout>
@@ -130,15 +231,126 @@ export function LandingPage() {
             </article>
           ))}
         </div>
+
+        <div className="px-4 pb-14 lg:px-6 xl:px-10">
+          <div className="grid gap-5 lg:grid-cols-3">
+            {QUICK_SERVICES.map((service) => (
+              <Link
+                key={service.to}
+                to={service.to}
+                className="group flex items-start gap-4 rounded-3xl bg-white p-6 shadow-lg shadow-slate-200/80 ring-1 ring-slate-100 transition-transform hover:-translate-y-1"
+              >
+                <span className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 ring-1 ring-blue-100">
+                  {service.icon}
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-lg font-black text-slate-950">{service.title}</span>
+                  <span className="mt-1 block text-sm font-semibold leading-6 text-slate-500">
+                    {service.description}
+                  </span>
+                </span>
+                <ArrowRight
+                  size={18}
+                  className="ml-auto mt-1 shrink-0 text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-blue-700"
+                />
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-8 grid gap-6 xl:grid-cols-2">
+            <OverviewCard
+              title="Total Residents by Purok"
+              subtitle="Registered residents per purok, Barangay Daine II"
+            >
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={RESIDENTS_BY_PUROK} margin={{ top: 12, right: 8, left: -18, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#e8eef8" />
+                  <XAxis dataKey="purok" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                  <Tooltip cursor={{ fill: '#eff6ff' }} />
+                  <Bar dataKey="residents" fill="#3f7ee8" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </OverviewCard>
+
+            <OverviewCard
+              title="Monthly Document Requests - 2026"
+              subtitle="Number of documents requested per month"
+            >
+              <ResponsiveContainer width="100%" height={260}>
+                <LineChart data={MONTHLY_DOCUMENT_REQUESTS} margin={{ top: 12, right: 10, left: -18, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#e8eef8" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="requests"
+                    stroke="#2563eb"
+                    strokeWidth={4}
+                    dot={{ r: 4, fill: '#2563eb', stroke: '#ffffff', strokeWidth: 2 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </OverviewCard>
+          </div>
+
+          <section className="mt-8">
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="h-7 w-1 rounded-full bg-blue-700" />
+                <h2 className="text-2xl font-black text-slate-950">Latest Announcements</h2>
+              </div>
+              <Link to="/announcements" className="text-sm font-black text-blue-700 hover:text-blue-900">
+                View all
+              </Link>
+            </div>
+
+            <div className="space-y-4">
+              {announcementsLoading && (
+                <AnnouncementNotice message="Loading latest announcements..." />
+              )}
+
+              {!announcementsLoading && announcementsError && (
+                <AnnouncementNotice message={announcementsError} />
+              )}
+
+              {!announcementsLoading && !announcementsError && announcements.length === 0 && (
+                <AnnouncementNotice message="No published announcements yet. Please check again soon." />
+              )}
+
+              {!announcementsLoading &&
+                !announcementsError &&
+                announcements.map((announcement) => (
+                  <article
+                    key={announcement.id}
+                    className="rounded-3xl border-l-4 border-blue-600 bg-white p-6 shadow-lg shadow-slate-200/70 ring-1 ring-slate-100"
+                  >
+                    <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-black uppercase tracking-wide text-blue-700">
+                      {announcement.category}
+                    </span>
+                    <h3 className="mt-3 text-lg font-black text-slate-950">{announcement.title}</h3>
+                    <p className="mt-2 line-clamp-2 text-sm font-semibold leading-6 text-slate-500">
+                      {announcement.body}
+                    </p>
+                    <p className="mt-3 text-xs font-bold text-slate-400">
+                      {getAnnouncementDate(announcement)}
+                    </p>
+                  </article>
+                ))}
+            </div>
+          </section>
+        </div>
       </section>
 
       {aboutOpen && (
         <div
-          className="fixed inset-0 z-60 flex items-start justify-center overflow-y-auto bg-slate-950/50 px-4 py-6 backdrop-blur-[1px] sm:py-8"
+          className="fixed inset-0 z-60 flex items-start justify-center overflow-y-auto bg-slate-950/50 px-4 py-6 backdrop-blur-xs sm:py-8"
           onClick={() => setAboutOpen(false)}
         >
           <section
-            className="w-full max-w-180 overflow-hidden rounded-[26px] bg-white shadow-2xl shadow-slate-950/30"
+            className="w-full max-w-180 overflow-hidden rounded-3xl bg-white shadow-2xl shadow-slate-950/30"
             onClick={(event) => event.stopPropagation()}
             role="dialog"
             aria-modal="true"
@@ -189,7 +401,7 @@ export function LandingPage() {
                 <div className="mt-4 grid gap-2 sm:grid-cols-2">
                   {OFFICIAL_PLATFORMS.map(([position, name]) => (
                     <div key={position} className="rounded-lg bg-blue-50 px-4 py-3 ring-1 ring-blue-100">
-                      <p className="text-[11px] font-black uppercase tracking-wide text-blue-700">{position}</p>
+                      <p className="text-xs font-black uppercase tracking-wide text-blue-700">{position}</p>
                       <p className="mt-1 text-sm font-black text-slate-900">{name}</p>
                     </div>
                   ))}
@@ -224,5 +436,32 @@ export function LandingPage() {
         </div>
       )}
     </PublicLayout>
+  );
+}
+
+function OverviewCard({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-3xl bg-white p-6 shadow-lg shadow-slate-200/80 ring-1 ring-slate-100">
+      <h2 className="text-xl font-black text-slate-950">{title}</h2>
+      <p className="mt-1 text-sm font-semibold text-slate-400">{subtitle}</p>
+      <div className="mt-4">{children}</div>
+    </section>
+  );
+}
+
+function AnnouncementNotice({ message }: { message: string }) {
+  return (
+    <div className="rounded-3xl border border-dashed border-blue-200 bg-blue-50 p-6 text-center">
+      <Megaphone className="mx-auto text-blue-700" size={28} />
+      <p className="mt-3 text-sm font-bold text-blue-700">{message}</p>
+    </div>
   );
 }
