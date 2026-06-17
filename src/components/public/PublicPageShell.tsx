@@ -8,7 +8,7 @@ interface PublicPageShellProps {
 export function PublicPageShell({ eyebrow, title, description, children }: PublicPageShellProps) {
   return (
     <section className="relative overflow-hidden">
-      <div className="absolute inset-x-0 top-0 h-72 bg-[linear-gradient(135deg,#0758d6,#0a7bf5)]" />
+      <div className="absolute inset-x-0 top-0 h-72 bg-linear-to-br from-[#0758d6] to-[#0a7bf5]" />
       <div
         className="absolute inset-x-0 top-0 h-72 opacity-25"
         style={{
@@ -23,7 +23,7 @@ export function PublicPageShell({ eyebrow, title, description, children }: Publi
           <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-5xl">{title}</h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-blue-50 sm:text-lg">{description}</p>
         </div>
-        <div className="mt-8 rounded-[2rem] border border-white/70 bg-white/95 p-4 shadow-2xl shadow-blue-950/15 backdrop-blur sm:p-6">
+        <div className="mt-8 rounded-4xl border border-white/70 bg-white/95 p-4 shadow-2xl shadow-blue-950/15 backdrop-blur sm:p-6">
           {children}
         </div>
       </div>

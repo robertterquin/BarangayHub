@@ -56,9 +56,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#f4f7fb] text-slate-900">
       <header className="relative z-50 bg-white shadow-sm">
-        <div className="flex h-[86px] w-full items-center justify-between px-5 sm:px-7 lg:px-12">
+        <div className="flex h-21.5 w-full items-center justify-between px-5 sm:px-7 lg:px-12">
           <Link to="/" className="flex min-w-0 items-center gap-3" onClick={() => setMenuOpen(false)}>
-            <AppLogo className="h-[58px] w-[58px] shrink-0 border border-slate-200 shadow-sm" />
+            <AppLogo className="h-14.5 w-14.5 shrink-0 border border-slate-200 shadow-sm" />
             <span className="min-w-0">
               <span className="block truncate text-xl font-black leading-tight text-slate-950 sm:text-2xl">
                 BarangayHub
@@ -94,7 +94,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             className="ml-auto h-full w-full max-w-sm bg-white shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-center justify-between bg-gradient-to-br from-blue-700 to-blue-500 px-6 py-6 text-white">
+            <div className="flex items-center justify-between bg-linear-to-br from-blue-700 to-blue-500 px-6 py-6 text-white">
               <div className="flex items-center gap-3">
                 <AppLogo className="h-14 w-14 border-2 border-white/80 shadow-sm" />
                 <div>
