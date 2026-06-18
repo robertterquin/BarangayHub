@@ -147,16 +147,85 @@ function buildSections(logs: ActivityLog[]): HistorySectionData[] {
   return [...sections.values()].filter((section) => section.entries.length > 0);
 }
 
-function formatDetails(details: Json): string {
-  if (
-    details &&
-    typeof details === 'object' &&
-    !Array.isArray(details) &&
-    Object.keys(details).length === 0
-  ) {
-    return 'No additional details';
+function getEntityLabel(entityType: string): string {
+  const labels: Record<string, string> = {
+    admin_profiles: 'Admin account',
+    announcements: 'Announcement',
+    complaints: 'Complaint / blotter',
+    document_requests: 'Document request',
+    feedback: 'Feedback',
+    notifications: 'Notification',
+    officials: 'Barangay official',
+    residents: 'Resident record',
+    system_settings: 'System settings',
+  };
+
+  return labels[entityType] ?? entityType.replaceAll('_', ' ');
+}
+
+function getDetailsObject(details: Json): Record<string, Json | undefined> | null {
+  if (!details || typeof details !== 'object' || Array.isArray(details)) {
+    return null;
   }
-  return JSON.stringify(details, null, 2);
+
+  return details;
+}
+
+function toReadableValue(value: Json | undefined): string {
+  if (value === null || value === undefined) return 'Not set';
+  if (typeof value === 'string') return value.replaceAll('_', ' ');
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  return JSON.stringify(value);
+}
+
+function getOperationLabel(entry: ActivityLog): string {
+  const details = getDetailsObject(entry.details);
+  const operation = details?.operation;
+
+  if (typeof operation === 'string') {
+    const labels: Record<string, string> = {
+      DELETE: 'Deleted a record',
+      INSERT: 'Added a new record',
+      UPDATE: 'Updated a record',
+    };
+
+    return labels[operation] ?? operation.toLowerCase();
+  }
+
+  return entry.action;
+}
+
+function getReadableDetails(entry: ActivityLog): string[] {
+  const details = getDetailsObject(entry.details);
+  if (!details || Object.keys(details).length === 0) {
+    return ['No extra notes were recorded for this activity.'];
+  }
+
+  const messages: string[] = [];
+
+  if ('previous_status' in details || 'new_status' in details) {
+    messages.push(
+      `Status changed from ${toReadableValue(details.previous_status)} to ${toReadableValue(details.new_status)}.`
+    );
+  }
+
+  if ('operation' in details) {
+    messages.push(getOperationLabel(entry));
+  }
+
+  const hiddenKeys = new Set(['operation', 'previous_status', 'new_status']);
+  Object.entries(details).forEach(([key, value]) => {
+    if (hiddenKeys.has(key)) return;
+    messages.push(`${key.replaceAll('_', ' ')}: ${toReadableValue(value)}`);
+  });
+
+  return messages.length > 0 ? messages : ['No extra notes were recorded for this activity.'];
+}
+
+function getShortReference(entry: ActivityLog): string {
+  return entry.entity_id ? entry.entity_id.slice(0, 8).toUpperCase() : entry.id.slice(0, 8).toUpperCase();
 }
 
 function ActivityLogRow({
@@ -279,7 +348,7 @@ function ActivityLogModal({
 }) {
   return (
     <Modal
-      title="Activity Log Details"
+      title="Activity Details"
       subtitle={formatDateTime(entry.created_at)}
       width="lg"
       onClose={onClose}
@@ -290,7 +359,7 @@ function ActivityLogModal({
       }
     >
       <div className="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
-        <DetailField label="Action" value={entry.action} />
+        <DetailField label="Activity" value={entry.action} />
         <div>
           <p className="mb-0.5 text-[10px] font-bold uppercase tracking-widest text-blue-600">
             Event Type
@@ -300,17 +369,24 @@ function ActivityLogModal({
             tone={LOG_TONES[entry.log_type]}
           />
         </div>
-        <DetailField label="Admin Email" value={entry.admin_email || 'System'} />
-        <DetailField label="Admin ID" value={entry.admin_id || 'Not applicable'} />
-        <DetailField label="Entity Type" value={entry.entity_type} />
-        <DetailField label="Entity ID" value={entry.entity_id || 'Not applicable'} />
+        <DetailField label="Performed By" value={entry.admin_email || 'System'} />
+        <DetailField label="Record Affected" value={getEntityLabel(entry.entity_type)} />
+        <DetailField label="Date and Time" value={formatDateTime(entry.created_at)} />
+        <DetailField label="Reference" value={getShortReference(entry)} />
         <div className="sm:col-span-2">
           <p className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-blue-600">
-            Details
+            What Changed
           </p>
-          <pre className="max-h-64 overflow-auto rounded-xl border border-gray-200 bg-gray-50 p-4 text-xs leading-5 text-gray-700">
-            {formatDetails(entry.details)}
-          </pre>
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+            <ul className="space-y-2 text-sm font-semibold leading-6 text-gray-700">
+              {getReadableDetails(entry).map((detail) => (
+                <li key={detail} className="flex gap-2">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600" />
+                  <span>{detail}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </Modal>
