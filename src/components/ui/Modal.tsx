@@ -27,8 +27,8 @@ export function Modal({
   footer,
 }: ModalProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className={`w-full overflow-hidden rounded-2xl bg-white shadow-2xl ${WIDTH_CLASSES[width]}`}>
+    <div className="fixed inset-0 z-80 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm">
+      <div className={`max-h-[calc(100vh-2rem)] w-full overflow-y-auto rounded-2xl bg-white shadow-2xl ${WIDTH_CLASSES[width]}`}>
         <div className="flex items-start justify-between bg-linear-to-r from-blue-800 to-blue-600 px-6 py-4">
           <div>
             <h2 className="text-lg font-bold leading-tight text-white">{title}</h2>

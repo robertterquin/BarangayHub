@@ -159,6 +159,51 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       )}
 
       <main>{children}</main>
+
+      <footer className="bg-[#163b91] px-4 py-10 text-blue-100 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-3">
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-widest text-white">Contact Us</h2>
+            <div className="mt-4 space-y-2 text-sm font-semibold">
+              <p>
+                <span className="font-black text-white">Address:</span> Barangay Daine II, Indang, Cavite
+              </p>
+              <p>
+                <span className="font-black text-white">Contact:</span> (046) XXX-XXXX
+              </p>
+              <p>
+                <span className="font-black text-white">Email:</span> brgy.daineii@indang.gov.ph
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-widest text-white">Quick Links</h2>
+            <div className="mt-4 grid gap-2 text-sm font-semibold">
+              <Link to="/officials" className="hover:text-white">Barangay Officials</Link>
+              <Link to="/request-document" className="hover:text-white">Document Requests</Link>
+              <Link to="/track-status" className="hover:text-white">Track Requests</Link>
+              <Link to="/announcements" className="hover:text-white">Announcements</Link>
+              <Link to="/submit-complaint" className="hover:text-white">Submit Complaint</Link>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-widest text-white">Other Links</h2>
+            <div className="mt-4 grid gap-2 text-sm font-semibold">
+              <a href="https://indang-cavite.gov.ph/" className="hover:text-white">Indang, Cavite Website</a>
+              <a href="https://cavite.gov.ph/" className="hover:text-white">Province of Cavite</a>
+              <a href="https://www.gov.ph/" className="hover:text-white">GOVPH - Official Portal</a>
+              <a href="https://dilg.gov.ph/" className="hover:text-white">DILG Philippines</a>
+            </div>
+          </div>
+        </div>
+
+        <div className="mx-auto mt-8 flex max-w-7xl flex-col gap-2 border-t border-white/10 pt-5 text-xs font-semibold text-blue-200 sm:flex-row sm:items-center sm:justify-between">
+          <p>© 2026 Barangay Daine II, Indang, Cavite. All rights reserved.</p>
+          <p>Public Portal v1.0 - BarangayHub</p>
+        </div>
+      </footer>
     </div>
   );
 }

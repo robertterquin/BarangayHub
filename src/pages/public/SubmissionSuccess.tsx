@@ -1,30 +1,125 @@
-import { Link } from 'react-router-dom';
-import { CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { CheckCircle2, Clipboard, FileText, Search } from 'lucide-react';
 import { PublicLayout } from '../../layouts/PublicLayout';
 import { PublicPageShell } from '../../components/public';
 
+interface SubmissionState {
+  kind?: 'document' | 'complaint' | 'feedback';
+  trackingCode?: string;
+  referenceId?: string;
+  requesterName?: string;
+}
+
 export function SubmissionSuccess() {
+  const location = useLocation();
+  const state = (location.state ?? {}) as SubmissionState;
+  const trackingCode = state.trackingCode ?? state.referenceId ?? '';
+  const [copied, setCopied] = useState(false);
+
+  async function copyCode() {
+    if (!trackingCode) return;
+    await navigator.clipboard.writeText(trackingCode);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  }
+
   return (
     <PublicLayout>
       <PublicPageShell
         eyebrow="Submission Complete"
         title="Your request has been recorded"
-        description="This confirmation page will display the tracking code or complaint reference after a resident submits a form."
+        description="Please save your tracking code. You can use it anytime to check your request status."
       >
-        <div className="rounded-3xl bg-emerald-50 p-8 text-center ring-1 ring-emerald-100">
-          <CheckCircle2 className="mx-auto text-emerald-600" size={48} />
-          <h2 className="mt-4 text-2xl font-black text-slate-950">Success page placeholder</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-            Later, this page will show the generated tracking code, next steps, and a shortcut to track status.
+        <div className="rounded-3xl bg-emerald-50 p-6 text-center ring-1 ring-emerald-100 sm:p-8">
+          <CheckCircle2 className="mx-auto text-emerald-600" size={56} />
+          <h2 className="mt-4 text-2xl font-black text-slate-950">
+            Thank you{state.requesterName ? `, ${state.requesterName}` : ''}.
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-sm font-semibold leading-6 text-slate-600">
+            Your document request was submitted successfully. Barangay staff will review and process it.
           </p>
-          <Link
-            to="/track-status"
-            className="mt-6 inline-flex rounded-2xl bg-blue-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-800"
-          >
-            Go to Track Status
-          </Link>
+
+          {trackingCode ? (
+            <div className="mx-auto mt-6 max-w-xl rounded-3xl bg-white p-5 shadow-lg shadow-emerald-100 ring-1 ring-emerald-100">
+              <p className="text-xs font-black uppercase tracking-widest text-emerald-700">
+                Tracking Code
+              </p>
+              <p className="mt-2 break-all font-mono text-3xl font-black text-slate-950 sm:text-4xl">
+                {trackingCode}
+              </p>
+              <button
+                type="button"
+                onClick={() => void copyCode()}
+                className="mt-4 inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-black text-emerald-700 transition-colors hover:bg-emerald-100"
+              >
+                <Clipboard size={16} />
+                {copied ? 'Copied' : 'Copy Code'}
+              </button>
+            </div>
+          ) : (
+            <div className="mx-auto mt-6 max-w-xl rounded-3xl border border-yellow-200 bg-yellow-50 p-5">
+              <p className="text-sm font-bold leading-6 text-yellow-800">
+                No tracking code was found on this page. If you already submitted a request, please use the tracking
+                code shown after submission.
+              </p>
+            </div>
+          )}
+
+          <div className="mx-auto mt-7 grid max-w-2xl gap-3 text-left sm:grid-cols-3">
+            <StepCard
+              icon={<FileText size={18} />}
+              title="Submitted"
+              text="Your request is now recorded."
+            />
+            <StepCard
+              icon={<Search size={18} />}
+              title="Track"
+              text="Use your code to check progress."
+            />
+            <StepCard
+              icon={<CheckCircle2 size={18} />}
+              title="Claim"
+              text="Follow the status note when ready."
+            />
+          </div>
+
+          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link
+              to={trackingCode ? `/track-status?code=${encodeURIComponent(trackingCode)}` : '/track-status'}
+              className="inline-flex items-center justify-center rounded-2xl bg-blue-700 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-blue-800"
+            >
+              Track Request
+            </Link>
+            <Link
+              to="/request-document"
+              className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-600 transition-colors hover:bg-slate-50"
+            >
+              Submit Another Request
+            </Link>
+          </div>
         </div>
       </PublicPageShell>
     </PublicLayout>
+  );
+}
+
+function StepCard({
+  icon,
+  title,
+  text,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="rounded-2xl bg-white p-4 ring-1 ring-emerald-100">
+      <div className="flex items-center gap-2 text-emerald-700">
+        {icon}
+        <p className="text-sm font-black">{title}</p>
+      </div>
+      <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{text}</p>
+    </div>
   );
 }
