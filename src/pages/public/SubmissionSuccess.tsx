@@ -15,6 +15,8 @@ export function SubmissionSuccess() {
   const location = useLocation();
   const state = (location.state ?? {}) as SubmissionState;
   const trackingCode = state.trackingCode ?? state.referenceId ?? '';
+  const isComplaint = state.kind === 'complaint';
+  const codeLabel = isComplaint ? 'Reference Number' : 'Tracking Code';
   const [copied, setCopied] = useState(false);
 
   async function copyCode() {
@@ -28,8 +30,12 @@ export function SubmissionSuccess() {
     <PublicLayout>
       <PublicPageShell
         eyebrow="Submission Complete"
-        title="Your request has been recorded"
-        description="Please save your tracking code. You can use it anytime to check your request status."
+        title={isComplaint ? 'Your complaint has been recorded' : 'Your request has been recorded'}
+        description={
+          isComplaint
+            ? 'Please save your reference number. Barangay staff will review your complaint.'
+            : 'Please save your tracking code. You can use it anytime to check your request status.'
+        }
       >
         <div className="rounded-3xl bg-emerald-50 p-6 text-center ring-1 ring-emerald-100 sm:p-8">
           <CheckCircle2 className="mx-auto text-emerald-600" size={56} />
@@ -37,13 +43,15 @@ export function SubmissionSuccess() {
             Thank you{state.requesterName ? `, ${state.requesterName}` : ''}.
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm font-semibold leading-6 text-slate-600">
-            Your document request was submitted successfully. Barangay staff will review and process it.
+            {isComplaint
+              ? 'Your complaint or blotter report was submitted successfully. Barangay staff will review it and contact you if needed.'
+              : 'Your document request was submitted successfully. Barangay staff will review and process it.'}
           </p>
 
           {trackingCode ? (
             <div className="mx-auto mt-6 max-w-xl rounded-3xl bg-white p-5 shadow-lg shadow-emerald-100 ring-1 ring-emerald-100">
               <p className="text-xs font-black uppercase tracking-widest text-emerald-700">
-                Tracking Code
+                {codeLabel}
               </p>
               <p className="mt-2 break-all font-mono text-3xl font-black text-slate-950 sm:text-4xl">
                 {trackingCode}
@@ -60,8 +68,8 @@ export function SubmissionSuccess() {
           ) : (
             <div className="mx-auto mt-6 max-w-xl rounded-3xl border border-yellow-200 bg-yellow-50 p-5">
               <p className="text-sm font-bold leading-6 text-yellow-800">
-                No tracking code was found on this page. If you already submitted a request, please use the tracking
-                code shown after submission.
+                No {isComplaint ? 'reference number' : 'tracking code'} was found on this page. If you already
+                submitted a {isComplaint ? 'complaint' : 'request'}, please use the code shown after submission.
               </p>
             </div>
           )}
@@ -70,33 +78,43 @@ export function SubmissionSuccess() {
             <StepCard
               icon={<FileText size={18} />}
               title="Submitted"
-              text="Your request is now recorded."
+              text={isComplaint ? 'Your report is now recorded.' : 'Your request is now recorded.'}
             />
             <StepCard
               icon={<Search size={18} />}
-              title="Track"
-              text="Use your code to check progress."
+              title={isComplaint ? 'Review' : 'Track'}
+              text={isComplaint ? 'Barangay staff will review the report.' : 'Use your code to check progress.'}
             />
             <StepCard
               icon={<CheckCircle2 size={18} />}
-              title="Claim"
-              text="Follow the status note when ready."
+              title={isComplaint ? 'Follow-up' : 'Claim'}
+              text={isComplaint ? 'You may be contacted for details.' : 'Follow the status note when ready.'}
             />
           </div>
 
           <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+            {!isComplaint && (
+              <Link
+                to={trackingCode ? `/track-status?code=${encodeURIComponent(trackingCode)}` : '/track-status'}
+                className="inline-flex items-center justify-center rounded-2xl bg-blue-700 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-blue-800"
+              >
+                Track Request
+              </Link>
+            )}
             <Link
-              to={trackingCode ? `/track-status?code=${encodeURIComponent(trackingCode)}` : '/track-status'}
-              className="inline-flex items-center justify-center rounded-2xl bg-blue-700 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-blue-800"
-            >
-              Track Request
-            </Link>
-            <Link
-              to="/request-document"
+              to={isComplaint ? '/submit-complaint' : '/request-document'}
               className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-600 transition-colors hover:bg-slate-50"
             >
-              Submit Another Request
+              {isComplaint ? 'Submit Another Complaint' : 'Submit Another Request'}
             </Link>
+            {isComplaint && (
+              <Link
+                to="/"
+                className="inline-flex items-center justify-center rounded-2xl bg-blue-700 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-blue-800"
+              >
+                Back to Home
+              </Link>
+            )}
           </div>
         </div>
       </PublicPageShell>
