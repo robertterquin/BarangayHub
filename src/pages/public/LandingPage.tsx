@@ -25,6 +25,8 @@ import { PublicLayout } from '../../layouts/PublicLayout';
 import { getPublishedAnnouncements } from '../../services/publicService';
 import type { Announcement } from '../../types/database';
 import { usePublicDashboardSummary } from '../../hooks/usePublicDashboardSummary';
+import { usePublicOfficials } from '../../hooks/usePublicOfficials';
+import { usePublicSystemSettings } from '../../hooks/usePublicSystemSettings';
 import { formatDate } from '../../utils/formatters';
 
 const QUICK_SERVICES = [
@@ -48,32 +50,6 @@ const QUICK_SERVICES = [
   },
 ];
 
-const OFFICIAL_PLATFORMS = [
-  ['PUNONG BARANGAY', 'Hon. [Name]'],
-  ['SK CHAIRPERSON', 'Hon. [Name]'],
-  ['KAGAWAD - PEACE AND ORDER', 'Hon. [Name]'],
-  ['KAGAWAD - HEALTH', 'Hon. [Name]'],
-  ['KAGAWAD - EDUCATION', 'Hon. [Name]'],
-  ['KAGAWAD - LIVELIHOOD', 'Hon. [Name]'],
-  ['KAGAWAD - INFRASTRUCTURE', 'Hon. [Name]'],
-  ['KAGAWAD - ENVIRONMENT', 'Hon. [Name]'],
-  ['KAGAWAD - GAD', 'Hon. [Name]'],
-  ['BARANGAY SECRETARY', 'Hon. [Name]'],
-];
-
-const SERVICE_HISTORY = [
-  {
-    year: '2009',
-    border: 'border-blue-600',
-    text: 'Barangay officials began active service in Barangay Daine II, Indang, Cavite.',
-  },
-  {
-    year: '2026',
-    border: 'border-emerald-500',
-    text: 'Launch of BarangayHub - official digital portal for Barangay Daine II residents.',
-  },
-];
-
 function getAnnouncementDate(announcement: Announcement) {
   return formatDate(announcement.published_at ?? announcement.created_at);
 }
@@ -92,12 +68,32 @@ export function LandingPage() {
     loading: summaryLoading,
     error: summaryError,
   } = usePublicDashboardSummary();
+  const { officials, loading: officialsLoading, error: officialsError } = usePublicOfficials();
+  const { settings, publicSettings } = usePublicSystemSettings();
+
+  const barangayTitle = `Barangay ${publicSettings.barangayName}`;
+  const municipality = settings?.municipality || 'Indang';
+  const province = settings?.province || 'Cavite';
+  const location = `${municipality}, ${province}`;
+  const serviceSince = settings?.service_since ?? 2009;
+  const serviceHistory = [
+    {
+      year: String(serviceSince),
+      border: 'border-blue-600',
+      text: `${barangayTitle} began active public service in ${location}.`,
+    },
+    {
+      year: String(summary.year),
+      border: 'border-emerald-500',
+      text: `Launch of BarangayHub - official digital portal for ${barangayTitle} residents.`,
+    },
+  ];
 
   const stats = [
     {
       label: 'TOTAL RESIDENTS',
       value: summaryLoading ? '...' : formatCount(summary.total_residents),
-      caption: 'Registered - Daine II',
+      caption: `Registered - ${publicSettings.barangayName}`,
       accent: 'border-t-blue-600',
     },
     {
@@ -172,7 +168,7 @@ export function LandingPage() {
             </div>
 
             <h1 className="mt-12 text-5xl font-black leading-none tracking-tight text-white drop-shadow-sm sm:text-7xl lg:text-8xl">
-              Barangay Daine II
+              {barangayTitle}
             </h1>
             <p
               className="mt-2 text-5xl font-normal leading-none text-white drop-shadow-sm sm:text-7xl"
@@ -250,7 +246,7 @@ export function LandingPage() {
           <div className="mt-8 grid gap-6 xl:grid-cols-2">
             <OverviewCard
               title="Total Residents by Purok"
-              subtitle="Registered residents per purok, Barangay Daine II"
+              subtitle={`Registered residents per purok, ${barangayTitle}`}
             >
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={summary.residents_by_purok} margin={{ top: 12, right: 8, left: -18, bottom: 0 }}>
@@ -355,10 +351,10 @@ export function LandingPage() {
                 </span>
                 <div>
                   <h2 id="about-barangay-title" className="text-xl font-black leading-tight sm:text-2xl">
-                    About Barangay Daine II
+                    About {barangayTitle}
                   </h2>
                   <p className="mt-1 text-xs font-bold text-blue-100 sm:text-sm">
-                    Officials' Platforms, History and Why We Launched This Portal
+                    Officials, History and Why We Launched This Portal
                   </p>
                 </div>
               </div>
@@ -376,32 +372,56 @@ export function LandingPage() {
             <div className="max-h-[78vh] overflow-y-auto px-6 py-6 sm:px-8">
               <div>
                 <h3 className="text-base font-black text-blue-700 sm:text-lg">
-                  Our Elected Officials and Their Platforms
+                  Our Active Barangay Officials
                 </h3>
                 <p className="mt-3 text-sm font-medium leading-7 text-slate-600 sm:text-base">
-                  The barangay officials of Daine II, Indang, Cavite were duly elected by the residents to serve a
-                  three-year term. Their platform centered on transparent governance, digital public services, improved
-                  livelihood programs, safer streets, and better health and sanitation for every household.
+                  The barangay officials of {publicSettings.barangayName}, {location} serve residents through
+                  transparent governance, digital public services, safer communities, and responsive local programs.
                 </p>
                 <p className="mt-3 text-sm font-medium leading-7 text-slate-600 sm:text-base">
-                  Key commitments: (1) Barangay MIS system, (2) Online document requests, (3) Livelihood and skills
-                  training center, and (4) Infrastructure improvement in all puroks.
+                  This list comes from the active officials maintained in the admin portal, so updates made by the
+                  barangay staff appear here automatically.
                 </p>
 
                 <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                  {OFFICIAL_PLATFORMS.map(([position, name]) => (
-                    <div key={position} className="rounded-lg bg-blue-50 px-4 py-3 ring-1 ring-blue-100">
-                      <p className="text-xs font-black uppercase tracking-wide text-blue-700">{position}</p>
-                      <p className="mt-1 text-sm font-black text-slate-900">{name}</p>
-                    </div>
-                  ))}
+                  {officialsLoading && (
+                    <InfoCard
+                      title="Loading officials"
+                      text="Fetching the latest active officials..."
+                    />
+                  )}
+
+                  {!officialsLoading && officialsError && (
+                    <InfoCard
+                      title="Officials unavailable"
+                      text="Please check the Barangay Officials page again later."
+                    />
+                  )}
+
+                  {!officialsLoading && !officialsError && officials.length === 0 && (
+                    <InfoCard
+                      title="No active officials listed"
+                      text="Officials will appear here once they are added in the admin portal."
+                    />
+                  )}
+
+                  {!officialsLoading &&
+                    !officialsError &&
+                    officials.map((official) => (
+                      <div key={official.id} className="rounded-lg bg-blue-50 px-4 py-3 ring-1 ring-blue-100">
+                        <p className="text-xs font-black uppercase tracking-wide text-blue-700">
+                          {official.position}
+                        </p>
+                        <p className="mt-1 text-sm font-black text-slate-900">{official.full_name}</p>
+                      </div>
+                    ))}
                 </div>
               </div>
 
               <div className="mt-8 border-t border-slate-100 pt-6">
                 <h3 className="text-base font-black text-blue-700 sm:text-lg">Service History</h3>
                 <div className="mt-4 space-y-3">
-                  {SERVICE_HISTORY.map((item) => (
+                  {serviceHistory.map((item) => (
                     <div
                       key={item.year}
                       className={`grid gap-3 rounded-xl border-l-4 ${item.border} bg-slate-50 px-4 py-4 sm:grid-cols-[70px_1fr]`}
@@ -416,7 +436,7 @@ export function LandingPage() {
               <div className="mt-8 border-t border-slate-100 pt-6">
                 <h3 className="text-base font-black text-blue-700 sm:text-lg">Why a Public Online Portal?</h3>
                 <p className="mt-3 text-sm font-medium leading-7 text-slate-600 sm:text-base">
-                  Barangay Daine II launched this portal to modernize and digitalize barangay services. Residents no
+                  {barangayTitle} launched this portal to modernize and digitalize barangay services. Residents no
                   longer need to take time off work just to get a certificate. Everything can be done online from your
                   phone or computer, aligned with the Philippine Digital Transformation Strategy.
                 </p>
@@ -452,6 +472,15 @@ function AnnouncementNotice({ message }: { message: string }) {
     <div className="rounded-3xl border border-dashed border-blue-200 bg-blue-50 p-6 text-center">
       <Megaphone className="mx-auto text-blue-700" size={28} />
       <p className="mt-3 text-sm font-bold text-blue-700">{message}</p>
+    </div>
+  );
+}
+
+function InfoCard({ title, text }: { title: string; text: string }) {
+  return (
+    <div className="rounded-lg bg-blue-50 px-4 py-3 ring-1 ring-blue-100 sm:col-span-2">
+      <p className="text-xs font-black uppercase tracking-wide text-blue-700">{title}</p>
+      <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">{text}</p>
     </div>
   );
 }
