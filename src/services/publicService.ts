@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import type {
+  PublicDashboardSummary,
   SubmitComplaintPayload,
   SubmitDocumentRequestPayload,
   SubmitFeedbackPayload,
@@ -90,6 +91,15 @@ export async function getPublicOfficials() {
 
 export async function getPublicSystemSettings() {
   return supabase.from('system_settings').select('*').eq('id', 1).single();
+}
+
+export async function getPublicDashboardSummary() {
+  const { data, error } = await supabase.rpc('get_public_dashboard_summary');
+
+  return {
+    data: data as PublicDashboardSummary | null,
+    error,
+  };
 }
 
 export async function submitFeedback(payload: SubmitFeedbackPayload) {

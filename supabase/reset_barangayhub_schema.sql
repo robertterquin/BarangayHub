@@ -97,6 +97,7 @@ drop function if exists public.submit_feedback(
   public.feedback_category,
   text
 );
+drop function if exists public.get_public_dashboard_summary();
 
 -- Drop tables in reverse dependency order.
 drop table if exists public.notifications;

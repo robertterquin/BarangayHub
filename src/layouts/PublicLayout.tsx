@@ -11,6 +11,7 @@ import {
   X,
 } from 'lucide-react';
 import { AppLogo } from '../components/ui';
+import { usePublicSystemSettings } from '../hooks/usePublicSystemSettings';
 
 interface NavItem {
   label: string;
@@ -47,6 +48,7 @@ function formatDate(date: Date) {
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [now, setNow] = useState(new Date());
+  const { publicSettings } = usePublicSystemSettings();
 
   useEffect(() => {
     const interval = window.setInterval(() => setNow(new Date()), 1000);
@@ -64,7 +66,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 BarangayHub
               </span>
               <span className="block truncate font-mono text-xs font-bold tracking-wide text-slate-400 sm:text-sm">
-                Brgy. Daine II - Indang, Cavite
+                {publicSettings.locationLine}
               </span>
             </span>
           </Link>
@@ -99,7 +101,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 <AppLogo className="h-14 w-14 border-2 border-white/80 shadow-sm" />
                 <div>
                   <p className="text-xl font-black">BarangayHub</p>
-                  <p className="mt-1 font-mono text-xs font-bold text-blue-100">Brgy. Daine II - Indang, Cavite</p>
+                  <p className="mt-1 font-mono text-xs font-bold text-blue-100">
+                    {publicSettings.locationLine}
+                  </p>
                 </div>
               </div>
               <button
@@ -166,13 +170,16 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <h2 className="text-sm font-black uppercase tracking-widest text-white">Contact Us</h2>
             <div className="mt-4 space-y-2 text-sm font-semibold">
               <p>
-                <span className="font-black text-white">Address:</span> Barangay Daine II, Indang, Cavite
+                <span className="font-black text-white">Address:</span>{' '}
+                {publicSettings.completeAddress}
               </p>
               <p>
-                <span className="font-black text-white">Contact:</span> (046) XXX-XXXX
+                <span className="font-black text-white">Contact:</span>{' '}
+                {publicSettings.contactNumber}
               </p>
               <p>
-                <span className="font-black text-white">Email:</span> brgy.daineii@indang.gov.ph
+                <span className="font-black text-white">Email:</span>{' '}
+                {publicSettings.publicEmail}
               </p>
             </div>
           </div>
@@ -200,8 +207,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="mx-auto mt-8 flex max-w-7xl flex-col gap-2 border-t border-white/10 pt-5 text-xs font-semibold text-blue-200 sm:flex-row sm:items-center sm:justify-between">
-          <p>© 2026 Barangay Daine II, Indang, Cavite. All rights reserved.</p>
-          <p>Public Portal v1.0 - BarangayHub</p>
+          <p>Copyright 2026 Barangay {publicSettings.barangayName}. All rights reserved.</p>
+          <p>Public Portal - {publicSettings.systemVersion}</p>
         </div>
       </footer>
     </div>

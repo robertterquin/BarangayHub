@@ -24,40 +24,8 @@ import {
 import { PublicLayout } from '../../layouts/PublicLayout';
 import { getPublishedAnnouncements } from '../../services/publicService';
 import type { Announcement } from '../../types/database';
+import { usePublicDashboardSummary } from '../../hooks/usePublicDashboardSummary';
 import { formatDate } from '../../utils/formatters';
-
-const STATS = [
-  {
-    label: 'TOTAL RESIDENTS',
-    value: '4,821',
-    caption: 'Registered - Daine II',
-    accent: 'border-t-blue-600',
-  },
-  {
-    label: 'DOCS ISSUED',
-    value: '1,247',
-    caption: 'Year 2026',
-    accent: 'border-t-yellow-400',
-  },
-  {
-    label: 'ANNOUNCEMENTS',
-    value: '24',
-    caption: 'Published updates',
-    accent: 'border-t-emerald-500',
-  },
-  {
-    label: 'SERVICES',
-    value: '6',
-    caption: 'Available online',
-    accent: 'border-t-red-500',
-  },
-  {
-    label: 'HOUSEHOLDS',
-    value: '1,190',
-    caption: 'All puroks',
-    accent: 'border-t-violet-500',
-  },
-];
 
 const QUICK_SERVICES = [
   {
@@ -78,30 +46,6 @@ const QUICK_SERVICES = [
     to: '/submit-complaint',
     icon: <Send size={22} />,
   },
-];
-
-const RESIDENTS_BY_PUROK = [
-  { purok: 'Purok 1', residents: 905 },
-  { purok: 'Purok 2', residents: 785 },
-  { purok: 'Purok 3', residents: 860 },
-  { purok: 'Purok 4', residents: 740 },
-  { purok: 'Purok 5', residents: 812 },
-  { purok: 'Purok 6', residents: 690 },
-];
-
-const MONTHLY_DOCUMENT_REQUESTS = [
-  { month: 'Jan', requests: 62 },
-  { month: 'Feb', requests: 78 },
-  { month: 'Mar', requests: 55 },
-  { month: 'Apr', requests: 90 },
-  { month: 'May', requests: 94 },
-  { month: 'Jun', requests: 81 },
-  { month: 'Jul', requests: 75 },
-  { month: 'Aug', requests: 103 },
-  { month: 'Sep', requests: 88 },
-  { month: 'Oct', requests: 96 },
-  { month: 'Nov', requests: 70 },
-  { month: 'Dec', requests: 84 },
 ];
 
 const OFFICIAL_PLATFORMS = [
@@ -134,11 +78,53 @@ function getAnnouncementDate(announcement: Announcement) {
   return formatDate(announcement.published_at ?? announcement.created_at);
 }
 
+function formatCount(value: number) {
+  return new Intl.NumberFormat('en-PH').format(value);
+}
+
 export function LandingPage() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [announcementsLoading, setAnnouncementsLoading] = useState(true);
   const [announcementsError, setAnnouncementsError] = useState<string | null>(null);
+  const {
+    summary,
+    loading: summaryLoading,
+    error: summaryError,
+  } = usePublicDashboardSummary();
+
+  const stats = [
+    {
+      label: 'TOTAL RESIDENTS',
+      value: summaryLoading ? '...' : formatCount(summary.total_residents),
+      caption: 'Registered - Daine II',
+      accent: 'border-t-blue-600',
+    },
+    {
+      label: 'DOCS ISSUED',
+      value: summaryLoading ? '...' : formatCount(summary.documents_issued),
+      caption: `Year ${summary.year}`,
+      accent: 'border-t-yellow-400',
+    },
+    {
+      label: 'ANNOUNCEMENTS',
+      value: summaryLoading ? '...' : formatCount(summary.published_announcements),
+      caption: 'Published updates',
+      accent: 'border-t-emerald-500',
+    },
+    {
+      label: 'SERVICES',
+      value: summaryLoading ? '...' : formatCount(summary.online_services),
+      caption: 'Available online',
+      accent: 'border-t-red-500',
+    },
+    {
+      label: 'PUROKS',
+      value: summaryLoading ? '...' : formatCount(summary.residents_by_purok.length),
+      caption: 'With resident records',
+      accent: 'border-t-violet-500',
+    },
+  ];
 
   useEffect(() => {
     let isMounted = true;
@@ -217,7 +203,7 @@ export function LandingPage() {
         </div>
 
         <div className="grid gap-4 px-4 pb-8 pt-7 sm:grid-cols-2 lg:grid-cols-5 lg:px-6 xl:px-10">
-          {STATS.map((stat) => (
+          {stats.map((stat) => (
             <article
               key={stat.label}
               className={`rounded-2xl border-t-4 ${stat.accent} bg-white px-6 py-6 shadow-lg shadow-slate-200/70 ring-1 ring-slate-100`}
@@ -233,6 +219,10 @@ export function LandingPage() {
         </div>
 
         <div className="px-4 pb-14 lg:px-6 xl:px-10">
+          {summaryError && (
+            <AnnouncementNotice message="Dashboard totals are temporarily unavailable. Showing fallback values." />
+          )}
+
           <div className="grid gap-5 lg:grid-cols-3">
             {QUICK_SERVICES.map((service) => (
               <Link
@@ -263,7 +253,7 @@ export function LandingPage() {
               subtitle="Registered residents per purok, Barangay Daine II"
             >
               <ResponsiveContainer width="100%" height={260}>
-                <BarChart data={RESIDENTS_BY_PUROK} margin={{ top: 12, right: 8, left: -18, bottom: 0 }}>
+                <BarChart data={summary.residents_by_purok} margin={{ top: 12, right: 8, left: -18, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#e8eef8" />
                   <XAxis dataKey="purok" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
@@ -274,11 +264,11 @@ export function LandingPage() {
             </OverviewCard>
 
             <OverviewCard
-              title="Monthly Document Requests - 2026"
+              title={`Monthly Document Requests - ${summary.year}`}
               subtitle="Number of documents requested per month"
             >
               <ResponsiveContainer width="100%" height={260}>
-                <LineChart data={MONTHLY_DOCUMENT_REQUESTS} margin={{ top: 12, right: 10, left: -18, bottom: 0 }}>
+                <LineChart data={summary.monthly_document_requests} margin={{ top: 12, right: 10, left: -18, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#e8eef8" />
                   <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />

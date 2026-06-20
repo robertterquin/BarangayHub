@@ -306,6 +306,27 @@ export interface TrackedDocumentRequest {
   completed_at: string | null;
 }
 
+export interface PublicResidentsByPurok {
+  purok: string;
+  residents: number;
+}
+
+export interface PublicMonthlyDocumentRequests {
+  month: string;
+  requests: number;
+}
+
+export interface PublicDashboardSummary {
+  total_residents: number;
+  documents_issued: number;
+  published_announcements: number;
+  online_services: number;
+  year: number;
+  residents_by_purok: PublicResidentsByPurok[];
+  monthly_document_requests: PublicMonthlyDocumentRequests[];
+  generated_at: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -370,6 +391,10 @@ export interface Database {
           p_message: string;
         };
         Returns: string;
+      };
+      get_public_dashboard_summary: {
+        Args: never;
+        Returns: PublicDashboardSummary;
       };
     };
     Enums: {
