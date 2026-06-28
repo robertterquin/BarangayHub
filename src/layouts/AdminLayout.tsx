@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { AppLogo } from '../components/ui';
 import { useAuth } from '../hooks/useAuth';
+import { usePublicSystemSettings } from '../hooks/usePublicSystemSettings';
 import { useStats } from '../hooks/useStats';
 import {
   getNotifications,
@@ -56,6 +57,22 @@ const SYSTEM_NAV: NavItem[] = [
   { label: 'Activity History', to: '/admin/activity-logs', icon: <ScrollText size={18} /> },
   { label: 'Feedback & Suggestions', to: '/admin/feedback', icon: <MessageSquare size={18} /> },
   { label: 'Settings', to: '/admin/settings', icon: <Settings size={18} /> },
+];
+
+const FOOTER_QUICK_LINKS = [
+  { label: 'Resident Management', to: '/admin/residents' },
+  { label: 'Document Requests', to: '/admin/document-requests' },
+  { label: 'Complaints / Blotter', to: '/admin/complaints' },
+  { label: 'Announcements', to: '/admin/announcements' },
+  { label: 'Barangay Officials', to: '/admin/officials' },
+  { label: 'Reports', to: '/admin/reports' },
+];
+
+const FOOTER_OTHER_LINKS = [
+  'Indang, Cavite Website',
+  'Province of Cavite',
+  'GOVPH - Official Portal',
+  'DILG Philippines',
 ];
 
 function NavSection({
@@ -119,6 +136,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
   const notifRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { profile, signOut } = useAuth();
+  const { publicSettings } = usePublicSystemSettings();
   const { pendingRequests, openComplaints } = useStats();
 
   const loadNotifications = useCallback(async () => {
@@ -232,7 +250,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
                 Barangay<span className="text-blue-400">Hub</span>
               </span>
               <span className="text-gray-500 text-[10px] tracking-wide block truncate">
-                Brgy. Daine II · Indang, Cavite
+                {publicSettings.locationLine}
               </span>
             </div>
           )}
@@ -393,30 +411,41 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
             <div className="grid grid-cols-3 gap-8 px-8 py-6">
               <div>
                 <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-3">Contact</h4>
-                <p className="text-blue-300 text-xs leading-relaxed">Address: Barangay Daine II, Indang, Cavite</p>
-                <p className="text-blue-300 text-xs leading-relaxed">Contact: (046) XXX-XXXX</p>
-                <p className="text-blue-300 text-xs leading-relaxed">Email: brgy.daine@indang.gov.ph</p>
+                <p className="text-blue-300 text-xs leading-relaxed">Address: {publicSettings.completeAddress}</p>
+                <p className="text-blue-300 text-xs leading-relaxed">Contact: {publicSettings.contactNumber}</p>
+                <p className="text-blue-300 text-xs leading-relaxed">Email: {publicSettings.publicEmail}</p>
               </div>
               <div>
                 <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-3">Quick Links</h4>
                 <ul className="space-y-1">
-                  {['Resident Management', 'Document Requests', 'Announcements', 'Complaints'].map((link) => (
-                    <li key={link}><span className="text-blue-300 text-xs hover:text-white cursor-pointer transition-colors">{link}</span></li>
+                  {FOOTER_QUICK_LINKS.map((link) => (
+                    <li key={link.to}>
+                      <Link
+                        to={link.to}
+                        className="text-blue-300 text-xs transition-colors hover:text-white"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
                   ))}
                 </ul>
               </div>
               <div>
                 <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-3">Other Links</h4>
                 <ul className="space-y-1">
-                  {['Indang, Cavite Website', 'Province of Cavite', 'GOVPH'].map((link) => (
-                    <li key={link}><span className="text-blue-300 text-xs hover:text-white cursor-pointer transition-colors">{link}</span></li>
+                  {FOOTER_OTHER_LINKS.map((link) => (
+                    <li key={link}>
+                      <span className="text-blue-300 text-xs">{link}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
             </div>
             <div className="border-t border-blue-900/60 px-8 py-3 flex items-center justify-between">
-              <span className="text-blue-400/70 text-xs">© 2026 Barangay Daine II, Indang, Cavite – Admin MIS</span>
-              <span className="text-blue-400/70 text-xs">v1.0</span>
+              <span className="text-blue-400/70 text-xs">
+                Copyright 2026 Barangay {publicSettings.barangayName} - Admin MIS
+              </span>
+              <span className="text-blue-400/70 text-xs">{publicSettings.systemVersion}</span>
             </div>
           </footer>
         </main>

@@ -192,16 +192,17 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               <Link to="/track-status" className="hover:text-white">Track Requests</Link>
               <Link to="/announcements" className="hover:text-white">Announcements</Link>
               <Link to="/submit-complaint" className="hover:text-white">Submit Complaint</Link>
+              <Link to="/feedback" className="hover:text-white">Feedback</Link>
             </div>
           </div>
 
           <div>
             <h2 className="text-sm font-black uppercase tracking-widest text-white">Other Links</h2>
-            <div className="mt-4 grid gap-2 text-sm font-semibold">
-              <a href="https://indang-cavite.gov.ph/" className="hover:text-white">Indang, Cavite Website</a>
-              <a href="https://cavite.gov.ph/" className="hover:text-white">Province of Cavite</a>
-              <a href="https://www.gov.ph/" className="hover:text-white">GOVPH - Official Portal</a>
-              <a href="https://dilg.gov.ph/" className="hover:text-white">DILG Philippines</a>
+            <div className="mt-4 grid gap-2 text-sm font-semibold text-blue-200">
+              <span>Indang, Cavite Website</span>
+              <span>Province of Cavite</span>
+              <span>GOVPH - Official Portal</span>
+              <span>DILG Philippines</span>
             </div>
           </div>
         </div>
