@@ -1622,7 +1622,7 @@ values (
   'Indang',
   'Cavite',
   'Barangay Daine II, Indang, Cavite',
-  'admin@brgy.daine2.gov',
+  'barangayhub.admin@gmail.com',
   'MIS v1.0',
   2009
 )
@@ -1638,7 +1638,7 @@ begin
     insert into public.admin_profiles (id, email, display_name, role, status)
     select
       id,
-      coalesce(email, 'admin@brgy.daine2.gov'),
+      coalesce(email, 'barangayhub.admin@gmail.com'),
       coalesce(
         nullif(raw_user_meta_data ->> 'display_name', ''),
         'Admin'
