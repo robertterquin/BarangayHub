@@ -1,7 +1,7 @@
-import { AlertCircle, CalendarDays, RefreshCw, Shield, UserRound } from 'lucide-react';
+import { AlertCircle, CalendarDays, Shield, UserRound } from 'lucide-react';
 import { PublicLayout } from '../../layouts/PublicLayout';
 import { PublicPageShell } from '../../components/public';
-import { Button, Spinner } from '../../components/ui';
+import { Spinner } from '../../components/ui';
 import { usePublicOfficials } from '../../hooks/usePublicOfficials';
 import type { Official } from '../../types/database';
 import { formatDate } from '../../utils/formatters';
@@ -26,7 +26,7 @@ function getTermText(official: Official) {
 }
 
 export function PublicOfficials() {
-  const { officials, loading, error, refresh } = usePublicOfficials();
+  const { officials, loading, error } = usePublicOfficials();
 
   return (
     <PublicLayout>
@@ -44,15 +44,6 @@ export function PublicOfficials() {
                 Displaying officials marked active in the admin portal.
               </p>
             </div>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => void refresh()}
-              disabled={loading}
-            >
-              <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-              Refresh
-            </Button>
           </div>
 
           {error && (

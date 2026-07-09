@@ -1,7 +1,7 @@
-import { AlertCircle, CalendarDays, ImageIcon, Megaphone, RefreshCw } from 'lucide-react';
+import { AlertCircle, CalendarDays, ImageIcon, Megaphone } from 'lucide-react';
 import { PublicLayout } from '../../layouts/PublicLayout';
 import { PublicPageShell } from '../../components/public';
-import { Button, Spinner } from '../../components/ui';
+import { Spinner } from '../../components/ui';
 import { usePublicAnnouncements } from '../../hooks/usePublicAnnouncements';
 import type { Announcement } from '../../types/database';
 import { formatDate } from '../../utils/formatters';
@@ -11,7 +11,7 @@ function getDisplayDate(announcement: Announcement) {
 }
 
 export function PublicAnnouncements() {
-  const { announcements, loading, error, refresh } = usePublicAnnouncements(30);
+  const { announcements, loading, error } = usePublicAnnouncements(30);
 
   return (
     <PublicLayout>
@@ -29,15 +29,6 @@ export function PublicAnnouncements() {
                 Showing public announcements that are currently published.
               </p>
             </div>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => void refresh()}
-              disabled={loading}
-            >
-              <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-              Refresh
-            </Button>
           </div>
 
           {error && (
