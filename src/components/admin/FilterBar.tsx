@@ -18,7 +18,7 @@ export function FilterBar({
   return (
     <div className={`mb-5 flex flex-wrap items-center gap-3 ${className}`}>
       {onSearchChange && (
-        <div className="relative min-w-64 flex-1">
+        <div className="relative w-full min-w-0 flex-1 sm:min-w-64">
           <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"

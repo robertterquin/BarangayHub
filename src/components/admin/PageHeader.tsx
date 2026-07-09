@@ -13,7 +13,7 @@ export function PageHeader({ title, subtitle, meta, action, className = '' }: Pa
         <h1 className="text-xl font-extrabold tracking-tight text-gray-950">{title}</h1>
         {subtitle && <p className="mt-1 text-sm font-medium text-gray-400">{subtitle}</p>}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         {meta}
         {action}
       </div>

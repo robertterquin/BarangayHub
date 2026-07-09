@@ -80,11 +80,13 @@ function NavSection({
   items,
   collapsed,
   badges = {},
+  onNavigate,
 }: {
   label: string;
   items: NavItem[];
   collapsed: boolean;
   badges?: Record<string, number>;
+  onNavigate?: () => void;
 }) {
   return (
     <div className="mb-4">
@@ -99,6 +101,7 @@ function NavSection({
           <NavLink
             key={item.to}
             to={item.to}
+            onClick={onNavigate}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                 isActive
@@ -133,6 +136,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
   const [notifications, setNotifications] = useState<AdminNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notificationsLoading, setNotificationsLoading] = useState(true);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -238,21 +242,31 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
     '/admin/document-requests': pendingRequests,
     '/admin/complaints': openComplaints,
   };
+  const sidebarCollapsed = collapsed && !mobileNavOpen;
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-gray-100">
+      {mobileNavOpen && (
+        <div
+          className="fixed inset-0 z-60 bg-slate-950/50 md:hidden"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
-        className={`flex flex-col bg-[#1a1c23] border-r border-[#2a2d35] transition-all duration-300 ${
-          collapsed ? 'w-16' : 'w-60'
+        className={`fixed inset-y-0 left-0 z-70 flex flex-col border-r border-[#2a2d35] bg-[#1a1c23] transition-all duration-300 md:static md:z-auto ${
+          mobileNavOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        } ${
+          sidebarCollapsed ? 'w-16' : 'w-60'
         }`}
       >
         {/* Logo */}
-        <div className={`flex items-center border-b border-[#2a2d35] ${collapsed ? 'justify-center px-2 py-3' : 'gap-3 px-3 py-4'}`}>
+        <div className={`flex items-center border-b border-[#2a2d35] ${sidebarCollapsed ? 'justify-center px-2 py-3' : 'gap-3 px-3 py-4'}`}>
           <AppLogo
-            className={`${collapsed ? 'h-9 w-9' : 'h-11 w-11'} shrink-0 border-2 border-white/80 shadow-sm`}
+            className={`${sidebarCollapsed ? 'h-9 w-9' : 'h-11 w-11'} shrink-0 border-2 border-white/80 shadow-sm`}
           />
-          {!collapsed && (
+          {!sidebarCollapsed && (
             <div className="min-w-0">
               <span className="font-bold text-white text-lg tracking-tight block">
                 Barangay<span className="text-blue-400">Hub</span>
@@ -265,7 +279,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
         </div>
 
         {/* Admin user */}
-        {!collapsed ? (
+        {!sidebarCollapsed ? (
           <div className="px-3 py-3 border-b border-[#2a2d35]">
             <div className="flex items-center gap-2.5">
               <div className="relative shrink-0">
@@ -291,10 +305,31 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
-          <NavSection label="Main" items={MAIN_NAV} collapsed={collapsed} />
-          <NavSection label="Management" items={MANAGEMENT_NAV} collapsed={collapsed} badges={managementBadges} />
-          <NavSection label="Analytics" items={ANALYTICS_NAV} collapsed={collapsed} />
-          <NavSection label="System" items={SYSTEM_NAV} collapsed={collapsed} />
+          <NavSection
+            label="Main"
+            items={MAIN_NAV}
+            collapsed={sidebarCollapsed}
+            onNavigate={() => setMobileNavOpen(false)}
+          />
+          <NavSection
+            label="Management"
+            items={MANAGEMENT_NAV}
+            collapsed={sidebarCollapsed}
+            badges={managementBadges}
+            onNavigate={() => setMobileNavOpen(false)}
+          />
+          <NavSection
+            label="Analytics"
+            items={ANALYTICS_NAV}
+            collapsed={sidebarCollapsed}
+            onNavigate={() => setMobileNavOpen(false)}
+          />
+          <NavSection
+            label="System"
+            items={SYSTEM_NAV}
+            collapsed={sidebarCollapsed}
+            onNavigate={() => setMobileNavOpen(false)}
+          />
         </nav>
 
         {/* Logout */}
@@ -304,28 +339,35 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
             className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition-colors"
           >
             <LogOut size={18} />
-            {!collapsed && <span>Logout</span>}
+            {!sidebarCollapsed && <span>Logout</span>}
           </button>
         </div>
       </aside>
 
       {/* Main area */}
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Top Nav */}
-        <header className="flex items-center gap-4 px-6 py-3 bg-white border-b border-gray-200 shrink-0">
+        <header className="flex items-center gap-2 border-b border-gray-200 bg-white px-3 py-3 sm:gap-4 sm:px-6 shrink-0">
           {/* Left: hamburger + page title */}
-          <div className="flex items-center gap-3 min-w-35">
+          <div className="flex min-w-0 flex-1 items-center gap-3 md:min-w-35 md:flex-none">
             <button
-              onClick={() => setCollapsed(!collapsed)}
+              onClick={() => {
+                if (window.matchMedia('(max-width: 767px)').matches) {
+                  setMobileNavOpen(true);
+                  return;
+                }
+                setCollapsed(!collapsed);
+              }}
               className="p-1.5 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
+              aria-label="Toggle navigation"
             >
               <Menu size={18} />
             </button>
-            <span className="font-semibold text-gray-800 text-base">{title}</span>
+            <span className="truncate text-base font-semibold text-gray-800">{title}</span>
           </div>
 
           {/* Center: search */}
-          <div className="flex-1 flex justify-center">
+          <div className="hidden flex-1 justify-center md:flex">
             <input
               type="text"
               placeholder="Search..."
@@ -334,9 +376,9 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
           </div>
 
           {/* Right: clock + bell */}
-          <div className="flex items-center gap-4 min-w-50 justify-end">
+          <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-4 md:min-w-50">
             {/* Clock */}
-            <div className="text-right">
+            <div className="hidden text-right sm:block">
               <p className="text-gray-800 font-mono text-sm font-medium leading-tight">{clockStr}</p>
               <p className="text-gray-400 text-xs leading-tight">{dateStr}</p>
             </div>
@@ -357,7 +399,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
 
               {/* Notification dropdown */}
               {notifOpen && (
-                <div className="absolute right-0 top-10 w-80 bg-white border border-gray-200 rounded-xl shadow-2xl z-50">
+                <div className="absolute right-0 top-10 z-50 w-[calc(100vw-2rem)] rounded-xl border border-gray-200 bg-white shadow-2xl sm:w-80">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                     <span className="text-gray-800 font-semibold text-sm">Admin Notifications</span>
                     <div className="flex items-center gap-2">
@@ -412,11 +454,11 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto bg-gray-100 flex flex-col">
-          <div className="flex-1 p-6">{children}</div>
+          <div className="flex-1 p-4 sm:p-6">{children}</div>
 
           {/* Footer */}
           <footer className="bg-[#0f2045] shrink-0 mt-4">
-            <div className="grid grid-cols-3 gap-8 px-8 py-6">
+            <div className="grid grid-cols-1 gap-8 px-4 py-6 sm:grid-cols-2 sm:px-6 lg:grid-cols-3 lg:px-8">
               <div>
                 <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-3">Contact</h4>
                 <p className="text-blue-300 text-xs leading-relaxed">Address: {publicSettings.completeAddress}</p>
@@ -449,7 +491,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
                 </ul>
               </div>
             </div>
-            <div className="border-t border-blue-900/60 px-8 py-3 flex items-center justify-between">
+            <div className="flex flex-col gap-2 border-t border-blue-900/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
               <span className="text-blue-400/70 text-xs">
                 Copyright 2026 Barangay {publicSettings.barangayName} - Admin MIS
               </span>
