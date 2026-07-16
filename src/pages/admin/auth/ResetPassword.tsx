@@ -123,7 +123,7 @@ export function ResetPassword() {
             </p>
             {needsCurrentPassword && (
               <p className="text-blue-600 text-xs mt-2">
-                Enter the current admin password first so Supabase can verify the account.
+                Enter the current admin password first so the account can be verified.
               </p>
             )}
           </div>

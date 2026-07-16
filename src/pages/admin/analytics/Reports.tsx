@@ -139,7 +139,7 @@ export function Reports() {
 
         {loading && !snapshot ? (
           <div className="rounded-xl border border-gray-200 bg-white py-16 shadow-sm">
-            <Spinner label="Loading report data from Supabase..." />
+            <Spinner label="Loading report data..." />
           </div>
         ) : (
           <>

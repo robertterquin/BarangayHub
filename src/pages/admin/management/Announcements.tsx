@@ -698,7 +698,7 @@ export function Announcements() {
               Permanently delete this announcement?
             </p>
             <p className="mt-2 text-sm text-gray-500">
-              Its uploaded image will also be removed from Supabase Storage.
+              Its uploaded image will also be removed from storage.
             </p>
             {error && (
               <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">

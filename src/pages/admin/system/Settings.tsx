@@ -205,7 +205,7 @@ function InformationCard({
     setIsEditing(false);
     setNotice({
       tone: 'success',
-      message: 'Barangay information saved to Supabase.',
+      message: 'Barangay information saved successfully.',
     });
   }
 
@@ -313,7 +313,7 @@ function InformationCard({
                 <dt className="text-xs font-bold uppercase tracking-wide text-gray-400">
                   {label}
                 </dt>
-                <dd className="mt-1 break-words text-sm font-extrabold text-gray-900">
+                <dd className="mt-1 wrap-break-word text-sm font-extrabold text-gray-900">
                   {value}
                 </dd>
               </div>
@@ -420,7 +420,7 @@ function EmailSettings({
     setNotice({
       tone: result.data.confirmationRequired ? 'info' : 'success',
       message: result.data.confirmationRequired
-        ? 'Email change submitted. Confirm the change from the messages sent by Supabase.'
+        ? 'Email change submitted. Confirm the change from the message sent to your inbox.'
         : 'Admin sign-in email updated successfully.',
     });
   }
@@ -717,7 +717,7 @@ export function Settings() {
 
       {loading ? (
         <SettingsCard title="Loading Settings" className="min-h-0">
-          <Spinner label="Loading settings from Supabase..." className="py-10" />
+          <Spinner label="Loading settings..." className="py-10" />
         </SettingsCard>
       ) : (
         <div className="space-y-5">
@@ -776,9 +776,8 @@ export function Settings() {
           <div className="flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-5 py-4 text-sm text-blue-800">
             <Info size={18} className="mt-0.5 shrink-0" />
             <p>
-              Changes are saved securely through Supabase. Email updates may
-              require confirmation depending on your project authentication
-              settings.
+              Changes are saved securely. Email updates may require confirmation
+              depending on your account security settings.
             </p>
           </div>
         </div>

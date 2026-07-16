@@ -179,8 +179,8 @@ function AccountModal({
           <p className="text-xs font-bold text-blue-800">Credential note</p>
           <p className="mt-1 text-xs font-medium leading-relaxed text-blue-700">
             Email and password changes are handled in Settings. Creating new
-            Supabase Auth users requires an Edge Function or server-side admin
-            endpoint, so this page manages profiles that already exist.
+            accounts requires a server-side admin endpoint, so this page
+            manages profiles that already exist.
           </p>
         </div>
       </div>
@@ -251,7 +251,7 @@ export function UserManagement() {
                 User Management
               </h1>
               <p className="mt-0.5 text-xs font-medium text-gray-400">
-                Manage Supabase admin profiles and account availability.
+                Manage admin profiles and account availability.
               </p>
             </div>
             <span className="rounded-full bg-orange-50 px-4 py-1.5 text-xs font-extrabold text-orange-500">
@@ -265,14 +265,14 @@ export function UserManagement() {
               <p className="flex-1 text-sm font-medium text-blue-700">
                 <span className="font-extrabold">Admin Profiles:</span> This page reads from
                 <span className="font-mono"> admin_profiles </span>
-                and updates status/display name through RLS.
+                and updates status/display name through account rules.
               </p>
               <Button
                 type="button"
                 variant="secondary"
                 size="sm"
                 disabled
-                title="Creating auth users requires a server-side Supabase Admin API endpoint."
+                title="Creating accounts requires a server-side admin endpoint."
               >
                 <UserRoundPlus size={14} />
                 Add Account Soon
