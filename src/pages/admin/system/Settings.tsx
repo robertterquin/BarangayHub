@@ -97,7 +97,7 @@ function PasswordInput({
         type="button"
         disabled={disabled}
         onClick={onToggleVisible}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-600 disabled:cursor-not-allowed"
+        className="absolute right-1 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition-colors hover:text-gray-600 disabled:cursor-not-allowed"
         aria-label={visible ? 'Hide password' : 'Show password'}
       >
         {visible ? <EyeOff size={18} /> : <Eye size={18} />}

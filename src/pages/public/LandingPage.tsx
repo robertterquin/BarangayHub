@@ -178,7 +178,7 @@ export function LandingPage() {
             </p>
 
             <p className="mt-10 max-w-3xl text-xl font-semibold leading-9 text-blue-50 sm:text-2xl">
-              Request certificates, stay updated with announcements, and
+              Request certificates, stay updated with announcements, and{' '}
               <br className="hidden sm:block" />
               access barangay services - anytime, anywhere.
             </p>
