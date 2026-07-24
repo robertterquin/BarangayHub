@@ -4,7 +4,6 @@ import {
   RefreshCw,
   Settings2,
   ShieldCheck,
-  UserRoundPlus,
 } from 'lucide-react';
 import {
   FilterBar,
@@ -178,9 +177,9 @@ function AccountModal({
         <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
           <p className="text-xs font-bold text-blue-800">Credential note</p>
           <p className="mt-1 text-xs font-medium leading-relaxed text-blue-700">
-            Email and password changes are handled in Settings. Creating new
-            accounts requires a server-side admin endpoint, so this page
-            manages profiles that already exist.
+            Email and password changes are handled in Settings. New account
+            creation is reserved for a future secure admin workflow, so this
+            page manages profiles that already exist.
           </p>
         </div>
       </div>
@@ -263,20 +262,9 @@ export function UserManagement() {
             <div className="mb-5 flex flex-col gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 sm:flex-row sm:items-center">
               <ShieldCheck size={17} className="shrink-0 text-blue-600" />
               <p className="flex-1 text-sm font-medium text-blue-700">
-                <span className="font-extrabold">Admin Profiles:</span> This page reads from
-                <span className="font-mono"> admin_profiles </span>
-                and updates status/display name through account rules.
+                <span className="font-extrabold">Admin Profiles:</span> Manage existing
+                administrator profiles, display names, and account availability.
               </p>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                disabled
-                title="Creating accounts requires a server-side admin endpoint."
-              >
-                <UserRoundPlus size={14} />
-                Add Account Soon
-              </Button>
             </div>
 
             <FilterBar
