@@ -7,7 +7,7 @@ const DEFAULT_SETTINGS: PublicSystemSettingsView = {
   barangayName: 'Daine II',
   locationLine: 'Brgy. Daine II - Indang, Cavite',
   completeAddress: 'Barangay Daine II, Indang, Cavite',
-  contactNumber: '(046) XXX-XXXX',
+  contactNumber: 'Contact number unavailable',
   publicEmail: 'brgy.daineii@indang.gov.ph',
   systemVersion: 'v1.0',
 };
