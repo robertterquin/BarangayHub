@@ -560,7 +560,7 @@ export function Residents() {
                 {error}
               </p>
             )}
-            <div className="mt-6 flex gap-3">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Button
                 type="button"
                 variant="secondary"

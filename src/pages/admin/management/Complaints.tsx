@@ -220,7 +220,7 @@ function AssignOfficialModal({
             </option>
           ))}
         </Select>
-        <div className="mt-5 flex gap-3">
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <Button
             type="button"
             variant="secondary"
