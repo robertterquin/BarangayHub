@@ -66,7 +66,7 @@ function RecentActivityItem({ activity }: { activity: ActivityLog }) {
       <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${activityDotColor[activity.log_type]}`} />
       <div className="min-w-0 flex-1">
         <p className="text-sm font-bold text-gray-800">{activity.action}</p>
-        <p className="truncate text-xs font-medium capitalize text-gray-400">
+        <p className="truncate text-xs font-medium text-gray-400">
           {getActivityDetail(activity)}
         </p>
       </div>
