@@ -364,9 +364,9 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
       {/* Main area */}
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Top Nav */}
-        <header className="flex items-center gap-2 border-b border-gray-200 bg-white px-3 py-3 sm:gap-4 sm:px-6 shrink-0">
+        <header className="flex items-center justify-between border-b border-gray-200 bg-white px-3 py-3 sm:gap-4 sm:px-6 shrink-0">
           {/* Left: hamburger + page title */}
-          <div className="flex min-w-0 flex-1 items-center gap-3 md:min-w-35 md:flex-none">
+          <div className="flex min-w-0 items-center gap-3">
             <button
               onClick={() => {
                 if (window.matchMedia('(max-width: 767px)').matches) {
@@ -383,17 +383,8 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
             <span className="truncate text-base font-semibold text-gray-800">{currentTitle}</span>
           </div>
 
-          {/* Center: search */}
-          <div className="hidden flex-1 justify-center md:flex">
-            <input
-              type="text"
-              placeholder="Search..."
-              className="text-sm bg-gray-100 border border-gray-200 text-gray-700 placeholder-gray-400 rounded-lg px-3 py-1.5 w-64 focus:outline-none focus:border-blue-500 transition-colors"
-            />
-          </div>
-
           {/* Right: clock + bell */}
-          <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-4 md:min-w-50">
+          <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-4">
             {/* Clock */}
             <div className="hidden text-right sm:block">
               <p className="text-gray-800 font-mono text-sm font-medium leading-tight">{clockStr}</p>
