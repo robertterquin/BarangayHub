@@ -192,10 +192,30 @@ export function PublicLayout({ children }: { children?: React.ReactNode }) {
           <div>
             <h2 className="text-sm font-black uppercase tracking-widest text-white">Other Links</h2>
             <div className="mt-4 grid gap-2 text-sm font-semibold text-blue-200">
-              <span>Indang, Cavite Website</span>
-              <span>Province of Cavite</span>
-              <span>GOVPH - Official Portal</span>
-              <span>DILG Philippines</span>
+              <a
+                href="https://cavite.gov.ph"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-white"
+              >
+                Province of Cavite
+              </a>
+              <a
+                href="https://www.gov.ph"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-white"
+              >
+                GOVPH - Official Portal
+              </a>
+              <a
+                href="https://www.dilg.gov.ph"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-white"
+              >
+                DILG Philippines
+              </a>
             </div>
           </div>
         </div>

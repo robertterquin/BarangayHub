@@ -69,10 +69,9 @@ const FOOTER_QUICK_LINKS = [
 ];
 
 const FOOTER_OTHER_LINKS = [
-  'Indang, Cavite Website',
-  'Province of Cavite',
-  'GOVPH - Official Portal',
-  'DILG Philippines',
+  { label: 'Province of Cavite', href: 'https://cavite.gov.ph' },
+  { label: 'GOVPH - Official Portal', href: 'https://www.gov.ph' },
+  { label: 'DILG Philippines', href: 'https://www.dilg.gov.ph' },
 ];
 
 function NavSection({
@@ -492,8 +491,15 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
                 <h4 className="text-white font-bold text-xs tracking-widest uppercase mb-3">Other Links</h4>
                 <ul className="space-y-1">
                   {FOOTER_OTHER_LINKS.map((link) => (
-                    <li key={link}>
-                      <span className="text-blue-300 text-xs">{link}</span>
+                    <li key={link.label}>
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-300 text-xs transition-colors hover:text-white"
+                      >
+                        {link.label}
+                      </a>
                     </li>
                   ))}
                 </ul>
