@@ -150,13 +150,6 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               >
                 Send Feedback
               </Link>
-              <Link
-                to="/admin/login"
-                onClick={() => setMenuOpen(false)}
-                className="mt-3 block rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-bold text-slate-500"
-              >
-                Admin Login
-              </Link>
             </div>
           </aside>
         </div>
