@@ -12,7 +12,6 @@ import {
   TableShell,
 } from '../../../components/ui';
 import { useResidents, type ResidentFilters } from '../../../hooks/useResidents';
-import { AdminLayout } from '../../../layouts/AdminLayout';
 import type {
   CivilStatusType,
   GenderType,
@@ -351,7 +350,7 @@ export function Residents() {
 
   return (
     <>
-      <AdminLayout title="Resident Management">
+      <div className="space-y-6">
         <PageHeader
           title="Resident Management"
           subtitle="Search, add, update, and maintain resident records."
@@ -516,7 +515,7 @@ export function Residents() {
             </div>
           </div>
         </TableShell>
-      </AdminLayout>
+      </div>
 
       {modal && (
         <ResidentModal

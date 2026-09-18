@@ -7,7 +7,6 @@ import {
   MessageSquare,
   ShieldCheck,
 } from 'lucide-react';
-import { PublicLayout } from '../../layouts/PublicLayout';
 import { PublicPageShell } from '../../components/public';
 import { Input, Select } from '../../components/ui';
 import { usePublicFeedback } from '../../hooks/usePublicFeedback';
@@ -138,7 +137,7 @@ export function PublicFeedback() {
   const visibleError = formError ?? error;
 
   return (
-    <PublicLayout>
+    <>
       <PublicPageShell
         eyebrow="Feedback"
         title="Send feedback or suggestions"
@@ -296,6 +295,6 @@ export function PublicFeedback() {
           </form>
         </section>
       </PublicPageShell>
-    </PublicLayout>
+    </>
   );
 }

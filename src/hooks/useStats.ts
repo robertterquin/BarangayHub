@@ -25,13 +25,16 @@ export interface StatsState extends DashboardStats {
   refresh: () => Promise<void>;
 }
 
+let cachedStats: DashboardStats | null = null;
+
 export function useStats(): StatsState {
-  const [stats, setStats] = useState<DashboardStats>(INITIAL_STATS);
-  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<DashboardStats>(cachedStats ?? INITIAL_STATS);
+  const [loading, setLoading] = useState(!cachedStats);
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     const { data, error: statsError } = await getDashboardStats();
+    cachedStats = data;
     setStats(data);
     setError(statsError ? getServiceErrorMessage(statsError, 'Unable to load dashboard counts.') : null);
     setLoading(false);
@@ -43,6 +46,7 @@ export function useStats(): StatsState {
     const load = async () => {
       const { data, error: statsError } = await getDashboardStats();
       if (!isActive) return;
+      cachedStats = data;
       setStats(data);
       setError(statsError ? getServiceErrorMessage(statsError, 'Unable to load dashboard counts.') : null);
       setLoading(false);

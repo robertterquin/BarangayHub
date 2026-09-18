@@ -48,17 +48,31 @@ function toPublicView(settings: SystemSettings | null): PublicSystemSettingsView
   };
 }
 
+let cachedSettings: SystemSettings | null = null;
+let settingsFetchPromise: Promise<{ data: SystemSettings | null; error: unknown }> | null = null;
+
+export function setCachedPublicSystemSettings(newSettings: SystemSettings | null) {
+  cachedSettings = newSettings;
+}
+
 export function usePublicSystemSettings() {
-  const [settings, setSettings] = useState<SystemSettings | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState<SystemSettings | null>(cachedSettings);
+  const [loading, setLoading] = useState(!cachedSettings);
   const [error, setError] = useState<string | null>(null);
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
+  const refresh = useCallback(async (force = false) => {
+    if (!cachedSettings) {
+      setLoading(true);
+    }
 
     try {
-      const result = await getPublicSystemSettings();
-
+      if (!settingsFetchPromise || force) {
+        settingsFetchPromise = getPublicSystemSettings();
+      }
+      const result = await settingsFetchPromise;
+      if (result.data) {
+        cachedSettings = result.data;
+      }
       setSettings(result.data);
       setError(
         result.error
@@ -66,19 +80,23 @@ export function usePublicSystemSettings() {
           : null
       );
     } catch (requestError) {
-      setSettings(null);
+      if (!cachedSettings) {
+        setSettings(null);
+      }
       setError(getServiceErrorMessage(requestError, 'Unable to load barangay information.'));
     } finally {
+      settingsFetchPromise = null;
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      void refresh();
-    }, 0);
-
-    return () => window.clearTimeout(timer);
+    if (!cachedSettings) {
+      const timer = window.setTimeout(() => {
+        void refresh();
+      }, 0);
+      return () => window.clearTimeout(timer);
+    }
   }, [refresh]);
 
   const publicSettings = useMemo(() => toPublicView(settings), [settings]);

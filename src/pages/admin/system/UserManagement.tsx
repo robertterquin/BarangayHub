@@ -24,7 +24,6 @@ import {
   type UserManagementFilters,
 } from '../../../hooks/useUserManagement';
 import { useAuth } from '../../../hooks/useAuth';
-import { AdminLayout } from '../../../layouts/AdminLayout';
 import type {
   AccountStatus,
   AdminProfile,
@@ -223,7 +222,7 @@ export function UserManagement() {
 
   return (
     <>
-      <AdminLayout title="User Management">
+      <div className="space-y-6">
         {error && (
           <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
             <AlertCircle size={18} className="mt-0.5 shrink-0 text-red-500" />
@@ -417,7 +416,7 @@ export function UserManagement() {
             </div>
           </div>
         </section>
-      </AdminLayout>
+      </div>
 
       {selectedProfile && (
         <AccountModal

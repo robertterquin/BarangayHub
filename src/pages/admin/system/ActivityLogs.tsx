@@ -22,7 +22,6 @@ import {
   useActivityLogs,
   type ActivityLogFilters,
 } from '../../../hooks/useActivityLogs';
-import { AdminLayout } from '../../../layouts/AdminLayout';
 import type { ActivityLog, Json, LogType } from '../../../types/database';
 import { formatDateTime, formatTimeAgo } from '../../../utils/formatters';
 
@@ -415,7 +414,7 @@ export function ActivityLogs() {
 
   return (
     <>
-      <AdminLayout title="Activity History">
+      <div className="space-y-6">
         {error && (
           <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
             <AlertCircle size={18} className="mt-0.5 shrink-0 text-red-500" />
@@ -575,7 +574,7 @@ export function ActivityLogs() {
             </div>
           </div>
         </section>
-      </AdminLayout>
+      </div>
 
       {viewEntry && (
         <ActivityLogModal entry={viewEntry} onClose={() => setViewEntry(null)} />

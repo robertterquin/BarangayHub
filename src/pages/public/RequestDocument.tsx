@@ -1,7 +1,6 @@
 import { type ChangeEvent, type FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, FileText, Info, ShieldCheck } from 'lucide-react';
-import { PublicLayout } from '../../layouts/PublicLayout';
 import { PublicPageShell } from '../../components/public';
 import { Button, Input, Modal, Select } from '../../components/ui';
 import { usePublicDocumentRequest } from '../../hooks/usePublicDocumentRequest';
@@ -177,7 +176,7 @@ export function RequestDocument() {
   const visibleError = formError ?? error;
 
   return (
-    <PublicLayout>
+    <>
       <PublicPageShell
         eyebrow="Document Requests"
         title="Document Requests"
@@ -359,6 +358,6 @@ export function RequestDocument() {
           </Modal>
         )}
       </PublicPageShell>
-    </PublicLayout>
+    </>
   );
 }

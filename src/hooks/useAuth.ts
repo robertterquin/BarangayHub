@@ -17,14 +17,23 @@ interface UseAuthReturn {
   updatePassword: (newPassword: string) => Promise<{ error: AuthError | null }>;
 }
 
+let cachedUser: User | null = null;
+let cachedProfile: AdminProfile | null = null;
+let cachedIsActiveAdmin = false;
+let hasInitialAuthResolved = false;
+
 export function useAuth(): UseAuthReturn {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<AdminProfile | null>(null);
-  const [isActiveAdmin, setIsActiveAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(cachedUser);
+  const [profile, setProfile] = useState<AdminProfile | null>(cachedProfile);
+  const [isActiveAdmin, setIsActiveAdmin] = useState(cachedIsActiveAdmin);
+  const [loading, setLoading] = useState(!hasInitialAuthResolved);
 
   const loadAuthorizedUser = useCallback(async (nextUser: User | null) => {
     if (!nextUser) {
+      cachedUser = null;
+      cachedProfile = null;
+      cachedIsActiveAdmin = false;
+      hasInitialAuthResolved = true;
       setUser(null);
       setProfile(null);
       setIsActiveAdmin(false);
@@ -42,9 +51,14 @@ export function useAuth(): UseAuthReturn {
       adminProfile?.status === 'active' &&
       adminProfile.role === 'admin';
 
-    setUser(authorized ? nextUser : null);
-    setProfile(authorized ? adminProfile : null);
-    setIsActiveAdmin(authorized);
+    cachedUser = authorized ? nextUser : null;
+    cachedProfile = authorized ? adminProfile : null;
+    cachedIsActiveAdmin = authorized;
+    hasInitialAuthResolved = true;
+
+    setUser(cachedUser);
+    setProfile(cachedProfile);
+    setIsActiveAdmin(cachedIsActiveAdmin);
     setLoading(false);
     return authorized;
   }, []);
@@ -92,6 +106,10 @@ export function useAuth(): UseAuthReturn {
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
+    cachedUser = null;
+    cachedProfile = null;
+    cachedIsActiveAdmin = false;
+    hasInitialAuthResolved = false;
     setUser(null);
     setProfile(null);
     setIsActiveAdmin(false);

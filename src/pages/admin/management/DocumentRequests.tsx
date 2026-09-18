@@ -14,7 +14,6 @@ import {
   useDocumentRequests,
   type DocumentRequestFilters,
 } from '../../../hooks/useDocumentRequests';
-import { AdminLayout } from '../../../layouts/AdminLayout';
 import type {
   DocumentRequest,
   DocumentRequestUpdate,
@@ -297,7 +296,7 @@ export function DocumentRequests() {
 
   return (
     <>
-      <AdminLayout title="Document Requests">
+      <div className="space-y-6">
         {error && (
           <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
             <AlertCircle size={18} className="mt-0.5 shrink-0 text-red-500" />
@@ -472,7 +471,7 @@ export function DocumentRequests() {
             </div>
           </div>
         </div>
-      </AdminLayout>
+      </div>
 
       {viewRequest && (
         <RequestViewModal request={viewRequest} onClose={() => setViewRequest(null)} />

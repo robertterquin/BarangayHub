@@ -11,7 +11,6 @@ import {
 import { PageHeader, ReportCard, StatCard } from '../../../components/admin';
 import { Button, Select, Spinner } from '../../../components/ui';
 import { useReports } from '../../../hooks/useReports';
-import { AdminLayout } from '../../../layouts/AdminLayout';
 import type { ReportId } from '../../../services/reportService';
 import { formatDateTime } from '../../../utils/formatters';
 
@@ -89,7 +88,7 @@ export function Reports() {
   }
 
   return (
-    <AdminLayout title="Reports">
+    <div className="space-y-6">
       <section className="space-y-5">
         <PageHeader
           title="Reports & Analytics"
@@ -224,6 +223,6 @@ export function Reports() {
           </div>
         )}
       </section>
-    </AdminLayout>
+    </div>
   );
 }

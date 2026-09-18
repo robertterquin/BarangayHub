@@ -1,5 +1,4 @@
 import { AlertCircle, CalendarDays, Shield, UserRound } from 'lucide-react';
-import { PublicLayout } from '../../layouts/PublicLayout';
 import { PublicPageShell } from '../../components/public';
 import { Spinner } from '../../components/ui';
 import { usePublicOfficials } from '../../hooks/usePublicOfficials';
@@ -29,7 +28,7 @@ export function PublicOfficials() {
   const { officials, loading, error } = usePublicOfficials();
 
   return (
-    <PublicLayout>
+    <>
       <PublicPageShell
         eyebrow="Barangay Officials"
         title="Barangay Officials"
@@ -79,7 +78,7 @@ export function PublicOfficials() {
           )}
         </section>
       </PublicPageShell>
-    </PublicLayout>
+    </>
   );
 }
 

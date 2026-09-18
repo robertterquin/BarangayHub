@@ -13,7 +13,6 @@ import { AlertCircle, RefreshCw } from 'lucide-react';
 import { PageHeader, StatCard } from '../../../components/admin';
 import { Spinner } from '../../../components/ui';
 import { useDashboard } from '../../../hooks/useDashboard';
-import { AdminLayout } from '../../../layouts/AdminLayout';
 import type { ActivityLog, Json, LogType } from '../../../types/database';
 import { formatTimeAgo } from '../../../utils/formatters';
 
@@ -136,7 +135,7 @@ export function Dashboard() {
   const largestWorkflowValue = Math.max(1, ...workflowItems.map((item) => item.value));
 
   return (
-    <AdminLayout title="Dashboard">
+    <div className="space-y-6">
       <PageHeader
         title="Dashboard Overview"
         subtitle="Live operational data for Barangay Daine II."
@@ -307,6 +306,6 @@ export function Dashboard() {
           </div>
         </>
       )}
-    </AdminLayout>
+    </div>
   );
 }

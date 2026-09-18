@@ -5,7 +5,6 @@ import {
   Search,
   XCircle,
 } from 'lucide-react';
-import { PublicLayout } from '../../layouts/PublicLayout';
 import { PublicPageShell } from '../../components/public';
 import { Button, Input } from '../../components/ui';
 import { usePublicDocumentRequest } from '../../hooks/usePublicDocumentRequest';
@@ -68,7 +67,7 @@ export function TrackStatus() {
   const visibleError = localError ?? error;
 
   return (
-    <PublicLayout>
+    <>
       <PublicPageShell
         eyebrow="Track Request"
         title="Track My Request"
@@ -127,7 +126,7 @@ export function TrackStatus() {
           </div>
         </section>
       </PublicPageShell>
-    </PublicLayout>
+    </>
   );
 }
 

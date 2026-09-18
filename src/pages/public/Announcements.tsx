@@ -1,5 +1,4 @@
 import { AlertCircle, CalendarDays, ImageIcon, Megaphone } from 'lucide-react';
-import { PublicLayout } from '../../layouts/PublicLayout';
 import { PublicPageShell } from '../../components/public';
 import { Spinner } from '../../components/ui';
 import { usePublicAnnouncements } from '../../hooks/usePublicAnnouncements';
@@ -14,7 +13,7 @@ export function PublicAnnouncements() {
   const { announcements, loading, error } = usePublicAnnouncements(30);
 
   return (
-    <PublicLayout>
+    <>
       <PublicPageShell
         eyebrow="Announcements"
         title="Official barangay updates"
@@ -100,6 +99,6 @@ export function PublicAnnouncements() {
           )}
         </section>
       </PublicPageShell>
-    </PublicLayout>
+    </>
   );
 }

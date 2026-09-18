@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
@@ -124,12 +124,29 @@ function NavSection({
   );
 }
 
+const ADMIN_TITLES: Record<string, string> = {
+  '/admin/dashboard': 'Dashboard',
+  '/admin/residents': 'Resident Management',
+  '/admin/document-requests': 'Document Requests',
+  '/admin/complaints': 'Complaints / Blotter',
+  '/admin/announcements': 'Announcements',
+  '/admin/officials': 'Barangay Officials',
+  '/admin/reports': 'Reports',
+  '/admin/users': 'User Management',
+  '/admin/activity-logs': 'Activity History',
+  '/admin/history': 'Activity History',
+  '/admin/feedback': 'Feedback & Suggestions',
+  '/admin/settings': 'Settings',
+};
+
 interface AdminLayoutProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   title?: string;
 }
 
-export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps) {
+export function AdminLayout({ children, title }: AdminLayoutProps) {
+  const location = useLocation();
+  const currentTitle = title ?? ADMIN_TITLES[location.pathname] ?? 'Dashboard';
   const [collapsed, setCollapsed] = useState(false);
   const [time, setTime] = useState(new Date());
   const [notifOpen, setNotifOpen] = useState(false);
@@ -363,7 +380,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
             >
               <Menu size={18} />
             </button>
-            <span className="truncate text-base font-semibold text-gray-800">{title}</span>
+            <span className="truncate text-base font-semibold text-gray-800">{currentTitle}</span>
           </div>
 
           {/* Center: search */}
@@ -454,7 +471,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto bg-gray-100 flex flex-col">
-          <div className="flex-1 p-4 sm:p-6">{children}</div>
+          <div className="flex-1 p-4 sm:p-6">{children ?? <Outlet />}</div>
 
           {/* Footer */}
           <footer className="bg-[#0f2045] shrink-0 mt-4">

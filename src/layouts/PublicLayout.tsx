@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 import {
   FileText,
   LayoutDashboard,
@@ -45,7 +45,7 @@ function formatDate(date: Date) {
   });
 }
 
-export function PublicLayout({ children }: { children: React.ReactNode }) {
+export function PublicLayout({ children }: { children?: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [now, setNow] = useState(new Date());
   const { publicSettings } = usePublicSystemSettings();
@@ -155,7 +155,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <main>{children}</main>
+      <main>{children ?? <Outlet />}</main>
 
       <footer className="bg-[#163b91] px-4 py-10 text-blue-100 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-3">

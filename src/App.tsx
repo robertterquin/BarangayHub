@@ -1,5 +1,7 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
+import { PublicLayout } from './layouts/PublicLayout';
+import { AdminLayout } from './layouts/AdminLayout';
 import { AdminLogin } from './pages/admin/auth/Login';
 import { ResetPassword } from './pages/admin/auth/ResetPassword';
 import { Dashboard } from './pages/admin/main/Dashboard';
@@ -25,7 +27,7 @@ import {
   TrackStatus,
 } from './pages/public';
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+export function ProtectedRoute({ children }: { children?: React.ReactNode }) {
   const { user, isActiveAdmin, loading } = useAuth();
   if (loading) {
     return (
@@ -35,36 +37,50 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
   if (!user || !isActiveAdmin) return <Navigate to="/admin/login" replace />;
-  return <>{children}</>;
+  return <>{children ?? <Outlet />}</>;
 }
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/select-service" element={<SelectService />} />
-      <Route path="/request-document" element={<RequestDocument />} />
-      <Route path="/submission-success" element={<SubmissionSuccess />} />
-      <Route path="/track-status" element={<TrackStatus />} />
-      <Route path="/submit-complaint" element={<SubmitComplaint />} />
-      <Route path="/announcements" element={<PublicAnnouncements />} />
-      <Route path="/officials" element={<PublicOfficials />} />
-      <Route path="/feedback" element={<PublicFeedback />} />
+      {/* Public Pages with Persistent PublicLayout */}
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/select-service" element={<SelectService />} />
+        <Route path="/request-document" element={<RequestDocument />} />
+        <Route path="/submission-success" element={<SubmissionSuccess />} />
+        <Route path="/track-status" element={<TrackStatus />} />
+        <Route path="/submit-complaint" element={<SubmitComplaint />} />
+        <Route path="/announcements" element={<PublicAnnouncements />} />
+        <Route path="/officials" element={<PublicOfficials />} />
+        <Route path="/feedback" element={<PublicFeedback />} />
+      </Route>
 
+      {/* Standalone Admin Auth Pages */}
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin/reset-password" element={<ResetPassword />} />
-      <Route path="/admin/residents" element={<ProtectedRoute><Residents /></ProtectedRoute>} />
-      <Route path="/admin/document-requests" element={<ProtectedRoute><DocumentRequests /></ProtectedRoute>} />
-      <Route path="/admin/complaints" element={<ProtectedRoute><Complaints /></ProtectedRoute>} />
-      <Route path="/admin/announcements" element={<ProtectedRoute><Announcements /></ProtectedRoute>} />
-      <Route path="/admin/officials" element={<ProtectedRoute><Officials /></ProtectedRoute>} />
-      <Route path="/admin/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-      <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
-      <Route path="/admin/activity-logs" element={<ProtectedRoute><ActivityLogs /></ProtectedRoute>} />
-      <Route path="/admin/history" element={<Navigate to="/admin/activity-logs" replace />} />
-      <Route path="/admin/feedback" element={<ProtectedRoute><Feedback /></ProtectedRoute>} />
-      <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-      <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+
+      {/* Admin Pages with Persistent AdminLayout */}
+      <Route
+        element={
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/admin/dashboard" element={<Dashboard />} />
+        <Route path="/admin/residents" element={<Residents />} />
+        <Route path="/admin/document-requests" element={<DocumentRequests />} />
+        <Route path="/admin/complaints" element={<Complaints />} />
+        <Route path="/admin/announcements" element={<Announcements />} />
+        <Route path="/admin/officials" element={<Officials />} />
+        <Route path="/admin/reports" element={<Reports />} />
+        <Route path="/admin/users" element={<UserManagement />} />
+        <Route path="/admin/activity-logs" element={<ActivityLogs />} />
+        <Route path="/admin/history" element={<Navigate to="/admin/activity-logs" replace />} />
+        <Route path="/admin/feedback" element={<Feedback />} />
+        <Route path="/admin/settings" element={<Settings />} />
+      </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

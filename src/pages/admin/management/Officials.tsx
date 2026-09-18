@@ -10,7 +10,6 @@ import {
 import { ActionGroup, PageHeader, StatusBadge } from '../../../components/admin';
 import { Button, Input, Modal, Select, Spinner } from '../../../components/ui';
 import { useOfficials } from '../../../hooks/useOfficials';
-import { AdminLayout } from '../../../layouts/AdminLayout';
 import type {
   Official,
   OfficialAccent,
@@ -560,7 +559,7 @@ export function Officials() {
 
   return (
     <>
-      <AdminLayout title="Barangay Officials">
+      <div className="space-y-6">
         <section className="space-y-5">
           <PageHeader
             title="Barangay Officials - Daine II"
@@ -708,7 +707,7 @@ export function Officials() {
             </div>
           </section>
         </section>
-      </AdminLayout>
+      </div>
 
       {modal && (
         <OfficialModal

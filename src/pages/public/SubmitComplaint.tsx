@@ -1,7 +1,6 @@
 import { type ChangeEvent, type FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, ClipboardList, FileUp, ShieldAlert } from 'lucide-react';
-import { PublicLayout } from '../../layouts/PublicLayout';
 import { PublicPageShell } from '../../components/public';
 import { Input, Select } from '../../components/ui';
 import { usePublicComplaint } from '../../hooks/usePublicComplaint';
@@ -124,7 +123,7 @@ export function SubmitComplaint() {
   const visibleError = formError ?? error;
 
   return (
-    <PublicLayout>
+    <>
       <PublicPageShell
         eyebrow="Submit Complaint"
         title="Submit a Complaint"
@@ -281,6 +280,6 @@ export function SubmitComplaint() {
           </button>
         </form>
       </PublicPageShell>
-    </PublicLayout>
+    </>
   );
 }

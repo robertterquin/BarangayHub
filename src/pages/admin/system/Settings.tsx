@@ -10,7 +10,6 @@ import {
 import { PageHeader, SettingsCard } from '../../../components/admin';
 import { Button, Input, Spinner } from '../../../components/ui';
 import { useSettings } from '../../../hooks/useSettings';
-import { AdminLayout } from '../../../layouts/AdminLayout';
 import type {
   SystemSettings,
   SystemSettingsUpdate,
@@ -717,7 +716,7 @@ export function Settings() {
   } = useSettings();
 
   return (
-    <AdminLayout title="Settings">
+    <div className="space-y-6">
       <PageHeader
         title="System Settings"
         subtitle="Manage barangay information and administrator credentials."
@@ -790,6 +789,6 @@ export function Settings() {
           </div>
         </div>
       )}
-    </AdminLayout>
+    </div>
   );
 }

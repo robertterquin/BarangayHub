@@ -15,7 +15,6 @@ import {
   useAnnouncements,
   type AnnouncementFilters,
 } from '../../../hooks/useAnnouncements';
-import { AdminLayout } from '../../../layouts/AdminLayout';
 import type {
   Announcement,
   AnnouncementInsert,
@@ -485,7 +484,7 @@ export function Announcements() {
 
   return (
     <>
-      <AdminLayout title="Announcements">
+      <div className="space-y-6">
         <PageHeader
           title="Announcements"
           subtitle={`${count.toLocaleString()} announcements in the barangay portal`}
@@ -660,7 +659,7 @@ export function Announcements() {
             </div>
           </div>
         </TableShell>
-      </AdminLayout>
+      </div>
 
       {modal && (
         <AnnouncementModal

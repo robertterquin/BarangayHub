@@ -1,5 +1,4 @@
 import { ClipboardList, FileText, Megaphone, MessageSquare, Search, Shield } from 'lucide-react';
-import { PublicLayout } from '../../layouts/PublicLayout';
 import { PublicPageShell, PublicServiceCard } from '../../components/public';
 
 const SERVICES = [
@@ -49,7 +48,7 @@ const SERVICES = [
 
 export function SelectService() {
   return (
-    <PublicLayout>
+    <>
       <PublicPageShell
         eyebrow="Resident Services"
         title="Choose an online service"
@@ -61,6 +60,6 @@ export function SelectService() {
           ))}
         </div>
       </PublicPageShell>
-    </PublicLayout>
+    </>
   );
 }

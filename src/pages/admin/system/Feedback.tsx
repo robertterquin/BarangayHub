@@ -17,7 +17,6 @@ import {
   useFeedback,
   type FeedbackFilters,
 } from '../../../hooks/useFeedback';
-import { AdminLayout } from '../../../layouts/AdminLayout';
 import type {
   Feedback as FeedbackRecord,
   FeedbackCategory,
@@ -337,7 +336,7 @@ export function Feedback() {
 
   return (
     <>
-      <AdminLayout title="Feedback & Suggestions">
+      <div className="space-y-6">
         {error && (
           <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
             <AlertCircle
@@ -502,7 +501,7 @@ export function Feedback() {
             </div>
           </div>
         </section>
-      </AdminLayout>
+      </div>
 
       {viewFeedback && (
         <FeedbackDetailsModal

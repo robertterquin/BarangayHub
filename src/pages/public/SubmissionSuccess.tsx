@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { CheckCircle2, Clipboard, FileText, Search } from 'lucide-react';
-import { PublicLayout } from '../../layouts/PublicLayout';
 import { PublicPageShell } from '../../components/public';
 
 interface SubmissionState {
@@ -27,7 +26,7 @@ export function SubmissionSuccess() {
   }
 
   return (
-    <PublicLayout>
+    <>
       <PublicPageShell
         eyebrow="Submission Complete"
         title={isComplaint ? 'Your complaint has been recorded' : 'Your request has been recorded'}
@@ -118,7 +117,7 @@ export function SubmissionSuccess() {
           </div>
         </div>
       </PublicPageShell>
-    </PublicLayout>
+    </>
   );
 }
 

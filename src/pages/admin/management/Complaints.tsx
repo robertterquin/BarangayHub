@@ -3,7 +3,6 @@ import { AlertCircle, Paperclip, RefreshCw, UserRoundCheck } from 'lucide-react'
 import { ActionGroup, DetailField, FilterBar, StatusBadge } from '../../../components/admin';
 import { Button, Modal, Select, Spinner } from '../../../components/ui';
 import { useComplaints, type ComplaintFilters } from '../../../hooks/useComplaints';
-import { AdminLayout } from '../../../layouts/AdminLayout';
 import type {
   Complaint,
   ComplaintStatus,
@@ -425,7 +424,7 @@ export function Complaints() {
 
   return (
     <>
-      <AdminLayout title="Complaints / Blotter">
+      <div className="space-y-6">
         <div className="mb-5 flex items-center justify-between">
           <h1 className="text-xl font-bold text-gray-800">Complaints / Blotter</h1>
           <span className="text-sm font-medium text-gray-500">
@@ -562,7 +561,7 @@ export function Complaints() {
             </button>
           </div>
         </div>
-      </AdminLayout>
+      </div>
 
       {viewComplaint && (
         <ComplaintViewModal

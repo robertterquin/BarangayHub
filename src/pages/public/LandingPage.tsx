@@ -21,7 +21,6 @@ import {
   Send,
   X,
 } from 'lucide-react';
-import { PublicLayout } from '../../layouts/PublicLayout';
 import { getPublishedAnnouncements } from '../../services/publicService';
 import type { Announcement } from '../../types/database';
 import { usePublicDashboardSummary } from '../../hooks/usePublicDashboardSummary';
@@ -148,7 +147,7 @@ export function LandingPage() {
   }, []);
 
   return (
-    <PublicLayout>
+    <>
       <section className="min-h-[calc(100vh-86px)] w-full bg-[#f4f7fb]">
         <div className="relative min-h-143.75 overflow-hidden bg-linear-to-br from-[#14368f] via-[#105be2] to-[#3e9cff]">
           <div
@@ -445,7 +444,7 @@ export function LandingPage() {
           </section>
         </div>
       )}
-    </PublicLayout>
+    </>
   );
 }
 
