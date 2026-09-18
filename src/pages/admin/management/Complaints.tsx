@@ -428,7 +428,10 @@ export function Complaints() {
         <div className="mb-5 flex items-center justify-between">
           <h1 className="text-xl font-bold text-gray-800">Complaints / Blotter</h1>
           <span className="text-sm font-medium text-gray-500">
-            <span className="font-bold text-red-500">{activeCount}</span> active
+            <span className={`font-bold ${activeCount > 0 ? 'text-red-500' : 'text-gray-600'}`}>
+              {activeCount}
+            </span>{' '}
+            open {activeCount === 1 ? 'case' : 'cases'}
           </span>
         </div>
 

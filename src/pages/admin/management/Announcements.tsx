@@ -487,7 +487,7 @@ export function Announcements() {
       <div className="space-y-6">
         <PageHeader
           title="Announcements"
-          subtitle={`${count.toLocaleString()} announcements in the barangay portal`}
+          subtitle={`${count.toLocaleString()} ${count === 1 ? 'announcement' : 'announcements'} in the barangay portal`}
           action={
             <Button
               onClick={() => {

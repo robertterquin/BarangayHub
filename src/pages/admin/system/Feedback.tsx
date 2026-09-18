@@ -375,7 +375,7 @@ export function Feedback() {
             </div>
 
             <span className="text-sm font-semibold text-gray-500">
-              <span className="font-extrabold text-orange-500">
+              <span className={`font-extrabold ${pendingCount > 0 ? 'text-orange-500' : 'text-gray-600'}`}>
                 {pendingCount}
               </span>{' '}
               pending review

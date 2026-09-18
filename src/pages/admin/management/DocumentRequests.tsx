@@ -318,7 +318,10 @@ export function DocumentRequests() {
           <div className="flex items-center justify-between border-b border-gray-100 px-6 pb-4 pt-5">
             <h2 className="text-base font-bold text-gray-900">Document Requests</h2>
             <span className="text-sm font-medium text-gray-500">
-              <span className="font-bold text-orange-400">{pendingCount}</span> pending
+              <span className={`font-bold ${pendingCount > 0 ? 'text-orange-500' : 'text-gray-600'}`}>
+                {pendingCount}
+              </span>{' '}
+              pending {pendingCount === 1 ? 'request' : 'requests'}
             </span>
           </div>
 
