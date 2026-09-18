@@ -344,8 +344,8 @@ export function AdminLayout({ children }: AdminLayoutProps = {}) {
           <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-4">
             {/* Clock */}
             <div className="hidden text-right sm:block">
-              <p className="text-gray-800 font-mono text-sm font-medium leading-tight">{clockStr}</p>
-              <p className="text-gray-400 text-xs leading-tight">{dateStr}</p>
+              <p className="font-mono text-sm font-bold leading-tight text-blue-600">{clockStr}</p>
+              <p className="text-xs leading-tight text-gray-400">{dateStr}</p>
             </div>
 
             {/* Notification bell */}
