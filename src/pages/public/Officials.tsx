@@ -30,7 +30,7 @@ export function PublicOfficials() {
   return (
     <>
       <PublicPageShell
-        eyebrow="Barangay Officials"
+        eyebrow="Local Government"
         title="Barangay Officials"
         description="Meet the active officials serving Barangay Daine II residents."
         icon={<Shield size={32} />}
@@ -38,9 +38,9 @@ export function PublicOfficials() {
         <section className="mx-auto max-w-6xl space-y-5">
           <div className="flex flex-col gap-3 rounded-3xl bg-white p-5 shadow-lg shadow-slate-200/80 ring-1 ring-slate-100 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-xl font-black text-slate-950">Active Barangay Officials</h2>
+              <h2 className="text-xl font-black text-slate-950">Elected & Appointed Council</h2>
               <p className="mt-1 text-sm font-semibold text-slate-400">
-                Displaying officials marked active in the admin portal.
+                Displaying leaders currently serving Barangay Daine II.
               </p>
             </div>
           </div>

@@ -125,7 +125,7 @@ export function SubmitComplaint() {
   return (
     <>
       <PublicPageShell
-        eyebrow="Submit Complaint"
+        eyebrow="Incident Reporting"
         title="Submit a Complaint"
         description="File a complaint or blotter report to the Barangay"
         icon={<ClipboardList size={32} />}

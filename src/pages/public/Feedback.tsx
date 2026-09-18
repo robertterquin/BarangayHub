@@ -139,7 +139,7 @@ export function PublicFeedback() {
   return (
     <>
       <PublicPageShell
-        eyebrow="Feedback"
+        eyebrow="Community Voices"
         title="Send feedback or suggestions"
         description="Share suggestions, commendations, concerns, and system feedback with the barangay."
         icon={<MessageSquare size={32} />}

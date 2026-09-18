@@ -178,8 +178,8 @@ export function RequestDocument() {
   return (
     <>
       <PublicPageShell
-        eyebrow="Document Requests"
-        title="Document Requests"
+        eyebrow="Online Services"
+        title="Request a Document"
         description="Request barangay certificates online - fast and convenient"
         icon={<FileText size={32} />}
       >

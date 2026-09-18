@@ -69,14 +69,14 @@ export function TrackStatus() {
   return (
     <>
       <PublicPageShell
-        eyebrow="Track Request"
+        eyebrow="Request Tracker"
         title="Track My Request"
         description="Enter your reference number to check your document request status"
         icon={<Search size={32} />}
       >
         <section className="mx-auto max-w-3xl rounded-3xl bg-white p-6 shadow-lg shadow-slate-200/80 ring-1 ring-slate-100">
           <div>
-            <h2 className="text-base font-black text-slate-950">Track Document Request</h2>
+            <h2 className="text-base font-black text-slate-950">Search by Reference Number</h2>
             <p className="mt-1 text-sm font-semibold text-slate-400">
               Enter the reference number you received after submitting your request.
             </p>

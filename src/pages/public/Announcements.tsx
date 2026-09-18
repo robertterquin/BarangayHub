@@ -15,15 +15,15 @@ export function PublicAnnouncements() {
   return (
     <>
       <PublicPageShell
-        eyebrow="Announcements"
-        title="Official barangay updates"
+        eyebrow="Public Advisories"
+        title="Official Announcements"
         description="Read published advisories, events, programs, and notices from Barangay Daine II."
         icon={<Megaphone size={32} />}
       >
         <section className="mx-auto max-w-5xl space-y-5">
           <div className="flex flex-col gap-3 rounded-3xl bg-white p-5 shadow-lg shadow-slate-200/80 ring-1 ring-slate-100 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-xl font-black text-slate-950">Latest Announcements</h2>
+              <h2 className="text-xl font-black text-slate-950">Latest Bulletins & Advisories</h2>
               <p className="mt-1 text-sm font-semibold text-slate-400">
                 Showing public announcements that are currently published.
               </p>
