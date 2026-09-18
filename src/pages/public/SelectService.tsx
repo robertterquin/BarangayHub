@@ -52,7 +52,7 @@ export function SelectService() {
       <PublicPageShell
         eyebrow="Resident Services"
         title="Choose an online service"
-        description="Select what you need today. Each service will be connected step by step in the next public portal phases."
+        description="Select the online barangay service you need today. Request documents, track status, report incidents, view advisories, and share community feedback."
       >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {SERVICES.map((service) => (
