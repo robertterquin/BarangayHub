@@ -9,12 +9,12 @@ import {
   RefreshCw,
   ScrollText,
   Settings,
-  ShieldCheck,
   Users,
 } from 'lucide-react';
 import {
   DetailField,
   FilterBar,
+  PageHeader,
   StatusBadge,
 } from '../../../components/admin';
 import { Button, Modal, Select, Spinner } from '../../../components/ui';
@@ -434,25 +434,18 @@ export function ActivityLogs() {
           </div>
         )}
 
-        <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 px-6 py-5">
-            <div>
-              <div className="flex items-center gap-2">
-                <ScrollText size={18} className="text-blue-700" />
-                <h1 className="text-base font-extrabold text-gray-950">
-                  Activity History
-                </h1>
-              </div>
-              <p className="mt-1 flex items-center gap-1.5 text-xs font-medium text-gray-400">
-                <ShieldCheck size={13} className="text-green-600" />
-                One immutable audit trail, shown as either a timeline or raw log list.
-              </p>
-            </div>
-            <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
-              {count.toLocaleString()} records
+        <PageHeader
+          title="Activity History"
+          subtitle="One immutable audit trail and operational log history for all administrative actions."
+          meta={
+            <span className="text-sm font-medium text-gray-500">
+              <span className="font-bold text-blue-600">{count.toLocaleString()}</span>{' '}
+              {count === 1 ? 'record' : 'records'}
             </span>
-          </div>
+          }
+        />
 
+        <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
           <div className="border-b border-gray-100 px-6 py-4">
             <div className="mb-4 inline-flex rounded-xl border border-gray-200 bg-gray-50 p-1">
               <button

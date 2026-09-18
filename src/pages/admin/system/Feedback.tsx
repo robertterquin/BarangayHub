@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   AlertCircle,
-  Inbox,
   Mail,
   Phone,
   RefreshCw,
@@ -10,6 +9,7 @@ import {
 import {
   DetailField,
   FilterBar,
+  PageHeader,
   StatusBadge,
 } from '../../../components/admin';
 import { Button, Modal, Select, Spinner } from '../../../components/ui';
@@ -359,29 +359,20 @@ export function Feedback() {
           </div>
         )}
 
-        <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="flex flex-col gap-3 border-b border-gray-100 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <div>
-              <div className="flex items-center gap-2">
-                <Inbox size={18} className="text-blue-700" />
-                <h1 className="text-xl font-extrabold tracking-tight text-gray-950">
-                  Received from Residents
-                </h1>
-              </div>
-              <p className="mt-1 text-sm font-medium text-gray-400">
-                Review suggestions, bug reports, and commendations from the
-                public portal.
-              </p>
-            </div>
-
-            <span className="text-sm font-semibold text-gray-500">
-              <span className={`font-extrabold ${pendingCount > 0 ? 'text-orange-500' : 'text-gray-600'}`}>
+        <PageHeader
+          title="Feedback & Suggestions"
+          subtitle="Review suggestions, bug reports, and commendations submitted from the public portal."
+          meta={
+            <span className="text-sm font-medium text-gray-500">
+              <span className={`font-bold ${pendingCount > 0 ? 'text-orange-500' : 'text-gray-600'}`}>
                 {pendingCount}
               </span>{' '}
               pending review
             </span>
-          </div>
+          }
+        />
 
+        <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
           <FilterBar
             searchValue={search}
             searchPlaceholder="Search resident, message, email, or contact..."

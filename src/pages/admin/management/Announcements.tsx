@@ -487,7 +487,13 @@ export function Announcements() {
       <div className="space-y-6">
         <PageHeader
           title="Announcements"
-          subtitle={`${count.toLocaleString()} ${count === 1 ? 'announcement' : 'announcements'} in the barangay portal`}
+          subtitle="Publish advisories, community news, and official public updates."
+          meta={
+            <span className="text-sm font-medium text-gray-500">
+              <span className="font-bold text-gray-700">{count.toLocaleString()}</span>{' '}
+              {count === 1 ? 'announcement' : 'announcements'}
+            </span>
+          }
           action={
             <Button
               onClick={() => {

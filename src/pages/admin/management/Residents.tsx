@@ -354,6 +354,12 @@ export function Residents() {
         <PageHeader
           title="Resident Management"
           subtitle="Search, add, update, and maintain resident records."
+          meta={
+            <span className="text-sm font-medium text-gray-500">
+              <span className="font-bold text-gray-700">{count.toLocaleString()}</span>{' '}
+              registered {count === 1 ? 'resident' : 'residents'}
+            </span>
+          }
           action={
             <Button
               onClick={() => {

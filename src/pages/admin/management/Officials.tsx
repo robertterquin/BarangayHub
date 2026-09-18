@@ -563,7 +563,13 @@ export function Officials() {
         <section className="space-y-5">
           <PageHeader
             title="Barangay Officials - Daine II"
-            subtitle={`${activeCount} active of ${count.toLocaleString()} registered officials`}
+            subtitle="Manage council members, barangay staff profiles, and official terms."
+            meta={
+              <span className="text-sm font-medium text-gray-500">
+                <span className="font-bold text-blue-600">{activeCount}</span> active of{' '}
+                <span className="font-bold text-gray-700">{count.toLocaleString()}</span> registered
+              </span>
+            }
             action={
               <Button
                 onClick={() => {

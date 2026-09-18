@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AlertCircle, Paperclip, RefreshCw, UserRoundCheck } from 'lucide-react';
-import { ActionGroup, DetailField, FilterBar, StatusBadge } from '../../../components/admin';
+import { ActionGroup, DetailField, FilterBar, PageHeader, StatusBadge } from '../../../components/admin';
 import { Button, Modal, Select, Spinner } from '../../../components/ui';
 import { useComplaints, type ComplaintFilters } from '../../../hooks/useComplaints';
 import type {
@@ -425,15 +425,18 @@ export function Complaints() {
   return (
     <>
       <div className="space-y-6">
-        <div className="mb-5 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-800">Complaints / Blotter</h1>
-          <span className="text-sm font-medium text-gray-500">
-            <span className={`font-bold ${activeCount > 0 ? 'text-red-500' : 'text-gray-600'}`}>
-              {activeCount}
-            </span>{' '}
-            open {activeCount === 1 ? 'case' : 'cases'}
-          </span>
-        </div>
+        <PageHeader
+          title="Complaints / Blotter"
+          subtitle="Record, investigate, and resolve barangay blotter incidents and resident disputes."
+          meta={
+            <span className="text-sm font-medium text-gray-500">
+              <span className={`font-bold ${activeCount > 0 ? 'text-red-500' : 'text-gray-600'}`}>
+                {activeCount}
+              </span>{' '}
+              open {activeCount === 1 ? 'case' : 'cases'}
+            </span>
+          }
+        />
 
         {error && (
           <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">

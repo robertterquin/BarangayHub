@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
-import { ActionGroup, DetailField, FilterBar, StatusBadge } from '../../../components/admin';
+import { ActionGroup, DetailField, FilterBar, PageHeader, StatusBadge } from '../../../components/admin';
 import {
   Button,
   Modal,
@@ -297,6 +297,19 @@ export function DocumentRequests() {
   return (
     <>
       <div className="space-y-6">
+        <PageHeader
+          title="Document Requests"
+          subtitle="Review, track, and process resident certificate and clearance requests."
+          meta={
+            <span className="text-sm font-medium text-gray-500">
+              <span className={`font-bold ${pendingCount > 0 ? 'text-orange-500' : 'text-gray-600'}`}>
+                {pendingCount}
+              </span>{' '}
+              pending {pendingCount === 1 ? 'request' : 'requests'}
+            </span>
+          }
+        />
+
         {error && (
           <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
             <AlertCircle size={18} className="mt-0.5 shrink-0 text-red-500" />
@@ -314,26 +327,14 @@ export function DocumentRequests() {
           </div>
         )}
 
-        <div className="rounded-xl border border-gray-100 bg-white shadow-sm">
-          <div className="flex items-center justify-between border-b border-gray-100 px-6 pb-4 pt-5">
-            <h2 className="text-base font-bold text-gray-900">Document Requests</h2>
-            <span className="text-sm font-medium text-gray-500">
-              <span className={`font-bold ${pendingCount > 0 ? 'text-orange-500' : 'text-gray-600'}`}>
-                {pendingCount}
-              </span>{' '}
-              pending {pendingCount === 1 ? 'request' : 'requests'}
-            </span>
-          </div>
-
-          <FilterBar
-            searchValue={search}
-            searchPlaceholder="Search by name or ref no..."
-            onSearchChange={(value) => {
-              setSearch(value);
-              setCurrentPage(1);
-            }}
-            className="mb-0 border-b border-gray-100 px-6 py-4"
-          >
+        <FilterBar
+          searchValue={search}
+          searchPlaceholder="Search by name or ref no..."
+          onSearchChange={(value) => {
+            setSearch(value);
+            setCurrentPage(1);
+          }}
+        >
             <Select
               value={typeFilter}
               onChange={(event) => {
@@ -380,7 +381,7 @@ export function DocumentRequests() {
             </button>
           </FilterBar>
 
-          <TableShell className="rounded-none border-0 shadow-none">
+          <TableShell className="rounded-2xl">
             <table className="w-full text-sm">
               <TableHeader
                 columns={[
@@ -447,33 +448,32 @@ export function DocumentRequests() {
                 )}
               </tbody>
             </table>
-          </TableShell>
 
-          <div className="flex items-center justify-between border-t border-gray-100 px-6 py-3">
-            <p className="text-xs text-gray-400">
-              Showing {displayStart}-{displayEnd} of {count.toLocaleString()} requests
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-                disabled={safePage === 1 || loading}
-                className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Previous
-              </button>
-              <span className="px-1 text-xs text-gray-500">
-                {safePage} / {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
-                disabled={safePage >= totalPages || loading}
-                className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Next
-              </button>
+            <div className="flex items-center justify-between border-t border-gray-100 px-6 py-3">
+              <p className="text-xs text-gray-400">
+                Showing {displayStart}-{displayEnd} of {count.toLocaleString()} requests
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  disabled={safePage === 1 || loading}
+                  className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Previous
+                </button>
+                <span className="px-1 text-xs text-gray-500">
+                  {safePage} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
+                  disabled={safePage >= totalPages || loading}
+                  className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Next
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
+          </TableShell>
       </div>
 
       {viewRequest && (

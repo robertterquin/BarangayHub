@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import {
   FilterBar,
+  PageHeader,
   StatusBadge,
 } from '../../../components/admin';
 import {
@@ -242,21 +243,17 @@ export function UserManagement() {
           </div>
         )}
 
-        <section className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <div className="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-base font-extrabold text-gray-950">
-                User Management
-              </h1>
-              <p className="mt-0.5 text-xs font-medium text-gray-400">
-                Manage admin profiles and account availability.
-              </p>
-            </div>
-            <span className="rounded-full bg-orange-50 px-4 py-1.5 text-xs font-extrabold text-orange-500">
-              {activeCount} Active Admin{activeCount === 1 ? '' : 's'}
+        <PageHeader
+          title="User Management"
+          subtitle="Manage administrator profiles, display names, and account availability."
+          meta={
+            <span className="text-sm font-medium text-gray-500">
+              <span className="font-bold text-orange-500">{activeCount}</span> active admin{activeCount === 1 ? '' : 's'}
             </span>
-          </div>
+          }
+        />
 
+        <section className="rounded-2xl border border-gray-200 bg-white shadow-sm">
           <div className="px-6 py-5">
             <div className="mb-5 flex flex-col gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 sm:flex-row sm:items-center">
               <ShieldCheck size={17} className="shrink-0 text-blue-600" />
