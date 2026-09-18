@@ -267,19 +267,17 @@ export function AdminLayout({ children }: AdminLayoutProps = {}) {
           </div>
         </div>
 
-        {/* Admin user */}
+        {/* Admin user card */}
         <div className="px-3 py-3 border-b border-[#2a2d35]">
-          <div className="flex items-center gap-2.5">
-            <div className="relative shrink-0">
-              <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
-                {initials}
-              </div>
-              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#1a1c23]" />
+          <div className="flex items-center gap-3 rounded-xl border border-[#8a7238]/60 bg-[#242731] px-3 py-2.5 shadow-sm">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f1b333] font-extrabold text-xs tracking-tight text-[#142340]">
+              {initials}
             </div>
-            <div className="min-w-0">
-              <p className="text-white text-sm font-semibold truncate">{displayName}</p>
-              <p className="text-gray-500 text-xs truncate">{email}</p>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-bold text-white leading-snug">{displayName}</p>
+              <p className="truncate text-xs text-gray-400 leading-snug">{email}</p>
             </div>
+            <span className="h-2 w-2 shrink-0 rounded-full bg-[#22c55e] ml-1" />
           </div>
         </div>
 
