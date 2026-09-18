@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
@@ -123,30 +123,11 @@ function NavSection({
   );
 }
 
-const ADMIN_TITLES: Record<string, string> = {
-  '/admin/dashboard': 'Dashboard',
-  '/admin/residents': 'Resident Management',
-  '/admin/document-requests': 'Document Requests',
-  '/admin/complaints': 'Complaints / Blotter',
-  '/admin/announcements': 'Announcements',
-  '/admin/officials': 'Barangay Officials',
-  '/admin/reports': 'Reports',
-  '/admin/users': 'User Management',
-  '/admin/activity-logs': 'Activity History',
-  '/admin/history': 'Activity History',
-  '/admin/feedback': 'Feedback & Suggestions',
-  '/admin/settings': 'Settings',
-};
-
 interface AdminLayoutProps {
   children?: React.ReactNode;
-  title?: string;
 }
 
-export function AdminLayout({ children, title }: AdminLayoutProps) {
-  const location = useLocation();
-  const currentTitle = title ?? ADMIN_TITLES[location.pathname] ?? 'Dashboard';
-  const [collapsed, setCollapsed] = useState(false);
+export function AdminLayout({ children }: AdminLayoutProps = {}) {
   const [time, setTime] = useState(new Date());
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState<AdminNotification[]>([]);
@@ -258,8 +239,6 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
     '/admin/document-requests': pendingRequests,
     '/admin/complaints': openComplaints,
   };
-  const sidebarCollapsed = collapsed && !mobileNavOpen;
-
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100">
       {mobileNavOpen && (
@@ -271,79 +250,64 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-70 flex flex-col border-r border-[#2a2d35] bg-[#1a1c23] transition-all duration-300 md:static md:z-auto ${
+        className={`fixed inset-y-0 left-0 z-70 flex w-60 flex-col border-r border-[#2a2d35] bg-[#1a1c23] transition-all duration-300 md:static md:z-auto ${
           mobileNavOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-        } ${
-          sidebarCollapsed ? 'w-16' : 'w-60'
         }`}
       >
         {/* Logo */}
-        <div className={`flex items-center border-b border-[#2a2d35] ${sidebarCollapsed ? 'justify-center px-2 py-3' : 'gap-3 px-3 py-4'}`}>
-          <AppLogo
-            className={`${sidebarCollapsed ? 'h-9 w-9' : 'h-11 w-11'} shrink-0`}
-          />
-          {!sidebarCollapsed && (
-            <div className="min-w-0">
-              <span className="font-bold text-white text-lg tracking-tight block">
-                Barangay<span className="text-blue-400">Hub</span>
-              </span>
-              <span className="text-gray-500 text-[10px] tracking-wide block truncate">
-                {publicSettings.locationLine}
-              </span>
-            </div>
-          )}
+        <div className="flex items-center gap-3 px-3 py-4 border-b border-[#2a2d35]">
+          <AppLogo className="h-11 w-11 shrink-0" />
+          <div className="min-w-0">
+            <span className="font-bold text-white text-lg tracking-tight block">
+              Barangay<span className="text-blue-400">Hub</span>
+            </span>
+            <span className="text-gray-500 text-[10px] tracking-wide block truncate">
+              {publicSettings.locationLine}
+            </span>
+          </div>
         </div>
 
         {/* Admin user */}
-        {!sidebarCollapsed ? (
-          <div className="px-3 py-3 border-b border-[#2a2d35]">
-            <div className="flex items-center gap-2.5">
-              <div className="relative shrink-0">
-                <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
-                  {initials}
-                </div>
-                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#1a1c23]" />
+        <div className="px-3 py-3 border-b border-[#2a2d35]">
+          <div className="flex items-center gap-2.5">
+            <div className="relative shrink-0">
+              <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                {initials}
               </div>
-              <div className="min-w-0">
-                <p className="text-white text-sm font-semibold truncate">{displayName}</p>
-                <p className="text-gray-500 text-xs truncate">{email}</p>
-              </div>
+              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#1a1c23]" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-white text-sm font-semibold truncate">{displayName}</p>
+              <p className="text-gray-500 text-xs truncate">{email}</p>
             </div>
           </div>
-        ) : (
-          <div className="flex justify-center py-3 border-b border-[#2a2d35]">
-            <div className="relative">
-              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs">{initials}</div>
-              <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-[#1a1c23]" />
-            </div>
-          </div>
-        )}
+        </div>
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
           <NavSection
             label="Main"
             items={MAIN_NAV}
-            collapsed={sidebarCollapsed}
+            collapsed={false}
             onNavigate={() => setMobileNavOpen(false)}
           />
           <NavSection
             label="Management"
             items={MANAGEMENT_NAV}
-            collapsed={sidebarCollapsed}
+            collapsed={false}
             badges={managementBadges}
             onNavigate={() => setMobileNavOpen(false)}
           />
           <NavSection
             label="Analytics"
             items={ANALYTICS_NAV}
-            collapsed={sidebarCollapsed}
+            collapsed={false}
             onNavigate={() => setMobileNavOpen(false)}
           />
           <NavSection
             label="System"
             items={SYSTEM_NAV}
-            collapsed={sidebarCollapsed}
+            collapsed={false}
             onNavigate={() => setMobileNavOpen(false)}
           />
         </nav>
@@ -355,7 +319,7 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
             className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition-colors"
           >
             <LogOut size={18} />
-            {!sidebarCollapsed && <span>Logout</span>}
+            <span>Logout</span>
           </button>
         </div>
       </aside>
@@ -364,22 +328,16 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Top Nav */}
         <header className="flex items-center justify-between border-b border-gray-200 bg-white px-3 py-3 sm:gap-4 sm:px-6 shrink-0">
-          {/* Left: hamburger + page title */}
+          {/* Left: mobile menu button */}
           <div className="flex min-w-0 items-center gap-3">
             <button
-              onClick={() => {
-                if (window.matchMedia('(max-width: 767px)').matches) {
-                  setMobileNavOpen(true);
-                  return;
-                }
-                setCollapsed(!collapsed);
-              }}
-              className="p-1.5 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors"
-              aria-label="Toggle navigation"
+              type="button"
+              onClick={() => setMobileNavOpen(true)}
+              className="p-1.5 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors md:hidden"
+              aria-label="Open navigation menu"
             >
-              <Menu size={18} />
+              <Menu size={20} />
             </button>
-            <span className="truncate text-base font-semibold text-gray-800">{currentTitle}</span>
           </div>
 
           {/* Right: clock + bell */}
