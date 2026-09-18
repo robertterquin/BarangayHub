@@ -73,7 +73,7 @@ export function PublicLayout({ children }: { children?: React.ReactNode }) {
 
           <div className="flex items-center gap-4">
             <div className="hidden text-right font-mono sm:block">
-              <p className="text-sm font-black tracking-[0.2em] text-blue-700">{formatClock(now)} PH</p>
+              <p className="text-sm font-black tracking-[0.2em] text-blue-700">{formatClock(now)}</p>
               <p className="mt-1 text-xs font-bold tracking-wide text-slate-400">{formatDate(now)}</p>
             </div>
 
