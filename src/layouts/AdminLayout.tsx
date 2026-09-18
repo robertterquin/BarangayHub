@@ -264,7 +264,7 @@ export function AdminLayout({ children, title = 'Dashboard' }: AdminLayoutProps)
         {/* Logo */}
         <div className={`flex items-center border-b border-[#2a2d35] ${sidebarCollapsed ? 'justify-center px-2 py-3' : 'gap-3 px-3 py-4'}`}>
           <AppLogo
-            className={`${sidebarCollapsed ? 'h-9 w-9' : 'h-11 w-11'} shrink-0 border-2 border-white/80 shadow-sm`}
+            className={`${sidebarCollapsed ? 'h-9 w-9' : 'h-11 w-11'} shrink-0`}
           />
           {!sidebarCollapsed && (
             <div className="min-w-0">
