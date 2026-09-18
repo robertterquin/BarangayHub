@@ -258,8 +258,7 @@ export function UserManagement() {
             <div className="mb-5 flex flex-col gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 sm:flex-row sm:items-center">
               <ShieldCheck size={17} className="shrink-0 text-blue-600" />
               <p className="flex-1 text-sm font-medium text-blue-700">
-                <span className="font-extrabold">Admin Profiles:</span> Manage existing
-                administrator profiles, display names, and account availability.
+                <span className="font-extrabold">Admin Profiles:</span> Select an administrator to modify profile details, toggle active access status, or review security permissions.
               </p>
             </div>
 
