@@ -72,7 +72,7 @@ export function TrackStatus() {
         eyebrow="Track Request"
         title="Track My Request"
         description="Enter your reference number to check your document request status"
-        icon={<Search size={24} />}
+        icon={<Search size={32} />}
       >
         <section className="mx-auto max-w-3xl rounded-3xl bg-white p-6 shadow-lg shadow-slate-200/80 ring-1 ring-slate-100">
           <div>

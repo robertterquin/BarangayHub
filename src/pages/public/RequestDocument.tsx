@@ -181,7 +181,7 @@ export function RequestDocument() {
         eyebrow="Document Requests"
         title="Document Requests"
         description="Request barangay certificates online - fast and convenient"
-        icon={<FileText size={24} />}
+        icon={<FileText size={32} />}
       >
         <div className="mx-auto max-w-4xl space-y-4">
           <section className="overflow-hidden rounded-3xl bg-white shadow-lg shadow-slate-200/80 ring-1 ring-slate-100">

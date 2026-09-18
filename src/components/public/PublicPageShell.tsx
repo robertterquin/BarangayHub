@@ -24,13 +24,13 @@ export function PublicPageShell({ eyebrow, title, description, icon, children }:
           <p className="font-mono text-xs font-black uppercase tracking-[0.35em] text-blue-50">
             {eyebrow}
           </p>
-          <div className="mt-4 flex items-start gap-3">
+          <div className="mt-4 flex items-center gap-3.5 sm:gap-4">
             {icon && (
-              <span className="mt-1 hidden text-white/90 sm:block">
+              <span className="flex shrink-0 items-center justify-center text-white/95 [&>svg]:h-8 [&>svg]:w-8 sm:[&>svg]:h-10 sm:[&>svg]:w-10">
                 {icon}
               </span>
             )}
-            <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-white drop-shadow-sm sm:text-5xl">
+            <h1 className="max-w-4xl text-3xl font-black leading-tight tracking-tight text-white drop-shadow-sm sm:text-4xl md:text-5xl">
               {title}
             </h1>
           </div>

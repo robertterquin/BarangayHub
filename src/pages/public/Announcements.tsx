@@ -18,7 +18,7 @@ export function PublicAnnouncements() {
         eyebrow="Announcements"
         title="Official barangay updates"
         description="Read published advisories, events, programs, and notices from Barangay Daine II."
-        icon={<Megaphone size={24} />}
+        icon={<Megaphone size={32} />}
       >
         <section className="mx-auto max-w-5xl space-y-5">
           <div className="flex flex-col gap-3 rounded-3xl bg-white p-5 shadow-lg shadow-slate-200/80 ring-1 ring-slate-100 sm:flex-row sm:items-center sm:justify-between">

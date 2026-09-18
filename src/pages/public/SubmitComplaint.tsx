@@ -128,7 +128,7 @@ export function SubmitComplaint() {
         eyebrow="Submit Complaint"
         title="Submit a Complaint"
         description="File a complaint or blotter report to the Barangay"
-        icon={<ClipboardList size={24} />}
+        icon={<ClipboardList size={32} />}
       >
         <form
           onSubmit={(event) => void handleSubmit(event)}

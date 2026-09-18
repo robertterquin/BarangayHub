@@ -33,7 +33,7 @@ export function PublicOfficials() {
         eyebrow="Barangay Officials"
         title="Barangay Officials"
         description="Meet the active officials serving Barangay Daine II residents."
-        icon={<Shield size={24} />}
+        icon={<Shield size={32} />}
       >
         <section className="mx-auto max-w-6xl space-y-5">
           <div className="flex flex-col gap-3 rounded-3xl bg-white p-5 shadow-lg shadow-slate-200/80 ring-1 ring-slate-100 sm:flex-row sm:items-center sm:justify-between">

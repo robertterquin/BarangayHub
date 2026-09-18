@@ -142,7 +142,7 @@ export function PublicFeedback() {
         eyebrow="Feedback"
         title="Send feedback or suggestions"
         description="Share suggestions, commendations, concerns, and system feedback with the barangay."
-        icon={<MessageSquare size={24} />}
+        icon={<MessageSquare size={32} />}
       >
         <section className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <aside className="space-y-4">

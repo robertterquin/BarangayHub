@@ -1,4 +1,4 @@
-import { ClipboardList, FileText, Megaphone, MessageSquare, Search, Shield } from 'lucide-react';
+import { ClipboardList, FileText, LayoutGrid, Megaphone, MessageSquare, Search, Shield } from 'lucide-react';
 import { PublicPageShell, PublicServiceCard } from '../../components/public';
 
 const SERVICES = [
@@ -53,6 +53,7 @@ export function SelectService() {
         eyebrow="Resident Services"
         title="Choose an online service"
         description="Select the online barangay service you need today. Request documents, track status, report incidents, view advisories, and share community feedback."
+        icon={<LayoutGrid size={32} />}
       >
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {SERVICES.map((service) => (
