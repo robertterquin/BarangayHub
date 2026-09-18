@@ -21,10 +21,19 @@ export interface PublicSystemSettingsView {
   systemVersion: string;
 }
 
+function normalizeBarangayName(name: string): string {
+  return name
+    .replace(/\bIl\b/g, 'II')
+    .replace(/\bIL\b/g, 'II')
+    .replace(/\b11\b/g, 'II')
+    .replace(/\bll\b/g, 'II');
+}
+
 function toPublicView(settings: SystemSettings | null): PublicSystemSettingsView {
   if (!settings) return DEFAULT_SETTINGS;
 
-  const barangayName = settings.barangay_name || DEFAULT_SETTINGS.barangayName;
+  const rawBarangayName = settings.barangay_name || DEFAULT_SETTINGS.barangayName;
+  const barangayName = normalizeBarangayName(rawBarangayName);
   const municipality = settings.municipality || 'Indang';
   const province = settings.province || 'Cavite';
 

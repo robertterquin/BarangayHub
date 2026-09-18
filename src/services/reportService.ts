@@ -1,4 +1,7 @@
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { supabase } from './supabase';
+import { formatDate } from '../utils/formatters';
 import type {
   CivilStatusType,
   Complaint,
@@ -258,135 +261,334 @@ export async function getReportsSnapshot(
   };
 }
 
-function escapeCsv(value: string | number | boolean | null): string {
-  const rawText = value === null ? '' : String(value);
-  const text = /^[=+\-@\t\r]/.test(rawText) ? `'${rawText}` : rawText;
-  return `"${text.replaceAll('"', '""')}"`;
+function normalizeBarangayName(name: string): string {
+  return name
+    .replace(/\bIl\b/g, 'II')
+    .replace(/\bIL\b/g, 'II')
+    .replace(/\b11\b/g, 'II')
+    .replace(/\bll\b/g, 'II');
 }
 
-function createCsv(headers: string[], rows: (string | number | boolean | null)[][]) {
-  return [
-    headers.map(escapeCsv).join(','),
-    ...rows.map((row) => row.map(escapeCsv).join(',')),
-  ].join('\r\n');
-}
+function addReportHeader(
+  doc: jsPDF,
+  title: string,
+  snapshot: ReportsSnapshot,
+  subtitle?: string
+): number {
+  const rawBarangay = snapshot.settings?.barangay_name ?? 'Daine II';
+  const barangay = normalizeBarangayName(rawBarangay);
+  const municipality = snapshot.settings?.municipality ?? 'Indang';
+  const province = snapshot.settings?.province ?? 'Cavite';
+  const pageWidth = doc.internal.pageSize.getWidth();
 
-function downloadCsv(fileName: string, csv: string) {
-  const blob = new Blob([`\uFEFF${csv}`], {
-    type: 'text/csv;charset=utf-8',
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(100, 116, 139);
+  doc.text('REPUBLIC OF THE PHILIPPINES', pageWidth / 2, 12, { align: 'center' });
+  doc.text(
+    `PROVINCE OF ${province.toUpperCase()} · MUNICIPALITY OF ${municipality.toUpperCase()}`,
+    pageWidth / 2,
+    16.5,
+    { align: 'center' }
+  );
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(30, 41, 59);
+  doc.text(`BARANGAY ${barangay.toUpperCase()}`, pageWidth / 2, 22, { align: 'center' });
+
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100, 116, 139);
+  doc.text('BARANGAY MANAGEMENT INFORMATION SYSTEM (BMIS)', pageWidth / 2, 26.5, { align: 'center' });
+
+  doc.setDrawColor(203, 213, 225);
+  doc.setLineWidth(0.4);
+  doc.line(14, 29.5, pageWidth - 14, 29.5);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(29, 78, 216);
+  doc.text(title.toUpperCase(), 14, 36);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(100, 116, 139);
+  const genDate = new Date(snapshot.generatedAt).toLocaleString('en-PH', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = fileName;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
+  doc.text(`Reporting Year: ${snapshot.year}   |   Generated: ${genDate}   |   System: BarangayHub`, 14, 41);
+
+  if (subtitle) {
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(8);
+    doc.setTextColor(71, 85, 105);
+    doc.text(subtitle, 14, 46);
+    return 50;
+  }
+
+  return 45;
+}
+
+function addReportFooter(doc: jsPDF) {
+  const pageCount = doc.getNumberOfPages();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(148, 163, 184);
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.3);
+    doc.line(14, pageHeight - 11, pageWidth - 14, pageHeight - 11);
+    doc.text('BarangayHub - Official Digital Management Information System', 14, pageHeight - 7);
+    doc.text(`Page ${i} of ${pageCount}`, pageWidth - 14, pageHeight - 7, { align: 'right' });
+  }
+}
+
+function getLastAutoTableY(doc: jsPDF, fallback: number): number {
+  const lastTable = (doc as unknown as { lastAutoTable?: { finalY?: number } }).lastAutoTable;
+  return lastTable?.finalY ?? fallback;
+}
+
+function generateMonthlyDocumentsPdf(snapshot: ReportsSnapshot): { doc: jsPDF; rowCount: number } {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const startY = addReportHeader(
+    doc,
+    'Monthly Document Issuance Report',
+    snapshot,
+    `Total Requests: ${snapshot.totals.documentRequests.toLocaleString()}   |   Completed: ${snapshot.totals.completedRequests.toLocaleString()}`
+  );
+
+  const tableBody = snapshot.monthlyDocuments.map((row) => [
+    row.month,
+    row.requested.toLocaleString(),
+    row.completed.toLocaleString(),
+    row.rejected.toLocaleString(),
+    row.requested > 0 ? `${Math.round((row.completed / row.requested) * 100)}%` : '0%',
+  ]);
+
+  const totalRejected = snapshot.monthlyDocuments.reduce((sum, r) => sum + r.rejected, 0);
+  const totalRate =
+    snapshot.totals.documentRequests > 0
+      ? `${Math.round((snapshot.totals.completedRequests / snapshot.totals.documentRequests) * 100)}%`
+      : '0%';
+
+  autoTable(doc, {
+    startY,
+    head: [['Month', 'Requested', 'Completed', 'Rejected', 'Completion Rate']],
+    body: tableBody,
+    foot: [
+      [
+        'Annual Total',
+        snapshot.totals.documentRequests.toLocaleString(),
+        snapshot.totals.completedRequests.toLocaleString(),
+        totalRejected.toLocaleString(),
+        totalRate,
+      ],
+    ],
+    theme: 'grid',
+    headStyles: { fillColor: [29, 78, 216], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
+    footStyles: { fillColor: [241, 245, 249], textColor: [15, 23, 42], fontStyle: 'bold', fontSize: 9 },
+    bodyStyles: { fontSize: 8.5, textColor: [51, 65, 85] },
+    alternateRowStyles: { fillColor: [248, 250, 252] },
+    margin: { left: 14, right: 14 },
+  });
+
+  addReportFooter(doc);
+  return { doc, rowCount: snapshot.monthlyDocuments.length };
+}
+
+function generateResidentCensusPdf(snapshot: ReportsSnapshot): { doc: jsPDF; rowCount: number } {
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  const startY = addReportHeader(
+    doc,
+    'Resident Census & Demographics Report',
+    snapshot,
+    `Total Registered Residents: ${snapshot.residents.length.toLocaleString()}   |   Registered Voters: ${snapshot.totals.registeredVoters.toLocaleString()}`
+  );
+
+  const tableBody =
+    snapshot.residents.length > 0
+      ? snapshot.residents.map((resident) => [
+          resident.reference_id,
+          resident.full_name,
+          GENDER_LABELS[resident.gender] ?? resident.gender,
+          resident.birthdate,
+          CIVIL_STATUS_LABELS[resident.civil_status] ?? resident.civil_status,
+          resident.purok,
+          resident.contact_number || 'N/A',
+          resident.is_voter ? 'Voter' : 'Non-Voter',
+        ])
+      : [['No resident records found.', '', '', '', '', '', '', '']];
+
+  autoTable(doc, {
+    startY,
+    head: [['Reference ID', 'Full Name', 'Gender', 'Birthdate', 'Civil Status', 'Purok', 'Contact No.', 'Voter Status']],
+    body: tableBody,
+    theme: 'grid',
+    headStyles: { fillColor: [22, 101, 52], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
+    bodyStyles: { fontSize: 8, textColor: [51, 65, 85] },
+    alternateRowStyles: { fillColor: [248, 250, 252] },
+    margin: { left: 14, right: 14 },
+  });
+
+  addReportFooter(doc);
+  return { doc, rowCount: snapshot.residents.length };
+}
+
+function generateComplaintsBlotterPdf(snapshot: ReportsSnapshot): { doc: jsPDF; rowCount: number } {
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  const startY = addReportHeader(
+    doc,
+    'Complaints & Blotter Log',
+    snapshot,
+    `Total Complaints: ${snapshot.totals.complaints.toLocaleString()}   |   Resolved: ${snapshot.totals.resolvedComplaints.toLocaleString()}`
+  );
+
+  const tableBody =
+    snapshot.complaints.length > 0
+      ? snapshot.complaints.map((complaint) => [
+          complaint.reference_id,
+          complaint.submitted_at ? formatDate(complaint.submitted_at) : 'N/A',
+          complaint.title,
+          complaint.complainant_name,
+          complaint.respondent_name || 'N/A',
+          complaint.purok,
+          URGENCY_LABELS[complaint.urgency] ?? complaint.urgency,
+          COMPLAINT_STATUS_LABELS[complaint.status] ?? complaint.status,
+        ])
+      : [['No complaints or blotter records filed for this period.', '', '', '', '', '', '', '']];
+
+  autoTable(doc, {
+    startY,
+    head: [['Reference ID', 'Date Filed', 'Title / Concern', 'Complainant', 'Respondent', 'Purok', 'Urgency', 'Status']],
+    body: tableBody,
+    theme: 'grid',
+    headStyles: { fillColor: [185, 28, 28], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
+    bodyStyles: { fontSize: 8, textColor: [51, 65, 85] },
+    alternateRowStyles: { fillColor: [248, 250, 252] },
+    margin: { left: 14, right: 14 },
+  });
+
+  addReportFooter(doc);
+  return { doc, rowCount: snapshot.complaints.length };
+}
+
+function generateAnnualSummaryPdf(snapshot: ReportsSnapshot): { doc: jsPDF; rowCount: number } {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const startY = addReportHeader(
+    doc,
+    'Annual Barangay MIS Consolidated Summary',
+    snapshot,
+    `Consolidated performance indicators and MIS analytics for Calendar Year ${snapshot.year}`
+  );
+
+  // Table 1: Key MIS Totals
+  autoTable(doc, {
+    startY,
+    head: [['Key Indicator', 'Metric Value']],
+    body: [
+      ['Total Resident Population', snapshot.totals.residents.toLocaleString()],
+      ['Registered Voters', snapshot.totals.registeredVoters.toLocaleString()],
+      ['Total Document Requests Received', snapshot.totals.documentRequests.toLocaleString()],
+      ['Documents Processed & Completed', snapshot.totals.completedRequests.toLocaleString()],
+      [
+        'Document Completion Efficiency',
+        snapshot.totals.documentRequests > 0
+          ? `${Math.round((snapshot.totals.completedRequests / snapshot.totals.documentRequests) * 100)}%`
+          : '0%',
+      ],
+      ['Complaints & Blotters Filed', snapshot.totals.complaints.toLocaleString()],
+      ['Complaints Resolved', snapshot.totals.resolvedComplaints.toLocaleString()],
+      [
+        'Complaint Resolution Rate',
+        snapshot.totals.complaints > 0
+          ? `${Math.round((snapshot.totals.resolvedComplaints / snapshot.totals.complaints) * 100)}%`
+          : '0%',
+      ],
+    ],
+    theme: 'grid',
+    headStyles: { fillColor: [180, 83, 9], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
+    bodyStyles: { fontSize: 8.5, textColor: [51, 65, 85] },
+    margin: { left: 14, right: 14 },
+  });
+
+  // Table 2: Document Breakdown
+  const table1EndY = getLastAutoTableY(doc, startY + 50);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(30, 41, 59);
+  doc.text('Document Requests Breakdown by Type', 14, table1EndY + 7);
+
+  autoTable(doc, {
+    startY: table1EndY + 9,
+    head: [['Document Classification', 'Volume Issued']],
+    body: snapshot.documentsByType.map((item) => [item.label, item.value.toLocaleString()]),
+    theme: 'grid',
+    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8.5 },
+    bodyStyles: { fontSize: 8, textColor: [51, 65, 85] },
+    margin: { left: 14, right: 14 },
+  });
+
+  // Table 3: Purok Distribution
+  const table2EndY = getLastAutoTableY(doc, table1EndY + 40);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(30, 41, 59);
+  doc.text('Population Distribution by Purok', 14, table2EndY + 7);
+
+  autoTable(doc, {
+    startY: table2EndY + 9,
+    head: [['Purok', 'Registered Residents']],
+    body: snapshot.residentsByPurok.map((item) => [item.label, item.value.toLocaleString()]),
+    theme: 'grid',
+    headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8.5 },
+    bodyStyles: { fontSize: 8, textColor: [51, 65, 85] },
+    margin: { left: 14, right: 14 },
+  });
+
+  addReportFooter(doc);
+  return { doc, rowCount: 8 + snapshot.documentsByType.length + snapshot.residentsByPurok.length };
 }
 
 export async function downloadReport(
   reportId: ReportId,
   snapshot: ReportsSnapshot
 ): Promise<{ data: ReportDownload | null; error: unknown }> {
-  const barangay = snapshot.settings?.barangay_name ?? 'barangay';
+  const rawBarangay = snapshot.settings?.barangay_name ?? 'Daine II';
+  const barangay = normalizeBarangayName(rawBarangay);
   const prefix = barangay.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   let fileName: string;
-  let csv: string;
+  let doc: jsPDF;
   let rowCount: number;
 
   if (reportId === 'monthly-documents') {
-    fileName = `${prefix}-${snapshot.year}-monthly-documents.csv`;
-    rowCount = snapshot.monthlyDocuments.length;
-    csv = createCsv(
-      ['Month', 'Requested', 'Completed', 'Rejected'],
-      snapshot.monthlyDocuments.map((row) => [
-        row.month,
-        row.requested,
-        row.completed,
-        row.rejected,
-      ])
-    );
+    fileName = `${prefix}-${snapshot.year}-monthly-documents.pdf`;
+    const result = generateMonthlyDocumentsPdf(snapshot);
+    doc = result.doc;
+    rowCount = result.rowCount;
   } else if (reportId === 'resident-census') {
-    fileName = `${prefix}-resident-census.csv`;
-    rowCount = snapshot.residents.length;
-    csv = createCsv(
-      [
-        'Reference ID',
-        'Full Name',
-        'Gender',
-        'Birthdate',
-        'Civil Status',
-        'Address',
-        'Purok',
-        'Contact Number',
-        'Citizenship',
-        'Registered Voter',
-      ],
-      snapshot.residents.map((resident) => [
-        resident.reference_id,
-        resident.full_name,
-        GENDER_LABELS[resident.gender],
-        resident.birthdate,
-        CIVIL_STATUS_LABELS[resident.civil_status],
-        resident.address,
-        resident.purok,
-        resident.contact_number,
-        resident.citizenship,
-        resident.is_voter,
-      ])
-    );
+    fileName = `${prefix}-resident-census.pdf`;
+    const result = generateResidentCensusPdf(snapshot);
+    doc = result.doc;
+    rowCount = result.rowCount;
   } else if (reportId === 'complaints-blotter') {
-    fileName = `${prefix}-${snapshot.year}-complaints-blotter.csv`;
-    rowCount = snapshot.complaints.length;
-    csv = createCsv(
-      [
-        'Reference ID',
-        'Date Submitted',
-        'Title',
-        'Complainant',
-        'Respondent',
-        'Purok',
-        'Incident Date',
-        'Incident Location',
-        'Urgency',
-        'Status',
-        'Resolution Notes',
-      ],
-      snapshot.complaints.map((complaint) => [
-        complaint.reference_id,
-        complaint.submitted_at,
-        complaint.title,
-        complaint.complainant_name,
-        complaint.respondent_name,
-        complaint.purok,
-        complaint.incident_date,
-        complaint.incident_location,
-        URGENCY_LABELS[complaint.urgency],
-        COMPLAINT_STATUS_LABELS[complaint.status],
-        complaint.resolution_notes,
-      ])
-    );
+    fileName = `${prefix}-${snapshot.year}-complaints-blotter.pdf`;
+    const result = generateComplaintsBlotterPdf(snapshot);
+    doc = result.doc;
+    rowCount = result.rowCount;
   } else {
-    fileName = `${prefix}-${snapshot.year}-annual-summary.csv`;
-    const rows: (string | number)[][] = [
-      ['Total Residents', snapshot.totals.residents],
-      ['Registered Voters', snapshot.totals.registeredVoters],
-      ['Document Requests', snapshot.totals.documentRequests],
-      ['Completed Requests', snapshot.totals.completedRequests],
-      ['Complaints Filed', snapshot.totals.complaints],
-      ['Resolved Complaints', snapshot.totals.resolvedComplaints],
-      ...snapshot.documentsByType.map((row) => [
-        `Documents - ${row.label}`,
-        row.value,
-      ]),
-      ...snapshot.complaintsByStatus.map((row) => [
-        `Complaints - ${row.label}`,
-        row.value,
-      ]),
-    ];
-    rowCount = rows.length;
-    csv = createCsv(['Metric', 'Value'], rows);
+    fileName = `${prefix}-${snapshot.year}-annual-summary.pdf`;
+    const result = generateAnnualSummaryPdf(snapshot);
+    doc = result.doc;
+    rowCount = result.rowCount;
   }
 
   const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -400,7 +602,7 @@ export async function downloadReport(
   const { error: logError } = await supabase.from('activity_logs').insert({
     admin_id: authData.user.id,
     admin_email: authData.user.email,
-    action: `Generated ${reportId.replaceAll('-', ' ')} report`,
+    action: `Generated ${reportId.replaceAll('-', ' ')} PDF report`,
     entity_type: 'reports',
     entity_id: null,
     log_type: 'system',
@@ -409,10 +611,11 @@ export async function downloadReport(
       reporting_year: snapshot.year,
       file_name: fileName,
       row_count: rowCount,
+      format: 'pdf',
     },
   });
   if (logError) return { data: null, error: logError };
 
-  downloadCsv(fileName, csv);
+  doc.save(fileName);
   return { data: { fileName, rowCount }, error: null };
 }

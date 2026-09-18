@@ -18,8 +18,8 @@ export function ReportCard({
   icon,
   accent,
   metric,
-  formatLabel = 'CSV',
-  actionLabel = 'Download CSV',
+  formatLabel = 'PDF',
+  actionLabel = 'Download PDF',
   disabled = false,
   onDownload,
 }: ReportCardProps) {

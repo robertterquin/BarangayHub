@@ -93,7 +93,7 @@ export function Reports() {
       <section className="space-y-5">
         <PageHeader
           title="Reports & Analytics"
-          subtitle="Generate live CSV reports from the BarangayHub database."
+          subtitle="Generate live PDF reports from the BarangayHub database."
           meta={<FileBarChart size={20} className="text-blue-700" />}
         />
 
@@ -186,7 +186,7 @@ export function Reports() {
                   actionLabel={
                     exportingId === report.id
                       ? 'Generating...'
-                      : 'Download CSV'
+                      : 'Download PDF'
                   }
                   disabled={loading || !snapshot || exportingId !== null}
                   onDownload={() => void handleDownload(report)}

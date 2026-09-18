@@ -129,6 +129,14 @@ function SaveNotice({ notice }: { notice: NoticeState | null }) {
   );
 }
 
+function normalizeBarangayName(name: string): string {
+  return name
+    .replace(/\bIl\b/g, 'II')
+    .replace(/\bIL\b/g, 'II')
+    .replace(/\b11\b/g, 'II')
+    .replace(/\bll\b/g, 'II');
+}
+
 function InformationCard({
   settings,
   saving,
@@ -141,7 +149,7 @@ function InformationCard({
   ) => Promise<{ error: string | null }>;
 }) {
   const initialState: BarangayInfoState = {
-    barangayName: settings.barangay_name,
+    barangayName: normalizeBarangayName(settings.barangay_name),
     municipality: settings.municipality,
     province: settings.province,
     completeAddress: settings.complete_address,
@@ -188,7 +196,7 @@ function InformationCard({
     }
 
     const result = await onSave({
-      barangay_name: form.barangayName.trim(),
+      barangay_name: normalizeBarangayName(form.barangayName.trim()),
       municipality: form.municipality.trim(),
       province: form.province.trim(),
       complete_address: form.completeAddress.trim(),
