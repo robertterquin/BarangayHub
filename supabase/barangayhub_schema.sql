@@ -1447,10 +1447,9 @@ drop policy if exists "Public can upload complaint attachments" on storage.objec
 create policy "Public can upload complaint attachments"
 on storage.objects
 for insert
-to anon
+to anon, authenticated
 with check (
   bucket_id = 'complaint-attachments'
-  and lower(storage.extension(name)) in ('jpg', 'jpeg', 'png', 'webp', 'pdf')
 );
 
 drop policy if exists "Admin can read complaint attachments" on storage.objects;
