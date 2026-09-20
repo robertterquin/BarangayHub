@@ -565,9 +565,9 @@ export function Officials() {
             title="Barangay Officials - Daine II"
             subtitle="Manage council members, barangay staff profiles, and official terms."
             meta={
-              <span className="text-sm font-medium text-gray-500">
-                <span className="font-bold text-blue-600">{activeCount}</span> active of{' '}
-                <span className="font-bold text-gray-700">{count.toLocaleString()}</span> registered
+              <span className="text-xs font-semibold text-gray-500">
+                <span className="font-extrabold text-blue-600">{activeCount}</span> active /{' '}
+                <span className="font-extrabold text-gray-800">{count.toLocaleString()}</span> total officials
               </span>
             }
             action={
