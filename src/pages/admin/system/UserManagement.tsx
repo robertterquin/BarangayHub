@@ -280,7 +280,8 @@ export function UserManagement() {
                   setStatusFilter(event.target.value as AccountStatus | '');
                   setCurrentPage(1);
                 }}
-                className="min-w-36 border-gray-200 py-2"
+                containerClassName="w-full sm:w-auto"
+                className="w-full border-gray-200 py-2 sm:min-w-36"
               >
                 <option value="">All Status</option>
                 <option value="active">Active</option>
@@ -386,7 +387,7 @@ export function UserManagement() {
                 >
                   Previous
                 </button>
-                <span className="px-1 text-xs text-gray-500">
+                <span className="px-1 text-xs text-gray-500 whitespace-nowrap shrink-0">
                   {safePage} / {totalPages}
                 </span>
                 <button

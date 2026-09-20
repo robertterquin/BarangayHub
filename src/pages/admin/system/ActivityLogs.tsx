@@ -490,7 +490,8 @@ export function ActivityLogs() {
                   setLogType(event.target.value as LogType | '');
                   setCurrentPage(1);
                 }}
-                className="min-w-36 border-gray-200 py-2"
+                containerClassName="w-full sm:w-auto"
+                className="w-full border-gray-200 py-2 sm:min-w-36"
               >
                 <option value="">All Event Types</option>
                 {LOG_TYPES.map((type) => (
@@ -545,7 +546,7 @@ export function ActivityLogs() {
               >
                 Previous
               </button>
-              <span className="text-xs font-medium text-gray-400">
+              <span className="text-xs font-medium text-gray-400 whitespace-nowrap shrink-0">
                 Page {safePage} of {totalPages}
               </span>
               <button

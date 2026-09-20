@@ -394,7 +394,8 @@ export function Feedback() {
                 );
                 setCurrentPage(1);
               }}
-              className="min-w-40 border-gray-200 py-2"
+              containerClassName="flex-1 min-w-[140px] sm:flex-initial sm:w-auto"
+              className="w-full border-gray-200 py-2 sm:min-w-40"
             >
               <option value="">All Categories</option>
               {CATEGORY_OPTIONS.map((category) => (
@@ -410,7 +411,8 @@ export function Feedback() {
                 setStatusFilter(event.target.value as FeedbackStatus | '');
                 setCurrentPage(1);
               }}
-              className="min-w-40 border-gray-200 py-2"
+              containerClassName="flex-1 min-w-[140px] sm:flex-initial sm:w-auto"
+              className="w-full border-gray-200 py-2 sm:min-w-40"
             >
               <option value="">All Statuses</option>
               {STATUS_OPTIONS.map((status) => (
@@ -464,7 +466,7 @@ export function Feedback() {
               >
                 Previous
               </button>
-              <span className="px-1 text-xs text-gray-500">
+              <span className="px-1 text-xs text-gray-500 whitespace-nowrap shrink-0">
                 {safePage} / {totalPages}
               </span>
               <button

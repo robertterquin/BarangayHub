@@ -474,7 +474,8 @@ export function Complaints() {
               setStatusFilter(event.target.value as ComplaintStatus | '');
               setCurrentPage(1);
             }}
-            className="min-w-36 border-gray-200 py-2"
+            containerClassName="flex-1 min-w-[140px] sm:flex-initial sm:w-auto"
+            className="w-full border-gray-200 py-2 sm:min-w-36"
           >
             <option value="">All Status</option>
             {STATUS_OPTIONS.map((status) => (
@@ -490,7 +491,8 @@ export function Complaints() {
               setUrgencyFilter(event.target.value as UrgencyLevel | '');
               setCurrentPage(1);
             }}
-            className="min-w-36 border-gray-200 py-2"
+            containerClassName="flex-1 min-w-[140px] sm:flex-initial sm:w-auto"
+            className="w-full border-gray-200 py-2 sm:min-w-36"
           >
             <option value="">All Urgency</option>
             {URGENCY_OPTIONS.map((urgency) => (
@@ -546,7 +548,7 @@ export function Complaints() {
             >
               Previous
             </button>
-            <span className="px-1 text-xs text-gray-500">
+            <span className="px-1 text-xs text-gray-500 whitespace-nowrap shrink-0">
               {safePage} / {totalPages}
             </span>
             <button

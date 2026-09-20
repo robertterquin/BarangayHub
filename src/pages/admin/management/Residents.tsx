@@ -397,7 +397,8 @@ export function Residents() {
           <Select
             value={purokFilter}
             onChange={(event) => updateFilter(setPurokFilter, event.target.value)}
-            className="min-w-36 border-gray-200 py-2"
+            containerClassName="flex-1 min-w-[140px] sm:flex-initial sm:w-auto"
+            className="w-full border-gray-200 py-2 sm:min-w-36"
           >
             <option value="">All Puroks</option>
             {PUROKS.map((purok) => <option key={purok} value={purok}>{purok}</option>)}
@@ -408,7 +409,8 @@ export function Residents() {
               setGenderFilter(event.target.value as GenderType | '');
               setCurrentPage(1);
             }}
-            className="min-w-36 border-gray-200 py-2"
+            containerClassName="flex-1 min-w-[140px] sm:flex-initial sm:w-auto"
+            className="w-full border-gray-200 py-2 sm:min-w-36"
           >
             <option value="">All Gender</option>
             <option value="male">Male</option>
@@ -420,7 +422,8 @@ export function Residents() {
               setVoterFilter(event.target.value as ResidentFilters['voterStatus']);
               setCurrentPage(1);
             }}
-            className="min-w-40 border-gray-200 py-2"
+            containerClassName="w-full sm:w-auto"
+            className="w-full border-gray-200 py-2 sm:min-w-40"
           >
             <option value="">All Voter Status</option>
             <option value="voter">Voter</option>
@@ -494,7 +497,7 @@ export function Residents() {
               Showing {displayStart}-{displayEnd} of {count.toLocaleString()} residents
             </span>
             <div className="flex items-center gap-2">
-              <span className="mr-1 text-xs font-medium text-gray-400">
+              <span className="mr-1 text-xs font-medium text-gray-400 whitespace-nowrap shrink-0">
                 Page {currentPage} of {totalPages}
               </span>
               <button

@@ -544,7 +544,8 @@ export function Announcements() {
               setStatusFilter(event.target.value as AnnouncementStatus | '');
               setCurrentPage(1);
             }}
-            className="min-w-40 border-gray-200 py-2"
+            containerClassName="w-full sm:w-auto"
+            className="w-full border-gray-200 py-2 sm:min-w-40"
           >
             <option value="">All Status</option>
             {STATUS_OPTIONS.map((status) => (
@@ -644,7 +645,7 @@ export function Announcements() {
               >
                 Previous
               </button>
-              <span className="text-xs font-medium text-gray-400">
+              <span className="text-xs font-medium text-gray-400 whitespace-nowrap shrink-0">
                 Page {safePage} of {totalPages}
               </span>
               <button
