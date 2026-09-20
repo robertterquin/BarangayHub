@@ -3,7 +3,6 @@ import {
   AlertCircle,
   AlertTriangle,
   Building2,
-  FileBarChart,
   FileText,
   RefreshCw,
   Users,
@@ -93,7 +92,6 @@ export function Reports() {
         <PageHeader
           title="Reports & Analytics"
           subtitle="Generate live PDF reports from the BarangayHub database."
-          meta={<FileBarChart size={20} className="text-blue-700" />}
         />
 
         <div className="flex items-end justify-between gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
