@@ -96,7 +96,7 @@ export function Reports() {
           meta={<FileBarChart size={20} className="text-blue-700" />}
         />
 
-        <div className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex items-end justify-between gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
           <Select
             label="Reporting Year"
             value={year}
@@ -105,7 +105,7 @@ export function Reports() {
               setYear(Number(event.target.value));
               setDownloadNotice(null);
             }}
-            containerClassName="w-full sm:w-52"
+            containerClassName="w-48 sm:w-52"
           >
             {YEAR_OPTIONS.map((option) => (
               <option key={option} value={option}>
@@ -113,15 +113,15 @@ export function Reports() {
               </option>
             ))}
           </Select>
-          <Button
+          <button
             type="button"
-            variant="secondary"
-            disabled={loading}
             onClick={() => void refresh()}
+            disabled={loading}
+            className="rounded-lg border border-gray-200 bg-white p-2 text-gray-500 shadow-sm transition-colors hover:border-blue-300 hover:text-blue-600 disabled:opacity-50"
+            aria-label="Refresh reports"
           >
-            <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
-            Refresh Reports
-          </Button>
+            <RefreshCw size={17} className={loading ? 'animate-spin' : ''} />
+          </button>
         </div>
 
         {error && (
