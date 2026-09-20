@@ -446,11 +446,11 @@ export function ActivityLogs() {
 
         <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
           <div className="border-b border-gray-100 px-6 py-4">
-            <div className="mb-4 inline-flex rounded-xl border border-gray-200 bg-gray-50 p-1">
+            <div className="mb-4 flex w-full rounded-xl border border-gray-200 bg-gray-50 p-1 sm:inline-flex sm:w-auto">
               <button
                 type="button"
                 onClick={() => setActiveView('timeline')}
-                className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
+                className={`inline-flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors sm:flex-initial ${
                   activeView === 'timeline'
                     ? 'bg-blue-700 text-white shadow-sm'
                     : 'text-gray-500 hover:text-gray-800'
@@ -462,7 +462,7 @@ export function ActivityLogs() {
               <button
                 type="button"
                 onClick={() => setActiveView('audit')}
-                className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
+                className={`inline-flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-bold transition-colors sm:flex-initial ${
                   activeView === 'audit'
                     ? 'bg-blue-700 text-white shadow-sm'
                     : 'text-gray-500 hover:text-gray-800'
