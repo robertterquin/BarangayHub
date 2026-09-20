@@ -6,7 +6,6 @@ import {
   FileText,
   ListChecks,
   Megaphone,
-  RefreshCw,
   ScrollText,
   Settings,
   Users,
@@ -481,6 +480,8 @@ export function ActivityLogs() {
                 setSearch(value);
                 setCurrentPage(1);
               }}
+              onRefresh={() => void refresh()}
+              loading={loading}
               className="mb-0"
             >
               <Select
@@ -498,15 +499,6 @@ export function ActivityLogs() {
                   </option>
                 ))}
               </Select>
-              <button
-                type="button"
-                onClick={() => void refresh()}
-                disabled={loading}
-                className="rounded-lg border border-gray-200 bg-white p-2 text-gray-500 shadow-sm transition-colors hover:border-blue-300 hover:text-blue-600 disabled:opacity-50"
-                aria-label="Refresh activity history"
-              >
-                <RefreshCw size={17} className={loading ? 'animate-spin' : ''} />
-              </button>
             </FilterBar>
           </div>
 

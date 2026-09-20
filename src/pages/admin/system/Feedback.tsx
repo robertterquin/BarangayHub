@@ -3,7 +3,6 @@ import {
   AlertCircle,
   Mail,
   Phone,
-  RefreshCw,
   UserRound,
 } from 'lucide-react';
 import {
@@ -380,6 +379,11 @@ export function Feedback() {
               setSearch(value);
               setCurrentPage(1);
             }}
+            onRefresh={() => {
+              clearError();
+              void refresh();
+            }}
+            loading={loading}
             className="mb-0 border-b border-gray-100 px-5 py-4 sm:px-6"
           >
             <Select
@@ -415,22 +419,6 @@ export function Feedback() {
                 </option>
               ))}
             </Select>
-
-            <button
-              type="button"
-              onClick={() => {
-                clearError();
-                void refresh();
-              }}
-              disabled={loading}
-              className="rounded-lg border border-gray-200 bg-white p-2 text-gray-500 shadow-sm transition-colors hover:border-blue-300 hover:text-blue-600 disabled:opacity-50"
-              aria-label="Refresh feedback"
-            >
-              <RefreshCw
-                size={17}
-                className={loading ? 'animate-spin' : ''}
-              />
-            </button>
           </FilterBar>
 
           {loading ? (

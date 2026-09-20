@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertCircle, RefreshCw, Trash2, UserPlus } from 'lucide-react';
+import { AlertCircle, Trash2, UserPlus } from 'lucide-react';
 import { DetailField, FilterBar, PageHeader, StatusBadge } from '../../../components/admin';
 import {
   Button,
@@ -391,6 +391,8 @@ export function Residents() {
           searchValue={search}
           searchPlaceholder="Search by name, ID, or purok..."
           onSearchChange={(value) => updateFilter(setSearch, value)}
+          onRefresh={() => void refresh()}
+          loading={loading}
         >
           <Select
             value={purokFilter}
@@ -424,15 +426,6 @@ export function Residents() {
             <option value="voter">Voter</option>
             <option value="non_voter">Non-Voter</option>
           </Select>
-          <button
-            type="button"
-            onClick={() => void refresh()}
-            disabled={loading}
-            className="rounded-lg border border-gray-200 bg-white p-2 text-gray-500 shadow-sm transition-colors hover:border-blue-300 hover:text-blue-600 disabled:opacity-50"
-            aria-label="Refresh residents"
-          >
-            <RefreshCw size={17} className={loading ? 'animate-spin' : ''} />
-          </button>
         </FilterBar>
 
         <TableShell>

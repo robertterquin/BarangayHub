@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertCircle, Paperclip, RefreshCw, UserRoundCheck } from 'lucide-react';
+import { AlertCircle, Paperclip, UserRoundCheck } from 'lucide-react';
 import { ActionGroup, DetailField, FilterBar, PageHeader, StatusBadge } from '../../../components/admin';
 import { Button, Modal, Select, Spinner } from '../../../components/ui';
 import { useComplaints, type ComplaintFilters } from '../../../hooks/useComplaints';
@@ -462,6 +462,11 @@ export function Complaints() {
             setSearch(value);
             setCurrentPage(1);
           }}
+          onRefresh={() => {
+            clearError();
+            void refresh();
+          }}
+          loading={loading}
         >
           <Select
             value={statusFilter}
@@ -494,19 +499,6 @@ export function Complaints() {
               </option>
             ))}
           </Select>
-
-          <button
-            type="button"
-            onClick={() => {
-              clearError();
-              void refresh();
-            }}
-            disabled={loading}
-            className="rounded-lg border border-gray-200 bg-white p-2 text-gray-500 shadow-sm transition-colors hover:border-blue-300 hover:text-blue-600 disabled:opacity-50"
-            aria-label="Refresh complaints"
-          >
-            <RefreshCw size={17} className={loading ? 'animate-spin' : ''} />
-          </button>
         </FilterBar>
 
         {loading ? (

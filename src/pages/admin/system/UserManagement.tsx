@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   AlertCircle,
-  RefreshCw,
   Settings2,
   ShieldCheck,
 } from 'lucide-react';
@@ -269,6 +268,11 @@ export function UserManagement() {
                 setSearch(value);
                 setCurrentPage(1);
               }}
+              onRefresh={() => {
+                clearError();
+                void refresh();
+              }}
+              loading={loading}
             >
               <Select
                 value={statusFilter}
@@ -282,19 +286,6 @@ export function UserManagement() {
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </Select>
-
-              <button
-                type="button"
-                onClick={() => {
-                  clearError();
-                  void refresh();
-                }}
-                disabled={loading}
-                className="rounded-lg border border-gray-200 bg-white p-2 text-gray-500 shadow-sm transition-colors hover:border-blue-300 hover:text-blue-600 disabled:opacity-50"
-                aria-label="Refresh admin accounts"
-              >
-                <RefreshCw size={17} className={loading ? 'animate-spin' : ''} />
-              </button>
             </FilterBar>
 
             <TableShell>

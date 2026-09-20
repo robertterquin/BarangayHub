@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertCircle, ImageIcon, Megaphone, RefreshCw, Trash2 } from 'lucide-react';
+import { AlertCircle, ImageIcon, Megaphone, Trash2 } from 'lucide-react';
 import { ActionGroup, FilterBar, PageHeader, StatusBadge } from '../../../components/admin';
 import {
   Button,
@@ -532,6 +532,11 @@ export function Announcements() {
             setSearch(value);
             setCurrentPage(1);
           }}
+          onRefresh={() => {
+            clearError();
+            void refresh();
+          }}
+          loading={loading}
         >
           <Select
             value={statusFilter}
@@ -548,18 +553,6 @@ export function Announcements() {
               </option>
             ))}
           </Select>
-          <button
-            type="button"
-            onClick={() => {
-              clearError();
-              void refresh();
-            }}
-            disabled={loading}
-            className="rounded-lg border border-gray-200 bg-white p-2 text-gray-500 shadow-sm transition-colors hover:border-blue-300 hover:text-blue-600 disabled:opacity-50"
-            aria-label="Refresh announcements"
-          >
-            <RefreshCw size={17} className={loading ? 'animate-spin' : ''} />
-          </button>
         </FilterBar>
 
         <TableShell className="rounded-2xl">
