@@ -26,9 +26,11 @@ const INITIAL_SNAPSHOT: DashboardSnapshot = {
 export function useDashboard() {
   const [snapshot, setSnapshot] = useState<DashboardSnapshot>(INITIAL_SNAPSHOT);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
+    setRefreshing(true);
     const { data, error: dashboardError } = await getDashboardSnapshot();
     setSnapshot(data);
     setError(
@@ -37,6 +39,7 @@ export function useDashboard() {
         : null
     );
     setLoading(false);
+    setRefreshing(false);
   }, []);
 
   useEffect(() => {
@@ -49,5 +52,5 @@ export function useDashboard() {
     return unsubscribe;
   }, [refresh]);
 
-  return { snapshot, loading, error, refresh };
+  return { snapshot, loading, refreshing, error, refresh };
 }

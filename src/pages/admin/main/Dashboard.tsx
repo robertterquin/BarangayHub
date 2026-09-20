@@ -78,7 +78,7 @@ function RecentActivityItem({ activity }: { activity: ActivityLog }) {
 }
 
 export function Dashboard() {
-  const { snapshot, loading, error, refresh } = useDashboard();
+  const { snapshot, loading, refreshing, error, refresh } = useDashboard();
   const monthLabel = new Date().toLocaleDateString('en-PH', { month: 'long', year: 'numeric' });
 
   const statCards: StatCardData[] = [
@@ -143,11 +143,11 @@ export function Dashboard() {
           <button
             type="button"
             onClick={() => void refresh()}
-            disabled={loading}
+            disabled={loading || refreshing}
             className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-600 shadow-sm transition-colors hover:border-blue-300 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-            Refresh
+            <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+            {refreshing ? 'Refreshing...' : 'Refresh'}
           </button>
         }
       />
