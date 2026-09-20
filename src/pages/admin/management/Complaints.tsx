@@ -548,8 +548,8 @@ export function Complaints() {
             >
               Previous
             </button>
-            <span className="px-1 text-xs text-gray-500 whitespace-nowrap shrink-0">
-              {safePage} / {totalPages}
+            <span className="px-1 text-xs font-medium text-gray-500 whitespace-nowrap shrink-0">
+              Page {safePage} of {totalPages}
             </span>
             <button
               type="button"

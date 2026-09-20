@@ -546,7 +546,7 @@ export function ActivityLogs() {
               >
                 Previous
               </button>
-              <span className="text-xs font-medium text-gray-400 whitespace-nowrap shrink-0">
+              <span className="text-xs font-medium text-gray-500 whitespace-nowrap shrink-0">
                 Page {safePage} of {totalPages}
               </span>
               <button

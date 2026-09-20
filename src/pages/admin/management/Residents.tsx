@@ -497,20 +497,22 @@ export function Residents() {
               Showing {displayStart}-{displayEnd} of {count.toLocaleString()} residents
             </span>
             <div className="flex items-center gap-2">
-              <span className="mr-1 text-xs font-medium text-gray-400 whitespace-nowrap shrink-0">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                disabled={currentPage === 1 || loading}
+                className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Previous
+              </button>
+              <span className="text-xs font-medium text-gray-500 whitespace-nowrap shrink-0">
                 Page {currentPage} of {totalPages}
               </span>
               <button
-                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-                disabled={currentPage === 1 || loading}
-                className="rounded border border-gray-200 px-3 py-1.5 text-xs text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                Prev
-              </button>
-              <button
+                type="button"
                 onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
                 disabled={currentPage >= totalPages || loading}
-                className="rounded border border-gray-200 px-3 py-1.5 text-xs text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
+                className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
               </button>
