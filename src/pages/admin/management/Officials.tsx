@@ -634,61 +634,90 @@ export function Officials() {
               <Spinner label="Loading barangay officials..." />
             </div>
           ) : officials.length === 0 ? (
-            <div className="rounded-xl border border-gray-200 bg-white py-16 text-center text-sm text-gray-400 shadow-sm">
-              No officials match your search.
+            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+              <div className="py-16 text-center text-sm text-gray-400">
+                No officials match your search.
+              </div>
+              <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3 sm:px-6">
+                <p className="text-xs text-gray-400">
+                  Showing {displayStart}-{displayEnd} of {count.toLocaleString()} officials
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                    disabled={safePage === 1 || loading}
+                    className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-xs font-medium text-gray-500 whitespace-nowrap shrink-0">
+                    Page {safePage} of {totalPages}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
+                    disabled={safePage >= totalPages || loading}
+                    className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-              {officials.map((official) => (
-                <OfficialCard
-                  key={official.id}
-                  official={official}
-                  saving={saving}
-                  deleting={deletingId === official.id}
-                  onEdit={() => {
-                    clearError();
-                    setModal({ mode: 'edit', official });
-                  }}
-                  onToggleStatus={() =>
-                    void editOfficial(official, {
-                      is_active: !official.is_active,
-                    })
-                  }
-                  onRemove={() => {
-                    clearError();
-                    setDeleteTarget(official);
-                  }}
-                />
-              ))}
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                {officials.map((official) => (
+                  <OfficialCard
+                    key={official.id}
+                    official={official}
+                    saving={saving}
+                    deleting={deletingId === official.id}
+                    onEdit={() => {
+                      clearError();
+                      setModal({ mode: 'edit', official });
+                    }}
+                    onToggleStatus={() =>
+                      void editOfficial(official, {
+                        is_active: !official.is_active,
+                      })
+                    }
+                    onRemove={() => {
+                      clearError();
+                      setDeleteTarget(official);
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm sm:px-6">
+                <p className="text-xs text-gray-400">
+                  Showing {displayStart}-{displayEnd} of {count.toLocaleString()} officials
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                    disabled={safePage === 1 || loading}
+                    className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-xs font-medium text-gray-500 whitespace-nowrap shrink-0">
+                    Page {safePage} of {totalPages}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
+                    disabled={safePage >= totalPages || loading}
+                    className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
             </div>
           )}
-
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-400">
-              Showing {displayStart}-{displayEnd} of {count.toLocaleString()} officials
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-                disabled={safePage === 1 || loading}
-                className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                Previous
-              </button>
-              <span className="text-xs font-medium text-gray-500 whitespace-nowrap shrink-0">
-                Page {safePage} of {totalPages}
-              </span>
-              <button
-                type="button"
-                onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
-                disabled={safePage >= totalPages || loading}
-                className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
-              >
-                Next
-              </button>
-            </div>
-          </div>
 
           <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm shadow-slate-200/70">
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">

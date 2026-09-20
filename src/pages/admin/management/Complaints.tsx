@@ -508,59 +508,88 @@ export function Complaints() {
             <Spinner label="Loading complaints..." />
           </div>
         ) : complaints.length === 0 ? (
-          <div className="rounded-xl border border-gray-200 bg-white py-16 text-center text-sm text-gray-400 shadow-sm">
-            No complaints match the selected filters.
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+            <div className="py-16 text-center text-sm text-gray-400">
+              No complaints match the selected filters.
+            </div>
+            <div className="flex items-center justify-between border-t border-gray-100 px-4 py-3 sm:px-6">
+              <p className="text-xs text-gray-400">
+                Showing {displayStart}-{displayEnd} of {count.toLocaleString()} complaints
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  disabled={safePage === 1 || loading}
+                  className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Previous
+                </button>
+                <span className="px-1 text-xs font-medium text-gray-500 whitespace-nowrap shrink-0">
+                  Page {safePage} of {totalPages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
+                  disabled={safePage >= totalPages || loading}
+                  className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {complaints.map((complaint) => (
-              <ComplaintCard
-                key={complaint.id}
-                complaint={complaint}
-                officials={officials}
-                saving={savingId === complaint.id}
-                onView={() => setViewComplaint(complaint)}
-                onAssign={() => {
-                  clearError();
-                  setAssignComplaint(complaint);
-                }}
-                onStatusChange={(status) =>
-                  void handleUpdate(complaint, getStatusUpdate(status))
-                }
-                onUrgencyChange={(urgency) =>
-                  void handleUpdate(complaint, { urgency })
-                }
-              />
-            ))}
+          <div className="space-y-4">
+            <div className="flex flex-col gap-4">
+              {complaints.map((complaint) => (
+                <ComplaintCard
+                  key={complaint.id}
+                  complaint={complaint}
+                  officials={officials}
+                  saving={savingId === complaint.id}
+                  onView={() => setViewComplaint(complaint)}
+                  onAssign={() => {
+                    clearError();
+                    setAssignComplaint(complaint);
+                  }}
+                  onStatusChange={(status) =>
+                    void handleUpdate(complaint, getStatusUpdate(status))
+                  }
+                  onUrgencyChange={(urgency) =>
+                    void handleUpdate(complaint, { urgency })
+                  }
+                />
+              ))}
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm sm:px-6">
+              <p className="text-xs text-gray-400">
+                Showing {displayStart}-{displayEnd} of {count.toLocaleString()} complaints
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                  disabled={safePage === 1 || loading}
+                  className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Previous
+                </button>
+                <span className="px-1 text-xs font-medium text-gray-500 whitespace-nowrap shrink-0">
+                  Page {safePage} of {totalPages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
+                  disabled={safePage >= totalPages || loading}
+                  className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         )}
-
-        <div className="mt-4 flex items-center justify-between">
-          <p className="text-xs text-gray-400">
-            Showing {displayStart}-{displayEnd} of {count.toLocaleString()} complaints
-          </p>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
-              disabled={safePage === 1 || loading}
-              className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Previous
-            </button>
-            <span className="px-1 text-xs font-medium text-gray-500 whitespace-nowrap shrink-0">
-              Page {safePage} of {totalPages}
-            </span>
-            <button
-              type="button"
-              onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
-              disabled={safePage >= totalPages || loading}
-              className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Next
-            </button>
-          </div>
-        </div>
       </div>
 
       {viewComplaint && (
