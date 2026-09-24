@@ -14,7 +14,7 @@ const COMPLAINT_TYPES = [
   'Theft / Robbery',
   'Drug-related Incident',
   'Vandalism',
-  'Other',
+  'Others',
 ];
 
 const PUROK_OPTIONS = ['Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5', 'Purok 6'];
@@ -25,6 +25,7 @@ interface ComplaintForm {
   complainantAddress: string;
   purok: string;
   complaintType: string;
+  customComplaintType: string;
   description: string;
   incidentDate: string;
   incidentLocation: string;
@@ -37,6 +38,7 @@ const EMPTY_FORM: ComplaintForm = {
   complainantAddress: '',
   purok: 'Purok 1',
   complaintType: '',
+  customComplaintType: '',
   description: '',
   incidentDate: '',
   incidentLocation: '',
@@ -48,6 +50,9 @@ function validateForm(form: ComplaintForm, attachment: File | null): string | nu
   if (form.complainantContact.trim().length < 7) return 'Please enter a valid contact number.';
   if (form.complainantAddress.trim().length < 5) return 'Please enter your complete address.';
   if (!form.complaintType) return 'Please select the type of complaint.';
+  if (form.complaintType === 'Others' && form.customComplaintType.trim().length < 3) {
+    return 'Please specify your complaint type (at least 3 characters).';
+  }
   if (form.description.trim().length < 10) {
     return 'Please describe the complaint in at least 10 characters.';
   }
@@ -77,7 +82,14 @@ export function SubmitComplaint() {
     field: keyof ComplaintForm,
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
-    updateField(field, event.target.value as never);
+    const value = event.target.value;
+    if (field === 'complaintType' && value !== 'Others') {
+      setForm((current) => ({ ...current, complaintType: value, customComplaintType: '' }));
+      setFormError(null);
+      clearError();
+      return;
+    }
+    updateField(field, value as never);
   }
 
   function handleAttachmentChange(event: ChangeEvent<HTMLInputElement>) {
@@ -95,8 +107,13 @@ export function SubmitComplaint() {
       return;
     }
 
+    const finalTitle =
+      form.complaintType === 'Others'
+        ? form.customComplaintType.trim()
+        : form.complaintType;
+
     const payload: SubmitComplaintPayload = {
-      title: form.complaintType,
+      title: finalTitle,
       description: form.description.trim(),
       complainantName: form.complainantName.trim(),
       respondentName: form.respondentName.trim() || null,
@@ -205,6 +222,18 @@ export function SubmitComplaint() {
                 ))}
               </Select>
             </div>
+
+            {form.complaintType === 'Others' && (
+              <Input
+                id="customComplaintType"
+                label="Specify Complaint Type"
+                requiredMark
+                value={form.customComplaintType}
+                onChange={(event) => handleInputChange('customComplaintType', event)}
+                placeholder="e.g. Stray Animals / Pets, Property Damage, Public Disturbance..."
+                autoFocus
+              />
+            )}
 
             <div className="grid gap-4 sm:grid-cols-2">
               <Input
