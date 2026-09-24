@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import {
   submitComplaint,
+  trackComplaint,
   uploadComplaintAttachment,
 } from '../services/publicService';
 import { getServiceErrorMessage } from '../services/serviceError';
-import type { SubmitComplaintPayload } from '../types/database';
+import type { SubmitComplaintPayload, TrackedComplaint } from '../types/database';
 
 export function usePublicComplaint() {
   const [submitting, setSubmitting] = useState(false);
+  const [tracking, setTracking] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function submit(payload: SubmitComplaintPayload, attachment?: File | null) {
@@ -49,14 +51,44 @@ export function usePublicComplaint() {
     return { referenceId: result.referenceId, error: null };
   }
 
+  async function track(referenceId: string) {
+    setTracking(true);
+    setError(null);
+
+    const result = await trackComplaint(referenceId);
+    setTracking(false);
+
+    if (result.error) {
+      const message = getServiceErrorMessage(
+        result.error,
+        'Unable to track this complaint right now. Please try again.'
+      );
+      setError(message);
+      return { complaint: null, error: message };
+    }
+
+    if (!result.data) {
+      const message = 'No complaint was found for this reference number.';
+      setError(message);
+      return { complaint: null, error: message };
+    }
+
+    return {
+      complaint: result.data as TrackedComplaint,
+      error: null,
+    };
+  }
+
   function clearError() {
     setError(null);
   }
 
   return {
     submitting,
+    tracking,
     error,
     submit,
+    track,
     clearError,
   };
 }

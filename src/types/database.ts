@@ -306,6 +306,18 @@ export interface TrackedDocumentRequest {
   completed_at: string | null;
 }
 
+export interface TrackedComplaint {
+  reference_id: string;
+  title: string;
+  status: ComplaintStatus;
+  incident_date: string | null;
+  incident_location: string | null;
+  resolution_notes: string | null;
+  resolved_at: string | null;
+  submitted_at: string;
+  updated_at: string;
+}
+
 export interface PublicResidentsByPurok {
   purok: string;
   residents: number;
@@ -365,6 +377,10 @@ export interface Database {
       track_document_request: {
         Args: { p_tracking_code: string };
         Returns: TrackedDocumentRequest[];
+      };
+      track_complaint: {
+        Args: { p_reference_id: string };
+        Returns: TrackedComplaint[];
       };
       submit_complaint: {
         Args: {

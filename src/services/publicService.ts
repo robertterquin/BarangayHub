@@ -41,6 +41,13 @@ export async function trackRequest(trackingCode: string) {
   return { data: data?.[0] ?? null, error };
 }
 
+export async function trackComplaint(referenceId: string) {
+  const { data, error } = await supabase.rpc('track_complaint', {
+    p_reference_id: referenceId.trim().toUpperCase(),
+  });
+  return { data: data?.[0] ?? null, error };
+}
+
 export async function uploadComplaintAttachment(file: File) {
   const path = createStoragePath(file);
   const { data, error } = await supabase.storage

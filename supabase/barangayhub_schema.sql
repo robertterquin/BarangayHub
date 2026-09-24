@@ -954,6 +954,38 @@ as $$
   limit 1;
 $$;
 
+create or replace function public.track_complaint(p_reference_id text)
+returns table (
+  reference_id text,
+  title text,
+  status public.complaint_status,
+  incident_date date,
+  incident_location text,
+  resolution_notes text,
+  resolved_at timestamptz,
+  submitted_at timestamptz,
+  updated_at timestamptz
+)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select
+    c.reference_id,
+    c.title,
+    c.status,
+    c.incident_date,
+    c.incident_location,
+    c.resolution_notes,
+    c.resolved_at,
+    c.submitted_at,
+    c.updated_at
+  from public.complaints c
+  where c.reference_id = upper(trim(p_reference_id))
+  limit 1;
+$$;
+
 create or replace function public.submit_complaint(
   p_title text,
   p_description text,
@@ -1219,6 +1251,7 @@ revoke all on function public.submit_document_request(
   public.document_type, text, text
 ) from public;
 revoke all on function public.track_document_request(text) from public;
+revoke all on function public.track_complaint(text) from public;
 revoke all on function public.submit_complaint(
   text, text, text, text, text, text, text, date, text, text
 ) from public;
@@ -1232,6 +1265,8 @@ grant execute on function public.submit_document_request(
   public.document_type, text, text
 ) to anon, authenticated;
 grant execute on function public.track_document_request(text)
+  to anon, authenticated;
+grant execute on function public.track_complaint(text)
   to anon, authenticated;
 grant execute on function public.submit_complaint(
   text, text, text, text, text, text, text, date, text, text

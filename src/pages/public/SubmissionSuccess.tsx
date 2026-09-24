@@ -81,8 +81,8 @@ export function SubmissionSuccess() {
             />
             <StepCard
               icon={<Search size={18} />}
-              title={isComplaint ? 'Review' : 'Track'}
-              text={isComplaint ? 'Barangay staff will review the report.' : 'Use your code to check progress.'}
+              title="Track"
+              text={isComplaint ? 'Use your reference number to check status.' : 'Use your code to check progress.'}
             />
             <StepCard
               icon={<CheckCircle2 size={18} />}
@@ -92,28 +92,18 @@ export function SubmissionSuccess() {
           </div>
 
           <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-            {!isComplaint && (
-              <Link
-                to={trackingCode ? `/track-status?code=${encodeURIComponent(trackingCode)}` : '/track-status'}
-                className="inline-flex items-center justify-center rounded-2xl bg-blue-700 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-blue-800"
-              >
-                Track Request
-              </Link>
-            )}
+            <Link
+              to={trackingCode ? `/track-status?code=${encodeURIComponent(trackingCode)}` : '/track-status'}
+              className="inline-flex items-center justify-center rounded-2xl bg-blue-700 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-blue-800"
+            >
+              {isComplaint ? 'Track Complaint' : 'Track Request'}
+            </Link>
             <Link
               to={isComplaint ? '/submit-complaint' : '/request-document'}
               className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-600 transition-colors hover:bg-slate-50"
             >
               {isComplaint ? 'Submit Another Complaint' : 'Submit Another Request'}
             </Link>
-            {isComplaint && (
-              <Link
-                to="/"
-                className="inline-flex items-center justify-center rounded-2xl bg-blue-700 px-5 py-3 text-sm font-black text-white transition-colors hover:bg-blue-800"
-              >
-                Back to Home
-              </Link>
-            )}
           </div>
         </div>
       </PublicPageShell>
