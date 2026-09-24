@@ -27,6 +27,7 @@ interface DocumentRequestForm {
   contactNumber: string;
   email: string;
   purpose: string;
+  customPurpose: string;
 }
 
 const DOCUMENT_OPTIONS: PublicDocumentOption[] = [
@@ -63,7 +64,7 @@ const PURPOSE_OPTIONS = [
   'Business Requirement',
   'Government Transaction',
   'Legal Transaction',
-  'Other Personal Requirement',
+  'Others',
 ];
 
 const EMPTY_FORM: DocumentRequestForm = {
@@ -75,6 +76,7 @@ const EMPTY_FORM: DocumentRequestForm = {
   contactNumber: '',
   email: '',
   purpose: '',
+  customPurpose: '',
 };
 
 function validateForm(form: DocumentRequestForm): string | null {
@@ -84,6 +86,9 @@ function validateForm(form: DocumentRequestForm): string | null {
   if (form.address.trim().length < 5) return 'Please enter your complete address.';
   if (form.contactNumber.trim().length < 7) return 'Please enter a valid contact number.';
   if (!form.purpose) return 'Please select your purpose of request.';
+  if (form.purpose === 'Others' && form.customPurpose.trim().length < 2) {
+    return 'Please specify your purpose of request.';
+  }
   return null;
 }
 
@@ -135,7 +140,14 @@ export function RequestDocument() {
     field: keyof DocumentRequestForm,
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
-    updateField(field, event.target.value as never);
+    const value = event.target.value;
+    if (field === 'purpose' && value !== 'Others') {
+      setForm((current) => ({ ...current, purpose: value, customPurpose: '' }));
+      setFormError(null);
+      clearError();
+      return;
+    }
+    updateField(field, value as never);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -148,6 +160,11 @@ export function RequestDocument() {
       return;
     }
 
+    const finalPurpose =
+      form.purpose === 'Others'
+        ? form.customPurpose.trim()
+        : form.purpose;
+
     const payload: SubmitDocumentRequestPayload = {
       requesterName: form.requesterName.trim(),
       birthdate: form.birthdate,
@@ -158,7 +175,7 @@ export function RequestDocument() {
       email: form.email.trim() || null,
       documentType: selectedDocument.documentType,
       otherDocumentType: null,
-      purpose: form.purpose,
+      purpose: finalPurpose,
     };
 
     const result = await submit(payload);
@@ -341,6 +358,18 @@ export function RequestDocument() {
                   ))}
                 </Select>
               </div>
+
+              {form.purpose === 'Others' && (
+                <Input
+                  id="customPurpose"
+                  label="Specify Purpose"
+                  requiredMark
+                  value={form.customPurpose}
+                  onChange={(event) => handleInputChange('customPurpose', event)}
+                  placeholder="e.g. Bank Account Opening, Passport Application, Loan Requirement..."
+                  autoFocus
+                />
+              )}
 
               <div className="rounded-xl border border-blue-100 bg-white p-3">
                 <div className="flex items-start gap-2">
